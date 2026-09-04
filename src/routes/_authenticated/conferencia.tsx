@@ -105,31 +105,34 @@ function Conferencia() {
       )}
 
       {(state.status === "review" || state.status === "blocked") && (
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           {state.status === "blocked" && (
-            <p className="bg-destructive/20 text-destructive-foreground mb-6 flex items-center justify-center gap-3 rounded-2xl px-6 py-4 text-2xl font-extrabold">
+            <p className="bg-destructive/20 text-destructive-foreground mb-8 flex items-center justify-center gap-3 rounded-2xl px-6 py-5 text-2xl font-extrabold">
               <AlertTriangle className="size-8" /> KIT JÁ ENTREGUE ANTERIORMENTE
             </p>
           )}
-          <p className="text-primary text-lg font-bold tracking-[0.2em] uppercase">
-            Confira seus dados
-          </p>
-          <h1 className="mt-1 text-5xl leading-tight font-extrabold sm:text-6xl">{state.name}</h1>
-          <p className="text-sidebar-foreground/70 mt-2 text-xl">{state.eventName}</p>
 
-          <dl className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <Big label="Nº de peito" value={state.bib} />
+          <div className="text-center">
+            <p className="text-primary text-lg font-bold tracking-[0.2em] uppercase">
+              Confira seus dados
+            </p>
+            <h1 className="mt-2 text-6xl leading-tight font-extrabold sm:text-7xl">{state.name}</h1>
+            <p className="text-sidebar-foreground/70 mt-2 text-xl">{state.eventName}</p>
+          </div>
+
+          <dl className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Big label="Número de peito" value={state.bib} highlight />
+            <Big label="Kit" value={state.kit} highlight />
             <Big label="Camiseta" value={state.shirt} />
             <Big label="Modalidade" value={state.modality} />
             <Big label="Categoria" value={state.category} />
-            <Big label="Kit" value={state.kit} />
             <Big label="Inscrição" value={state.registration} />
             {(state.fields ?? []).map((f) => (
               <Big key={f.label} label={f.label} value={f.value} />
             ))}
           </dl>
 
-          <p className="text-sidebar-foreground/70 mt-10 text-xl">
+          <p className="text-sidebar-foreground/70 mt-12 text-center text-xl">
             Se algum dado estiver incorreto, avise o atendente antes de receber o kit.
           </p>
         </div>
