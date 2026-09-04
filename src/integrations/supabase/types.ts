@@ -479,6 +479,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cpf: string | null
           created_at: string
           email: string
           id: string
@@ -486,6 +487,7 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          cpf?: string | null
           created_at?: string
           email?: string
           id: string
@@ -493,6 +495,7 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          cpf?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -606,6 +609,7 @@ export type Database = {
           shirt_size: string
         }[]
       }
+      shares_managed_event: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "organizer" | "attendant"
