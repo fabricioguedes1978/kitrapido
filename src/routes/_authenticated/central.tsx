@@ -48,8 +48,12 @@ export const Route = createFileRoute("/_authenticated/central")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    atleta: typeof search["atleta"] === "string" ? (search["atleta"] as string) : undefined,
+  }),
   component: Central,
 });
+
 
 type Athlete = {
   id: string;
