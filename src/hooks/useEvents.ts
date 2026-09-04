@@ -16,6 +16,7 @@ export type EventRow = {
   modalities: string[];
   custom_field_labels: string[];
   status: string;
+  archived: boolean;
   created_at: string;
 };
 
