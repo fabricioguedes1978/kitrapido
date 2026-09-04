@@ -10,33 +10,157 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ConsultaRouteImport } from './routes/consulta'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
+import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated/central'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticated/eventos'
+import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
+import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultaRoute = ConsultaRouteImport.update({
+  id: '/consulta',
+  path: '/consulta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAtletasRoute = AuthenticatedAtletasRouteImport.update({
+  id: '/atletas',
+  path: '/atletas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCentralRoute = AuthenticatedCentralRouteImport.update({
+  id: '/central',
+  path: '/central',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEventosRoute = AuthenticatedEventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKitsRoute = AuthenticatedKitsRouteImport.update({
+  id: '/kits',
+  path: '/kits',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
+  id: '/evento/$slug/kit',
+  path: '/evento/$slug/kit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/consulta': typeof ConsultaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/atletas': typeof AuthenticatedAtletasRoute
+  '/central': typeof AuthenticatedCentralRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/eventos': typeof AuthenticatedEventosRoute
+  '/kits': typeof AuthenticatedKitsRoute
+  '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/consulta': typeof ConsultaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/atletas': typeof AuthenticatedAtletasRoute
+  '/central': typeof AuthenticatedCentralRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/eventos': typeof AuthenticatedEventosRoute
+  '/kits': typeof AuthenticatedKitsRoute
+  '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/consulta': typeof ConsultaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
+  '/_authenticated/central': typeof AuthenticatedCentralRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/eventos': typeof AuthenticatedEventosRoute
+  '/_authenticated/kits': typeof AuthenticatedKitsRoute
+  '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/consulta'
+    | '/reset-password'
+    | '/atletas'
+    | '/central'
+    | '/dashboard'
+    | '/eventos'
+    | '/kits'
+    | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/consulta'
+    | '/reset-password'
+    | '/atletas'
+    | '/central'
+    | '/dashboard'
+    | '/eventos'
+    | '/kits'
+    | '/evento/$slug/kit'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/consulta'
+    | '/reset-password'
+    | '/_authenticated/atletas'
+    | '/_authenticated/central'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/eventos'
+    | '/_authenticated/kits'
+    | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ConsultaRoute: typeof ConsultaRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  EventoSlugKitRoute: typeof EventoSlugKitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +172,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consulta': {
+      id: '/consulta'
+      path: '/consulta'
+      fullPath: '/consulta'
+      preLoaderRoute: typeof ConsultaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/atletas': {
+      id: '/_authenticated/atletas'
+      path: '/atletas'
+      fullPath: '/atletas'
+      preLoaderRoute: typeof AuthenticatedAtletasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/central': {
+      id: '/_authenticated/central'
+      path: '/central'
+      fullPath: '/central'
+      preLoaderRoute: typeof AuthenticatedCentralRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/eventos': {
+      id: '/_authenticated/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof AuthenticatedEventosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/kits': {
+      id: '/_authenticated/kits'
+      path: '/kits'
+      fullPath: '/kits'
+      preLoaderRoute: typeof AuthenticatedKitsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/evento/$slug/kit': {
+      id: '/evento/$slug/kit'
+      path: '/evento/$slug/kit'
+      fullPath: '/evento/$slug/kit'
+      preLoaderRoute: typeof EventoSlugKitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAtletasRoute: typeof AuthenticatedAtletasRoute
+  AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEventosRoute: typeof AuthenticatedEventosRoute
+  AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAtletasRoute: AuthenticatedAtletasRoute,
+  AuthenticatedCentralRoute: AuthenticatedCentralRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEventosRoute: AuthenticatedEventosRoute,
+  AuthenticatedKitsRoute: AuthenticatedKitsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ConsultaRoute: ConsultaRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  EventoSlugKitRoute: EventoSlugKitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
