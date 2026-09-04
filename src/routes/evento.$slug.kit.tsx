@@ -1,15 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, Ticket } from "lucide-react";
+import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatDateTime } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
+import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
+
 
 export const Route = createFileRoute("/evento/$slug/kit")({
   ssr: false,
