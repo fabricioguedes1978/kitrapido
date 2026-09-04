@@ -128,14 +128,24 @@ function MeuKit() {
                 ))}
               </dl>
 
-              {!delivered && (
-                <div className="bg-card flex flex-col items-center gap-2 rounded-xl border p-5">
-                  <QRCodeSVG value={result.qr_payload} size={192} level="M" />
-                  <p className="text-muted-foreground text-xs">
-                    Apresente este QR Code no local de retirada.
-                  </p>
+              <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
+                <div ref={qrRef}>
+                  <QRCodeSVG value={scanUrl} size={192} level="M" />
                 </div>
-              )}
+                <p className="text-muted-foreground text-center text-xs">
+                  Apresente este QR Code no local de retirada. O atendente lê e o kit é baixado no
+                  sistema.
+                </p>
+                <div className="grid w-full grid-cols-2 gap-2">
+                  <Button variant="outline" onClick={() => void saveCredential("png")}>
+                    <ImageIcon className="size-4" /> Salvar imagem
+                  </Button>
+                  <Button variant="outline" onClick={() => void saveCredential("pdf")}>
+                    <FileDown className="size-4" /> Salvar PDF
+                  </Button>
+                </div>
+              </div>
+
             </CardContent>
           </Card>
         )}
