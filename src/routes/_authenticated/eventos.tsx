@@ -398,6 +398,23 @@ function Eventos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={!!removing} onOpenChange={(v) => !v && setRemoving(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir o evento {removing?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é definitiva e apaga também atletas, kits, estoque e entregas desse evento. Se
+              quiser apenas esconder o evento de todos, use "Inativar".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction disabled={busy} onClick={() => void removeEvent()}>
+              Excluir definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
