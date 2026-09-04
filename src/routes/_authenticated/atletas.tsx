@@ -205,19 +205,37 @@ function Atletas() {
 
     if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
 
+    const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
+    const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
+    let dupCpfCount = 0;
+    let dupBibCount = 0;
+    const unique = parsed.filter((row) => {
+      const cpf = row.cpf ?? "";
+      const bib = row.bib_number ?? "";
+      if (cpf && seenCpf.has(cpf)) { dupCpfCount++; return false; }
+      if (bib && seenBib.has(bib)) { dupBibCount++; return false; }
+      if (cpf) seenCpf.add(cpf);
+      if (bib) seenBib.add(bib);
+      return true;
+    });
+
     let inserted = 0;
-    let duplicates = 0;
-    for (let i = 0; i < parsed.length; i += 200) {
-      const chunk = parsed.slice(i, i + 200);
+    const duplicates = dupCpfCount + dupBibCount;
+    for (let i = 0; i < unique.length; i += 200) {
+      const chunk = unique.slice(i, i + 200);
       const { error, count } = await supabase
         .from("athletes")
         .upsert(chunk, { onConflict: "event_id,cpf", ignoreDuplicates: true, count: "exact" });
       if (error) {
-        toast.error("Erro na importação", { description: error.message });
+        toast.error("Erro na importação", {
+          description:
+            error.code === "23505"
+              ? "Existem CPFs ou números de peito repetidos na planilha ou já cadastrados."
+              : error.message,
+        });
         break;
       }
       inserted += count ?? chunk.length;
-      duplicates += chunk.length - (count ?? chunk.length);
     }
     void logAudit({
       eventId,
