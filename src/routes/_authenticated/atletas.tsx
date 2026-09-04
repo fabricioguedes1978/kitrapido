@@ -245,7 +245,12 @@ function Atletas() {
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setImporting(false);
-    toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`);
+    toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
+      description:
+        duplicates > 0
+          ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
+          : undefined,
+    });
   }
 
   function handleFile(file: File) {
