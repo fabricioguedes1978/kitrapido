@@ -1,15 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, Ticket } from "lucide-react";
+import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatDateTime } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
+import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
+
 
 export const Route = createFileRoute("/evento/$slug/kit")({
   ssr: false,
@@ -50,6 +53,7 @@ function MeuKit() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<KitInfo | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
@@ -63,6 +67,38 @@ function MeuKit() {
   }
 
   const delivered = result && result.kit_status !== "pending" && result.kit_status !== "blocked";
+  const eventIdFromPayload = result?.qr_payload?.split(":")[1] ?? "";
+  const scanUrl = result ? athleteQrUrl(eventIdFromPayload, result.athlete_id) : "";
+
+  async function saveCredential(kind: "png" | "pdf") {
+    const svg = qrRef.current?.querySelector("svg");
+    if (!result || !svg) return;
+    const data = {
+      eventName: result.event_name,
+      name: result.name,
+      rows: [
+        { label: "Nº de peito", value: result.bib_number || "—" },
+        { label: "Modalidade", value: result.modality || "—" },
+        { label: "Camiseta", value: result.shirt_size || "—" },
+        { label: "Kit", value: result.kit_type || "—" },
+        ...customFields(result.custom_labels, result.custom_values ?? []).map((f) => ({
+          label: f.label,
+          value: f.value,
+        })),
+      ],
+      footer: delivered
+        ? "Kit já retirado"
+        : "Apresente este QR Code na retirada do kit",
+    };
+    const base = `credencial-${result.name.toLowerCase().replace(/\s+/g, "-")}`;
+    try {
+      if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
+      else await downloadCredentialPdf(data, svg, `${base}.pdf`);
+    } catch {
+      toast.error("Não foi possível gerar o arquivo. Tente novamente.");
+    }
+  }
+
 
   return (
     <div className="bg-background min-h-screen">
@@ -128,14 +164,24 @@ function MeuKit() {
                 ))}
               </dl>
 
-              {!delivered && (
-                <div className="bg-card flex flex-col items-center gap-2 rounded-xl border p-5">
-                  <QRCodeSVG value={result.qr_payload} size={192} level="M" />
-                  <p className="text-muted-foreground text-xs">
-                    Apresente este QR Code no local de retirada.
-                  </p>
+              <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
+                <div ref={qrRef}>
+                  <QRCodeSVG value={scanUrl} size={192} level="M" />
                 </div>
-              )}
+                <p className="text-muted-foreground text-center text-xs">
+                  Apresente este QR Code no local de retirada. O atendente lê e o kit é baixado no
+                  sistema.
+                </p>
+                <div className="grid w-full grid-cols-2 gap-2">
+                  <Button variant="outline" onClick={() => void saveCredential("png")}>
+                    <ImageIcon className="size-4" /> Salvar imagem
+                  </Button>
+                  <Button variant="outline" onClick={() => void saveCredential("pdf")}>
+                    <FileDown className="size-4" /> Salvar PDF
+                  </Button>
+                </div>
+              </div>
+
             </CardContent>
           </Card>
         )}

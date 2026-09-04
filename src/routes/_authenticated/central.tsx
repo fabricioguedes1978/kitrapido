@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -48,8 +48,11 @@ export const Route = createFileRoute("/_authenticated/central")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { atleta?: string } =>
+    typeof search["atleta"] === "string" ? { atleta: search["atleta"] as string } : {},
   component: Central,
 });
+
 
 type Athlete = {
   id: string;
@@ -114,6 +117,22 @@ function Central() {
   });
 
   const roster = athletes.length > 0 ? athletes : readCachedAthletes<Athlete>(eventId ?? "");
+
+  // Abertura direta pelo QR Code do atleta (/central?atleta=<id>)
+  const { atleta } = Route.useSearch();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!atleta || roster.length === 0) return;
+    const found = roster.find((a) => a.id === atleta);
+    if (found) {
+      setSelected(found);
+      setMethod("qrcode");
+    } else {
+      toast.error("Atleta não encontrado neste evento. Selecione o evento correspondente.");
+    }
+    void navigate({ to: "/central", search: {}, replace: true });
+  }, [atleta, roster, navigate]);
+
 
   const { data: deliveries = [] } = useQuery({
     queryKey: ["deliveries", eventId],

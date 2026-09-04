@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Download, Plus, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { downloadCredentialPng } from "@/lib/credential";
+
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventsQuery, type EventRow } from "@/hooks/useEvents";
-import { EVENT_STATUS, formatDate, logAudit, slugify } from "@/lib/cronochip";
+import { EVENT_STATUS, checkinUrl, formatDate, logAudit, slugify } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/eventos")({
   head: () => ({
@@ -57,6 +60,28 @@ function Eventos() {
   const [editing, setEditing] = useState<EventRow | null>(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [poster, setPoster] = useState<EventRow | null>(null);
+  const posterRef = useRef<HTMLDivElement>(null);
+
+  async function downloadPoster() {
+    const svg = posterRef.current?.querySelector("svg");
+    if (!poster || !svg) return;
+    await downloadCredentialPng(
+      {
+        eventName: poster.name,
+        name: "CHECK-IN DO ATLETA",
+        rows: [
+          { label: "Como usar", value: "Aponte a câmera do celular" },
+          { label: "Depois", value: "Informe CPF ou inscrição" },
+          { label: "Resultado", value: "Seus dados e o QR do kit" },
+        ],
+        footer: checkinUrl(poster.slug),
+      },
+      svg,
+      `qr-checkin-${poster.slug}.png`,
+    );
+  }
+
 
   function openNew() {
     setEditing(null);
@@ -158,9 +183,12 @@ function Eventos() {
                   ))}
                 </div>
               )}
-              <div className="flex gap-2 pt-2">
+              <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
                   Editar
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setPoster(e)}>
+                  <QrCode className="size-4" /> QR de check-in
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <a href={`/evento/${e.slug}/kit`} target="_blank" rel="noreferrer">
@@ -168,6 +196,7 @@ function Eventos() {
                   </a>
                 </Button>
               </div>
+
             </CardContent>
           </Card>
         ))}
@@ -176,7 +205,28 @@ function Eventos() {
         )}
       </div>
 
+      <Dialog open={!!poster} onOpenChange={(v) => !v && setPoster(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>QR de check-in — {poster?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-3">
+            <div ref={posterRef} className="rounded-xl border bg-white p-4">
+              {poster && <QRCodeSVG value={checkinUrl(poster.slug)} size={220} level="M" />}
+            </div>
+            <p className="text-muted-foreground text-center text-xs">
+              Imprima e coloque no local do evento. O atleta aponta a câmera, confere os dados e salva
+              a credencial com o QR Code que o atendente lê para dar baixa no kit.
+            </p>
+            <Button className="w-full" onClick={() => void downloadPoster()}>
+              <Download className="size-4" /> Baixar cartaz em imagem
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={open} onOpenChange={setOpen}>
+
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar evento" : "Novo evento"}</DialogTitle>
