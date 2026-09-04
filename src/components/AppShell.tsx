@@ -17,6 +17,7 @@ import {
   Menu,
   ClipboardList,
   MonitorSmartphone,
+  ImageUp,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
