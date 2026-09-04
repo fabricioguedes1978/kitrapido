@@ -188,6 +188,32 @@ function Central() {
     (d) => d.status === "active" && new Date(d.delivered_at).toDateString() === new Date().toDateString(),
   ).length;
 
+  const extras = selected
+    ? customFields(event?.custom_field_labels, [
+        selected.custom_1,
+        selected.custom_2,
+        selected.custom_3,
+        selected.custom_4,
+        selected.custom_5,
+      ])
+    : [];
+
+  useEffect(() => {
+    if (!selected) return;
+    publishDisplay({
+      status: activeDelivery || queuedOffline ? "blocked" : "review",
+      eventName: event?.name ?? null,
+      name: selected.name,
+      bib: selected.bib_number,
+      shirt: selected.shirt_size,
+      modality: selected.modality,
+      category: selected.category,
+      kit: selected.kit_type,
+      registration: selected.registration_number,
+      fields: extras,
+    });
+  }, [selected, activeDelivery, queuedOffline, event?.name, extras]);
+
   function handleScan(raw: string) {
     const parsed = parseQrPayload(raw);
     setMethod("qrcode");
@@ -267,6 +293,12 @@ function Central() {
       bib: selected!.bib_number,
       at: new Date().toISOString(),
     });
+    publishDisplay({
+      status: "delivered",
+      eventName: event?.name ?? null,
+      name: selected!.name,
+      bib: selected!.bib_number,
+    });
     setConfirming(false);
     setSelected(null);
     setTerm("");
@@ -274,6 +306,7 @@ function Central() {
     setMethod("busca");
     setTimeout(() => {
       setSuccess(null);
+      publishDisplay({ status: "idle" });
       inputRef.current?.focus();
     }, 4000);
   }
@@ -463,6 +496,9 @@ function Central() {
                 <Info label="Modalidade" value={selected.modality} />
                 <Info label="Categoria" value={selected.category} />
                 <Info label="Inscrição" value={selected.registration_number} />
+                {extras.map((f) => (
+                  <Info key={f.label} label={f.label} value={f.value} />
+                ))}
               </dl>
 
               {locations.length > 0 && (
