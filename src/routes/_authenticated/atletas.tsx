@@ -274,6 +274,67 @@ function Atletas() {
         }}
       />
 
+      <Card className="mb-4">
+        <CardContent className="p-4">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") fileRef.current?.click();
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) handleFile(f);
+            }}
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+              dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"
+            }`}
+          >
+            <Upload className="text-primary size-8" />
+            <p className="mt-3 text-sm font-semibold">
+              {importing
+                ? "Importando arquivo…"
+                : "Arraste a planilha aqui ou clique para selecionar"}
+            </p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, cpf, e-mail, telefone, inscrição,
+              peito, modalidade, categoria, distância, camiseta e kit.
+            </p>
+            {lastFile && !importing && (
+              <p className="text-muted-foreground mt-2 text-xs">Último arquivo: {lastFile}</p>
+            )}
+          </div>
+          <div className="mt-3 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                downloadBlob(
+                  "\uFEFF" +
+                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit\n" +
+                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão\n",
+                  "modelo-atletas.csv",
+                  "text/csv;charset=utf-8",
+                );
+              }}
+            >
+              <Download className="size-4" /> Baixar planilha modelo
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+
+
       <Input
         placeholder="Buscar por nome, CPF, inscrição ou nº de peito"
         value={term}
