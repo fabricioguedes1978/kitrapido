@@ -126,7 +126,6 @@ function Conferencia() {
             <Big label="Camiseta" value={state.shirt} />
             <Big label="Modalidade" value={state.modality} />
             <Big label="Categoria" value={state.category} />
-            <Big label="Inscrição" value={state.registration} />
             {(state.fields ?? []).map((f) => (
               <Big key={f.label} label={f.label} value={f.value} />
             ))}
