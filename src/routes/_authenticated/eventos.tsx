@@ -164,8 +164,8 @@ function Eventos() {
             <CardContent className="space-y-2 py-5">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                 <h2 className="min-w-0 truncate text-lg font-bold">{e.name}</h2>
-                <Badge variant="secondary" className="shrink-0">
-                  {EVENT_STATUS[e.status] ?? e.status}
+                <Badge variant={e.archived ? "destructive" : "secondary"} className="shrink-0">
+                  {e.archived ? "Inativo" : (EVENT_STATUS[e.status] ?? e.status)}
                 </Badge>
               </div>
               <p className="text-muted-foreground text-sm">
