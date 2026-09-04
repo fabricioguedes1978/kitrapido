@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { onlyDigits } from "@/lib/cronochip";
+import { cpfLogin } from "@/lib/team.functions";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -40,7 +42,10 @@ function AuthPage() {
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    const typed = email.trim();
+    const digits = onlyDigits(typed);
+    const identifier = digits.length === 11 && !typed.includes("@") ? cpfLogin(digits) : typed;
+    const { error } = await supabase.auth.signInWithPassword({ email: identifier, password });
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
     navigate({ to: "/central", replace: true });
@@ -95,11 +100,11 @@ function AuthPage() {
             <TabsContent value="login">
               <form className="space-y-4" onSubmit={signIn}>
                 <div className="space-y-1.5">
-                  <Label htmlFor="email">E-mail</Label>
+                  <Label htmlFor="email">E-mail ou CPF</Label>
                   <Input
                     id="email"
-                    type="email"
-                    autoComplete="email"
+                    type="text"
+                    autoComplete="username"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
