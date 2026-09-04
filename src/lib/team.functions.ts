@@ -72,8 +72,15 @@ export const saveEventTeamUser = createServerFn({ method: "POST" })
         { onConflict: "id" },
       );
 
-    await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
-    await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: data.role });
+    const { data: currentRoles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const isAdminUser = (currentRoles ?? []).some((r) => r.role === "admin");
+    if (!isAdminUser) {
+      await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
+      await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: data.role });
+    }
 
     const { data: member } = await supabaseAdmin
       .from("event_members")
