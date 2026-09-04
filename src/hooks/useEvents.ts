@@ -14,6 +14,7 @@ export type EventRow = {
   description: string | null;
   logo_url: string | null;
   modalities: string[];
+  custom_field_labels: string[];
   status: string;
   created_at: string;
 };
