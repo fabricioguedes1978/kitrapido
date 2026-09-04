@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/relatorios")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: Relatorios;
+  component: Relatorios,
 });
 
 type Row = Record<string, string | number | null>;
