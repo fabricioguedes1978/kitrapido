@@ -114,7 +114,7 @@ export function EventSelector({ className }: { className?: string }) {
   const { events, eventId, select } = useCurrentEvent();
   if (events.length === 0) return null;
   return (
-    <Select value={eventId ?? undefined} onValueChange={select}>
+    <Select value={eventId ?? ""} onValueChange={select}>
       <SelectTrigger className={cn("h-9 w-full max-w-[16rem]", className)}>
         <SelectValue placeholder="Selecione o evento" />
       </SelectTrigger>
