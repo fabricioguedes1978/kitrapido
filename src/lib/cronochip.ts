@@ -72,8 +72,34 @@ export function qrPayload(eventId: string, athleteId: string) {
   return `CRONOCHIP:${eventId}:${athleteId}`;
 }
 
+/** URL que o atendente abre ao ler o QR do atleta (funciona na câmera do celular). */
+export function athleteQrUrl(eventId: string, athleteId: string, origin?: string) {
+  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}/central?atleta=${athleteId}&e=${eventId}`;
+}
+
+/** URL pública de check-in do evento (QR do cartaz). */
+export function checkinUrl(slug: string, origin?: string) {
+  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}/evento/${slug}/kit`;
+}
+
 export function parseQrPayload(raw: string) {
-  const parts = raw.trim().split(":");
+  const value = raw.trim();
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      const url = new URL(value);
+      const athleteId = url.searchParams.get("atleta");
+      if (athleteId) {
+        return { kind: "athlete" as const, eventId: url.searchParams.get("e") ?? "", athleteId };
+      }
+      const code = url.searchParams.get("auth");
+      if (code) return { kind: "third_party" as const, code };
+    } catch {
+      /* ignora URL inválida */
+    }
+  }
+  const parts = value.split(":");
   if (parts[0] === "CRONOCHIP" && parts.length >= 3) {
     return { kind: "athlete" as const, eventId: parts[1]!, athleteId: parts[2]! };
   }
@@ -82,6 +108,7 @@ export function parseQrPayload(raw: string) {
   }
   return null;
 }
+
 
 export function formatDateTime(value?: string | null) {
   if (!value) return "—";
