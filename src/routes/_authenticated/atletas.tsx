@@ -97,6 +97,9 @@ function Atletas() {
   const [term, setTerm] = useState("");
   const [qrAthlete, setQrAthlete] = useState<Athlete | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [lastFile, setLastFile] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
 
   const { data: athletes = [], isLoading } = useQuery({
@@ -157,7 +160,7 @@ function Atletas() {
         kit_type: r["kit_type"] ?? null,
       }));
 
-    if (parsed.length === 0) { toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
+    if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
 
     let inserted = 0;
     let duplicates = 0;
@@ -180,11 +183,16 @@ function Atletas() {
       userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
+    setImporting(false);
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`);
   }
 
   function handleFile(file: File) {
     const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
+    if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
+    setLastFile(file.name);
+    setImporting(true);
     if (ext === "csv") {
       Papa.parse<Record<string, unknown>>(file, {
         header: true,
@@ -265,6 +273,67 @@ function Atletas() {
           e.target.value = "";
         }}
       />
+
+      <Card className="mb-4">
+        <CardContent className="p-4">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") fileRef.current?.click();
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) handleFile(f);
+            }}
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+              dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"
+            }`}
+          >
+            <Upload className="text-primary size-8" />
+            <p className="mt-3 text-sm font-semibold">
+              {importing
+                ? "Importando arquivo…"
+                : "Arraste a planilha aqui ou clique para selecionar"}
+            </p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, cpf, e-mail, telefone, inscrição,
+              peito, modalidade, categoria, distância, camiseta e kit.
+            </p>
+            {lastFile && !importing && (
+              <p className="text-muted-foreground mt-2 text-xs">Último arquivo: {lastFile}</p>
+            )}
+          </div>
+          <div className="mt-3 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                downloadBlob(
+                  "\uFEFF" +
+                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit\n" +
+                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão\n",
+                  "modelo-atletas.csv",
+                  "text/csv;charset=utf-8",
+                );
+              }}
+            >
+              <Download className="size-4" /> Baixar planilha modelo
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+
 
       <Input
         placeholder="Buscar por nome, CPF, inscrição ou nº de peito"
