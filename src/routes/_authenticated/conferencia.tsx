@@ -141,13 +141,29 @@ function Conferencia() {
   );
 }
 
-function Big({ label, value }: { label: string; value?: string | null | undefined }) {
+function Big({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value?: string | null | undefined;
+  highlight?: boolean;
+}) {
   return (
-    <div className="bg-sidebar-accent/30 min-w-0 rounded-2xl p-5">
+    <div
+      className={`min-w-0 rounded-2xl p-6 ${
+        highlight
+          ? "bg-primary/20 ring-primary/30 ring-2"
+          : "bg-sidebar-accent/30"
+      }`}
+    >
       <dt className="text-sidebar-foreground/60 text-sm font-semibold tracking-wide uppercase">
         {label}
       </dt>
-      <dd className="mt-1 text-3xl font-extrabold break-words">{value || "—"}</dd>
+      <dd className={`mt-2 break-words font-extrabold ${highlight ? "text-5xl" : "text-3xl"}`}>
+        {value || "—"}
+      </dd>
     </div>
   );
 }
