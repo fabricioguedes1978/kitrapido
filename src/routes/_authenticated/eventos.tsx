@@ -57,6 +57,28 @@ function Eventos() {
   const [editing, setEditing] = useState<EventRow | null>(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [poster, setPoster] = useState<EventRow | null>(null);
+  const posterRef = useRef<HTMLDivElement>(null);
+
+  async function downloadPoster() {
+    const svg = posterRef.current?.querySelector("svg");
+    if (!poster || !svg) return;
+    await downloadCredentialPng(
+      {
+        eventName: poster.name,
+        name: "CHECK-IN DO ATLETA",
+        rows: [
+          { label: "Como usar", value: "Aponte a câmera do celular" },
+          { label: "Depois", value: "Informe CPF ou inscrição" },
+          { label: "Resultado", value: "Seus dados e o QR do kit" },
+        ],
+        footer: checkinUrl(poster.slug),
+      },
+      svg,
+      `qr-checkin-${poster.slug}.png`,
+    );
+  }
+
 
   function openNew() {
     setEditing(null);
