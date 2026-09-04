@@ -269,7 +269,15 @@ function Atletas() {
       modality: form.modality || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
     });
-    if (error) { toast.error("Não foi possível cadastrar", { description: error.message }); return; }
+    if (error) {
+      const dup = error.code === "23505";
+      const msg = dup
+        ? "CPF ou nº de peito já cadastrado neste evento."
+        : error.message;
+      if (dup) setDupWarning(msg);
+      toast.error("Não foi possível cadastrar", { description: msg });
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
     setForm({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
