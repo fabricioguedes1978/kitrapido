@@ -168,17 +168,43 @@ function TelaAtleta() {
           <CardContent className="pt-6">
             <p className="text-muted-foreground mb-3 text-sm font-medium">Pré-visualização</p>
             <div
-              className="bg-dark-gradient relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-cover bg-center"
+              className="bg-dark-gradient relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-cover bg-center p-8"
               style={bg.image ? { backgroundImage: `url(${bg.image})` } : undefined}
             >
               <div
                 className="absolute inset-0 bg-black"
                 style={{ opacity: bg.image ? bg.dim / 100 : 0 }}
               />
-              <div className="relative text-center text-white">
+              <div className="relative w-full max-w-3xl text-center text-white">
                 <p className="text-xs font-bold tracking-[0.2em] uppercase">Confira seus dados</p>
-                <p className="mt-1 text-2xl font-extrabold">Nome do Atleta</p>
-                <p className="text-sm opacity-80">Nº 1234 · Camiseta M</p>
+                <p className="mt-1 text-3xl font-extrabold">Nome do Atleta</p>
+                <p className="text-sm opacity-80">Prova Exemplo — Cronochip</p>
+                <div className="mt-6 grid grid-cols-3 gap-3 text-left">
+                  <div className="rounded-xl bg-white/10 p-3">
+                    <p className="text-[10px] uppercase opacity-70">Número de peito</p>
+                    <p className="text-xl font-extrabold">1234</p>
+                  </div>
+                  <div className="rounded-xl bg-primary/30 p-3 ring-1 ring-primary/40">
+                    <p className="text-[10px] uppercase opacity-90">Kit</p>
+                    <p className="text-xl font-extrabold">Completo</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-3">
+                    <p className="text-[10px] uppercase opacity-70">Camiseta</p>
+                    <p className="text-xl font-extrabold">M</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-3">
+                    <p className="text-[10px] uppercase opacity-70">Modalidade</p>
+                    <p className="text-xl font-extrabold">Corrida</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-3">
+                    <p className="text-[10px] uppercase opacity-70">Categoria</p>
+                    <p className="text-xl font-extrabold">Geral</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-3">
+                    <p className="text-[10px] uppercase opacity-70">Inscrição</p>
+                    <p className="text-xl font-extrabold">CR-001</p>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
