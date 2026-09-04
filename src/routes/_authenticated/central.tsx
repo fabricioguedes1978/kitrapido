@@ -188,15 +188,20 @@ function Central() {
     (d) => d.status === "active" && new Date(d.delivered_at).toDateString() === new Date().toDateString(),
   ).length;
 
-  const extras = selected
-    ? customFields(event?.custom_field_labels, [
-        selected.custom_1,
-        selected.custom_2,
-        selected.custom_3,
-        selected.custom_4,
-        selected.custom_5,
-      ])
-    : [];
+  const labelsKey = (event?.custom_field_labels ?? []).join("|");
+  const extras = useMemo(
+    () =>
+      selected
+        ? customFields(labelsKey.split("|"), [
+            selected.custom_1,
+            selected.custom_2,
+            selected.custom_3,
+            selected.custom_4,
+            selected.custom_5,
+          ])
+        : [],
+    [selected, labelsKey],
+  );
 
   useEffect(() => {
     if (!selected) return;
@@ -352,6 +357,14 @@ function Central() {
           <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
           <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
           <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => window.open("/conferencia", "cronochip-display")}
+          >
+            <MonitorSmartphone className="size-4" /> Abrir tela de conferência do atleta
+          </Button>
         </header>
 
         {!selected && (
@@ -554,6 +567,7 @@ function Central() {
                     onClick={() => {
                       setSelected(null);
                       setAsThirdParty(false);
+                      publishDisplay({ status: "idle" });
                     }}
                   >
                     <X className="size-5" /> Voltar
