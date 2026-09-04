@@ -58,9 +58,16 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  custom_1?: string | null;
+  custom_2?: string | null;
+  custom_3?: string | null;
+  custom_4?: string | null;
+  custom_5?: string | null;
 };
 
-const COLUMN_MAP: Record<string, keyof Athlete | "distance"> = {
+const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"] as const;
+
+const COLUMN_MAP: Record<string, string> = {
   nome: "name",
   atleta: "name",
   cpf: "cpf",
@@ -145,11 +152,15 @@ function Atletas() {
 
   async function importRows(rows: Record<string, unknown>[]) {
     if (!eventId) return;
+    const map: Record<string, string> = { ...COLUMN_MAP };
+    (event?.custom_field_labels ?? []).forEach((label, i) => {
+      if (label?.trim()) map[normalizeKey(label)] = CUSTOM_KEYS[i]!;
+    });
     const parsed = rows
       .map((row) => {
         const out: Record<string, string | null> = {};
         Object.entries(row).forEach(([key, value]) => {
-          const mapped = COLUMN_MAP[normalizeKey(key)];
+          const mapped = map[normalizeKey(key)];
           if (mapped) out[mapped] = value == null || value === "" ? null : String(value).trim();
         });
         return out;
