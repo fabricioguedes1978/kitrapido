@@ -46,6 +46,7 @@ const EMPTY = {
   description: "",
   modalities: "",
   status: "planning",
+  custom_field_labels: ["", "", "", "", ""] as string[],
 };
 
 function Eventos() {
@@ -75,6 +76,7 @@ function Eventos() {
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
+      custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
   }
