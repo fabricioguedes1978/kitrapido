@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConsultaRouteImport } from './routes/consulta'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
+import { Route as AuthenticatedAutorizacoesRouteImport } from './routes/_authenticated/autorizacoes'
 import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated/central'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
@@ -53,6 +54,12 @@ const AuthenticatedAtletasRoute = AuthenticatedAtletasRouteImport.update({
   path: '/atletas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAutorizacoesRoute =
+  AuthenticatedAutorizacoesRouteImport.update({
+    id: '/autorizacoes',
+    path: '/autorizacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentralRoute = AuthenticatedCentralRouteImport.update({
   id: '/central',
   path: '/central',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/atletas': typeof AuthenticatedAtletasRoute
+  '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/entregas': typeof AuthenticatedEntregasRoute
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/atletas': typeof AuthenticatedAtletasRoute
+  '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/entregas': typeof AuthenticatedEntregasRoute
@@ -132,6 +141,7 @@ export interface FileRoutesById {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
+  '/_authenticated/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/_authenticated/central': typeof AuthenticatedCentralRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/atletas'
+    | '/autorizacoes'
     | '/central'
     | '/dashboard'
     | '/entregas'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/atletas'
+    | '/autorizacoes'
     | '/central'
     | '/dashboard'
     | '/entregas'
@@ -180,6 +192,7 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/_authenticated/atletas'
+    | '/_authenticated/autorizacoes'
     | '/_authenticated/central'
     | '/_authenticated/dashboard'
     | '/_authenticated/entregas'
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAtletasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/autorizacoes': {
+      id: '/_authenticated/autorizacoes'
+      path: '/autorizacoes'
+      fullPath: '/autorizacoes'
+      preLoaderRoute: typeof AuthenticatedAutorizacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/central': {
       id: '/_authenticated/central'
       path: '/central'
@@ -304,6 +324,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAtletasRoute: typeof AuthenticatedAtletasRoute
+  AuthenticatedAutorizacoesRoute: typeof AuthenticatedAutorizacoesRoute
   AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
@@ -315,6 +336,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAtletasRoute: AuthenticatedAtletasRoute,
+  AuthenticatedAutorizacoesRoute: AuthenticatedAutorizacoesRoute,
   AuthenticatedCentralRoute: AuthenticatedCentralRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
