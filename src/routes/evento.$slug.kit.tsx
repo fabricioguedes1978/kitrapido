@@ -53,6 +53,7 @@ function MeuKit() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<KitInfo | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
@@ -66,6 +67,38 @@ function MeuKit() {
   }
 
   const delivered = result && result.kit_status !== "pending" && result.kit_status !== "blocked";
+  const eventIdFromPayload = result?.qr_payload?.split(":")[1] ?? "";
+  const scanUrl = result ? athleteQrUrl(eventIdFromPayload, result.athlete_id) : "";
+
+  async function saveCredential(kind: "png" | "pdf") {
+    const svg = qrRef.current?.querySelector("svg");
+    if (!result || !svg) return;
+    const data = {
+      eventName: result.event_name,
+      name: result.name,
+      rows: [
+        { label: "Nº de peito", value: result.bib_number || "—" },
+        { label: "Modalidade", value: result.modality || "—" },
+        { label: "Camiseta", value: result.shirt_size || "—" },
+        { label: "Kit", value: result.kit_type || "—" },
+        ...customFields(result.custom_labels, result.custom_values ?? []).map((f) => ({
+          label: f.label,
+          value: f.value,
+        })),
+      ],
+      footer: delivered
+        ? "Kit já retirado"
+        : "Apresente este QR Code na retirada do kit",
+    };
+    const base = `credencial-${result.name.toLowerCase().replace(/\s+/g, "-")}`;
+    try {
+      if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
+      else await downloadCredentialPdf(data, svg, `${base}.pdf`);
+    } catch {
+      toast.error("Não foi possível gerar o arquivo. Tente novamente.");
+    }
+  }
+
 
   return (
     <div className="bg-background min-h-screen">
