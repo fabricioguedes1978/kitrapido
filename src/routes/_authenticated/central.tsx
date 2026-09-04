@@ -119,6 +119,22 @@ function Central() {
 
   const roster = athletes.length > 0 ? athletes : readCachedAthletes<Athlete>(eventId ?? "");
 
+  // Abertura direta pelo QR Code do atleta (/central?atleta=<id>)
+  const { atleta } = Route.useSearch();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!atleta || roster.length === 0) return;
+    const found = roster.find((a) => a.id === atleta);
+    if (found) {
+      setSelected(found);
+      setMethod("qrcode");
+    } else {
+      toast.error("Atleta não encontrado neste evento. Selecione o evento correspondente.");
+    }
+    void navigate({ to: "/central", search: {}, replace: true });
+  }, [atleta, roster, navigate]);
+
+
   const { data: deliveries = [] } = useQuery({
     queryKey: ["deliveries", eventId],
     enabled: !!eventId,
