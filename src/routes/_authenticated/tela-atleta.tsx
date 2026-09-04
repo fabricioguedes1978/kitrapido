@@ -200,10 +200,6 @@ function TelaAtleta() {
                     <p className="text-[10px] uppercase opacity-70">Categoria</p>
                     <p className="text-xl font-extrabold">Geral</p>
                   </div>
-                  <div className="rounded-xl bg-white/10 p-3">
-                    <p className="text-[10px] uppercase opacity-70">Inscrição</p>
-                    <p className="text-xl font-extrabold">CR-001</p>
-                  </div>
                 </div>
               </div>
             </div>
