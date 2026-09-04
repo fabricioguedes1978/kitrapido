@@ -91,7 +91,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     <div className="bg-dark-gradient flex h-full flex-col gap-6 p-4">
       <Brand inverted />
       <div className="flex-1 overflow-y-auto">
-        <NavLinks onNavigate={onNavigate} />
+        <NavLinks onNavigate={onNavigate ?? (() => {})} />
       </div>
       <div className="border-sidebar-border space-y-3 border-t pt-4">
         <div className="min-w-0">
