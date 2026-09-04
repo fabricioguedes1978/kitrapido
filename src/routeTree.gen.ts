@@ -15,6 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConsultaRouteImport } from './routes/consulta'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
+import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
+import { Route as AuthenticatedAutorizacoesRouteImport } from './routes/_authenticated/autorizacoes'
 import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated/central'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
@@ -22,6 +24,8 @@ import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticated/eventos'
 import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
 import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated/locais'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +57,17 @@ const AuthenticatedAtletasRoute = AuthenticatedAtletasRouteImport.update({
   path: '/atletas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAutorizacoesRoute =
+  AuthenticatedAutorizacoesRouteImport.update({
+    id: '/autorizacoes',
+    path: '/autorizacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentralRoute = AuthenticatedCentralRouteImport.update({
   id: '/central',
   path: '/central',
@@ -88,6 +103,16 @@ const AuthenticatedLocaisRoute = AuthenticatedLocaisRouteImport.update({
   path: '/locais',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
   id: '/evento/$slug/kit',
   path: '/evento/$slug/kit',
@@ -100,6 +125,8 @@ export interface FileRoutesByFullPath {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/atletas': typeof AuthenticatedAtletasRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/entregas': typeof AuthenticatedEntregasRoute
@@ -107,6 +134,8 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesByTo {
@@ -115,6 +144,8 @@ export interface FileRoutesByTo {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/atletas': typeof AuthenticatedAtletasRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/entregas': typeof AuthenticatedEntregasRoute
@@ -122,6 +153,8 @@ export interface FileRoutesByTo {
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesById {
@@ -132,6 +165,8 @@ export interface FileRoutesById {
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
+  '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/_authenticated/autorizacoes': typeof AuthenticatedAutorizacoesRoute
   '/_authenticated/central': typeof AuthenticatedCentralRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
@@ -139,6 +174,8 @@ export interface FileRoutesById {
   '/_authenticated/eventos': typeof AuthenticatedEventosRoute
   '/_authenticated/kits': typeof AuthenticatedKitsRoute
   '/_authenticated/locais': typeof AuthenticatedLocaisRoute
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +186,8 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/atletas'
+    | '/auditoria'
+    | '/autorizacoes'
     | '/central'
     | '/dashboard'
     | '/entregas'
@@ -156,6 +195,8 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/kits'
     | '/locais'
+    | '/relatorios'
+    | '/usuarios'
     | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -164,6 +205,8 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/atletas'
+    | '/auditoria'
+    | '/autorizacoes'
     | '/central'
     | '/dashboard'
     | '/entregas'
@@ -171,6 +214,8 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/kits'
     | '/locais'
+    | '/relatorios'
+    | '/usuarios'
     | '/evento/$slug/kit'
   id:
     | '__root__'
@@ -180,6 +225,8 @@ export interface FileRouteTypes {
     | '/consulta'
     | '/reset-password'
     | '/_authenticated/atletas'
+    | '/_authenticated/auditoria'
+    | '/_authenticated/autorizacoes'
     | '/_authenticated/central'
     | '/_authenticated/dashboard'
     | '/_authenticated/entregas'
@@ -187,6 +234,8 @@ export interface FileRouteTypes {
     | '/_authenticated/eventos'
     | '/_authenticated/kits'
     | '/_authenticated/locais'
+    | '/_authenticated/relatorios'
+    | '/_authenticated/usuarios'
     | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
 }
@@ -243,6 +292,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAtletasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auditoria': {
+      id: '/_authenticated/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/autorizacoes': {
+      id: '/_authenticated/autorizacoes'
+      path: '/autorizacoes'
+      fullPath: '/autorizacoes'
+      preLoaderRoute: typeof AuthenticatedAutorizacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/central': {
       id: '/_authenticated/central'
       path: '/central'
@@ -292,6 +355,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLocaisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/relatorios': {
+      id: '/_authenticated/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/evento/$slug/kit': {
       id: '/evento/$slug/kit'
       path: '/evento/$slug/kit'
@@ -304,6 +381,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAtletasRoute: typeof AuthenticatedAtletasRoute
+  AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
+  AuthenticatedAutorizacoesRoute: typeof AuthenticatedAutorizacoesRoute
   AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
@@ -311,10 +390,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEventosRoute: typeof AuthenticatedEventosRoute
   AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
   AuthenticatedLocaisRoute: typeof AuthenticatedLocaisRoute
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAtletasRoute: AuthenticatedAtletasRoute,
+  AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
+  AuthenticatedAutorizacoesRoute: AuthenticatedAutorizacoesRoute,
   AuthenticatedCentralRoute: AuthenticatedCentralRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
@@ -322,6 +405,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEventosRoute: AuthenticatedEventosRoute,
   AuthenticatedKitsRoute: AuthenticatedKitsRoute,
   AuthenticatedLocaisRoute: AuthenticatedLocaisRoute,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

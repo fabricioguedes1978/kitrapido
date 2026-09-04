@@ -91,7 +91,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     <div className="bg-dark-gradient flex h-full flex-col gap-6 p-4">
       <Brand inverted />
       <div className="flex-1 overflow-y-auto">
-        <NavLinks onNavigate={onNavigate} />
+        <NavLinks onNavigate={onNavigate ?? (() => {})} />
       </div>
       <div className="border-sidebar-border space-y-3 border-t pt-4">
         <div className="min-w-0">
@@ -114,7 +114,7 @@ export function EventSelector({ className }: { className?: string }) {
   const { events, eventId, select } = useCurrentEvent();
   if (events.length === 0) return null;
   return (
-    <Select value={eventId ?? undefined} onValueChange={select}>
+    <Select value={eventId ?? ""} onValueChange={select}>
       <SelectTrigger className={cn("h-9 w-full max-w-[16rem]", className)}>
         <SelectValue placeholder="Selecione o evento" />
       </SelectTrigger>

@@ -80,7 +80,7 @@ function Eventos() {
   }
 
   async function save() {
-    if (!form.name.trim()) return toast.error("Informe o nome do evento.");
+    if (!form.name.trim()) { toast.error("Informe o nome do evento."); return; }
     setSaving(true);
     const payload = {
       name: form.name.trim(),
@@ -103,13 +103,13 @@ function Eventos() {
       : await supabase.from("events").insert({ ...payload, created_by: user?.id ?? null });
 
     setSaving(false);
-    if (error) return toast.error("Não foi possível salvar", { description: error.message });
+    if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     void logAudit({
       eventId: editing?.id ?? null,
       action: editing ? `Editou o evento ${payload.name}` : `Criou o evento ${payload.name}`,
       entity: "events",
       newData: payload,
-      userName: profile?.name,
+      userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["events"] });
     setOpen(false);
