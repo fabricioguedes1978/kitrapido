@@ -195,7 +195,34 @@ function Eventos() {
                     Página do atleta
                   </a>
                 </Button>
+                {isAdmin && (
+                  <>
+                    <Button
+                      variant={e.archived ? "secondary" : "outline"}
+                      size="sm"
+                      onClick={() => void toggleArchived(e)}
+                    >
+                      {e.archived ? (
+                        <>
+                          <Eye className="size-4" /> Reativar
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="size-4" /> Inativar
+                        </>
+                      )}
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => setRemoving(e)}>
+                      <Trash2 className="size-4" /> Excluir
+                    </Button>
+                  </>
+                )}
               </div>
+              {e.archived && (
+                <p className="text-muted-foreground pt-1 text-xs">
+                  Evento inativo: invisível para organizadores, atendentes e atletas.
+                </p>
+              )}
 
             </CardContent>
           </Card>
