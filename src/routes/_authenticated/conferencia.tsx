@@ -1,9 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Maximize2, MonitorSmartphone, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Maximize2, MonitorSmartphone, AlertTriangle, X, ImageUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/Brand";
-import { IDLE_STATE, readDisplay, subscribeDisplay, type DisplayState } from "@/lib/display";
+import {
+  IDLE_STATE,
+  readDisplay,
+  subscribeDisplay,
+  readBackground,
+  subscribeBackground,
+  DEFAULT_BACKGROUND,
+  type DisplayBackground,
+  type DisplayState,
+} from "@/lib/display";
 
 export const Route = createFileRoute("/_authenticated/conferencia")({
   ssr: false,
