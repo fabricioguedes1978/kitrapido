@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
 import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated/central'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticated/eventos'
 import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
@@ -60,6 +61,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEstoqueRoute = AuthenticatedEstoqueRouteImport.update({
+  id: '/estoque',
+  path: '/estoque',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEventosRoute = AuthenticatedEventosRouteImport.update({
   id: '/eventos',
   path: '/eventos',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/atletas': typeof AuthenticatedAtletasRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/estoque': typeof AuthenticatedEstoqueRoute
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/atletas': typeof AuthenticatedAtletasRoute
   '/central': typeof AuthenticatedCentralRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/estoque': typeof AuthenticatedEstoqueRoute
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
   '/_authenticated/central': typeof AuthenticatedCentralRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/eventos': typeof AuthenticatedEventosRoute
   '/_authenticated/kits': typeof AuthenticatedKitsRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/atletas'
     | '/central'
     | '/dashboard'
+    | '/estoque'
     | '/eventos'
     | '/kits'
     | '/evento/$slug/kit'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/atletas'
     | '/central'
     | '/dashboard'
+    | '/estoque'
     | '/eventos'
     | '/kits'
     | '/evento/$slug/kit'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/_authenticated/atletas'
     | '/_authenticated/central'
     | '/_authenticated/dashboard'
+    | '/_authenticated/estoque'
     | '/_authenticated/eventos'
     | '/_authenticated/kits'
     | '/evento/$slug/kit'
@@ -221,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/estoque': {
+      id: '/_authenticated/estoque'
+      path: '/estoque'
+      fullPath: '/estoque'
+      preLoaderRoute: typeof AuthenticatedEstoqueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/eventos': {
       id: '/_authenticated/eventos'
       path: '/eventos'
@@ -249,6 +268,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAtletasRoute: typeof AuthenticatedAtletasRoute
   AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedEventosRoute: typeof AuthenticatedEventosRoute
   AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
 }
@@ -257,6 +277,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAtletasRoute: AuthenticatedAtletasRoute,
   AuthenticatedCentralRoute: AuthenticatedCentralRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedEventosRoute: AuthenticatedEventosRoute,
   AuthenticatedKitsRoute: AuthenticatedKitsRoute,
 }
