@@ -202,7 +202,28 @@ function Eventos() {
         )}
       </div>
 
+      <Dialog open={!!poster} onOpenChange={(v) => !v && setPoster(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>QR de check-in — {poster?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-3">
+            <div ref={posterRef} className="rounded-xl border bg-white p-4">
+              {poster && <QRCodeSVG value={checkinUrl(poster.slug)} size={220} level="M" />}
+            </div>
+            <p className="text-muted-foreground text-center text-xs">
+              Imprima e coloque no local do evento. O atleta aponta a câmera, confere os dados e salva
+              a credencial com o QR Code que o atendente lê para dar baixa no kit.
+            </p>
+            <Button className="w-full" onClick={() => void downloadPoster()}>
+              <Download className="size-4" /> Baixar cartaz em imagem
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={open} onOpenChange={setOpen}>
+
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar evento" : "Novo evento"}</DialogTitle>
