@@ -72,6 +72,46 @@ function Eventos() {
   const [saving, setSaving] = useState(false);
   const [poster, setPoster] = useState<EventRow | null>(null);
   const posterRef = useRef<HTMLDivElement>(null);
+  const [removing, setRemoving] = useState<EventRow | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function toggleArchived(e: EventRow) {
+    const next = !e.archived;
+    const { error } = await supabase.from("events").update({ archived: next }).eq("id", e.id);
+    if (error) {
+      toast.error("Não foi possível alterar o evento", { description: error.message });
+      return;
+    }
+    void logAudit({
+      eventId: e.id,
+      action: next ? `Inativou o evento ${e.name}` : `Reativou o evento ${e.name}`,
+      entity: "events",
+      userName: profile?.name ?? null,
+    });
+    await qc.invalidateQueries();
+    toast.success(next ? "Evento inativado." : "Evento reativado.");
+  }
+
+  async function removeEvent() {
+    if (!removing) return;
+    setBusy(true);
+    const { error } = await supabase.from("events").delete().eq("id", removing.id);
+    setBusy(false);
+    if (error) {
+      toast.error("Não foi possível excluir", { description: error.message });
+      return;
+    }
+    void logAudit({
+      eventId: null,
+      action: `Excluiu o evento ${removing.name}`,
+      entity: "events",
+      userName: profile?.name ?? null,
+    });
+    setRemoving(null);
+    await qc.invalidateQueries();
+    toast.success("Evento excluído.");
+  }
+
 
   async function downloadPoster() {
     const svg = posterRef.current?.querySelector("svg");
