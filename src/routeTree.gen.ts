@@ -26,6 +26,7 @@ import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
 import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated/locais'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedTelaAtletaRouteImport } from './routes/_authenticated/tela-atleta'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
@@ -115,6 +116,11 @@ const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   path: '/relatorios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTelaAtletaRoute = AuthenticatedTelaAtletaRouteImport.update({
+  id: '/tela-atleta',
+  path: '/tela-atleta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/kits': typeof AuthenticatedKitsRoute
   '/_authenticated/locais': typeof AuthenticatedLocaisRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/kits'
     | '/locais'
     | '/relatorios'
+    | '/tela-atleta'
     | '/usuarios'
     | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/kits'
     | '/locais'
     | '/relatorios'
+    | '/tela-atleta'
     | '/usuarios'
     | '/evento/$slug/kit'
   id:
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/kits'
     | '/_authenticated/locais'
     | '/_authenticated/relatorios'
+    | '/_authenticated/tela-atleta'
     | '/_authenticated/usuarios'
     | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
@@ -382,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tela-atleta': {
+      id: '/_authenticated/tela-atleta'
+      path: '/tela-atleta'
+      fullPath: '/tela-atleta'
+      preLoaderRoute: typeof AuthenticatedTelaAtletaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/usuarios': {
       id: '/_authenticated/usuarios'
       path: '/usuarios'
@@ -412,6 +431,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
   AuthenticatedLocaisRoute: typeof AuthenticatedLocaisRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedTelaAtletaRoute: typeof AuthenticatedTelaAtletaRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
 }
 
@@ -428,6 +448,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedKitsRoute: AuthenticatedKitsRoute,
   AuthenticatedLocaisRoute: AuthenticatedLocaisRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedTelaAtletaRoute: AuthenticatedTelaAtletaRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
 }
 

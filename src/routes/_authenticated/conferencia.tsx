@@ -1,9 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Maximize2, MonitorSmartphone, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Maximize2, MonitorSmartphone, AlertTriangle, X, ImageUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/Brand";
-import { IDLE_STATE, readDisplay, subscribeDisplay, type DisplayState } from "@/lib/display";
+import {
+  IDLE_STATE,
+  readDisplay,
+  subscribeDisplay,
+  readBackground,
+  subscribeBackground,
+  DEFAULT_BACKGROUND,
+  type DisplayBackground,
+  type DisplayState,
+} from "@/lib/display";
 
 export const Route = createFileRoute("/_authenticated/conferencia")({
   ssr: false,
@@ -24,23 +33,56 @@ export const Route = createFileRoute("/_authenticated/conferencia")({
 
 function Conferencia() {
   const [state, setState] = useState<DisplayState>(IDLE_STATE);
+  const [bg, setBg] = useState<DisplayBackground>(DEFAULT_BACKGROUND);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setState(readDisplay());
     return subscribeDisplay(setState);
   }, []);
 
+  useEffect(() => {
+    setBg(readBackground());
+    return subscribeBackground(setBg);
+  }, []);
+
   function fullscreen() {
     void document.documentElement.requestFullscreen?.();
   }
 
+  async function close() {
+    if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+    if (window.opener) window.close();
+    void navigate({ to: "/central" });
+  }
+
+  const shade = bg.dim / 100;
+  const style = bg.image
+    ? {
+        backgroundImage: `linear-gradient(rgba(0,0,0,${shade}), rgba(0,0,0,${shade})), url(${bg.image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : undefined;
+
   return (
-    <div className="bg-dark-gradient text-sidebar-foreground min-h-screen p-6 sm:p-10">
-      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+    <div
+      className="bg-dark-gradient text-sidebar-foreground min-h-screen p-6 sm:p-10"
+      style={style}
+    >
+      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
         <Brand inverted />
-        <Button variant="secondary" size="sm" onClick={fullscreen}>
-          <Maximize2 className="size-4" /> Tela cheia
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={() => void navigate({ to: "/tela-atleta" })}>
+            <ImageUp className="size-4" /> Fundo
+          </Button>
+          <Button variant="secondary" size="sm" onClick={fullscreen}>
+            <Maximize2 className="size-4" /> Tela cheia
+          </Button>
+          <Button variant="destructive" size="sm" onClick={() => void close()}>
+            <X className="size-4" /> Fechar
+          </Button>
+        </div>
       </header>
 
       {state.status === "idle" && (
