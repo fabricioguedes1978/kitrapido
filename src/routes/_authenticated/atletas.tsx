@@ -480,7 +480,7 @@ function Atletas() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={newOpen} onOpenChange={setNewOpen}>
+      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Novo atleta</DialogTitle>
