@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Plus, QrCode } from "lucide-react";
+import { Download, Eye, EyeOff, Plus, QrCode, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { downloadCredentialPng } from "@/lib/credential";
 
@@ -62,6 +72,46 @@ function Eventos() {
   const [saving, setSaving] = useState(false);
   const [poster, setPoster] = useState<EventRow | null>(null);
   const posterRef = useRef<HTMLDivElement>(null);
+  const [removing, setRemoving] = useState<EventRow | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function toggleArchived(e: EventRow) {
+    const next = !e.archived;
+    const { error } = await supabase.from("events").update({ archived: next }).eq("id", e.id);
+    if (error) {
+      toast.error("Não foi possível alterar o evento", { description: error.message });
+      return;
+    }
+    void logAudit({
+      eventId: e.id,
+      action: next ? `Inativou o evento ${e.name}` : `Reativou o evento ${e.name}`,
+      entity: "events",
+      userName: profile?.name ?? null,
+    });
+    await qc.invalidateQueries();
+    toast.success(next ? "Evento inativado." : "Evento reativado.");
+  }
+
+  async function removeEvent() {
+    if (!removing) return;
+    setBusy(true);
+    const { error } = await supabase.from("events").delete().eq("id", removing.id);
+    setBusy(false);
+    if (error) {
+      toast.error("Não foi possível excluir", { description: error.message });
+      return;
+    }
+    void logAudit({
+      eventId: null,
+      action: `Excluiu o evento ${removing.name}`,
+      entity: "events",
+      userName: profile?.name ?? null,
+    });
+    setRemoving(null);
+    await qc.invalidateQueries();
+    toast.success("Evento excluído.");
+  }
+
 
   async function downloadPoster() {
     const svg = posterRef.current?.querySelector("svg");
@@ -164,8 +214,8 @@ function Eventos() {
             <CardContent className="space-y-2 py-5">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                 <h2 className="min-w-0 truncate text-lg font-bold">{e.name}</h2>
-                <Badge variant="secondary" className="shrink-0">
-                  {EVENT_STATUS[e.status] ?? e.status}
+                <Badge variant={e.archived ? "destructive" : "secondary"} className="shrink-0">
+                  {e.archived ? "Inativo" : (EVENT_STATUS[e.status] ?? e.status)}
                 </Badge>
               </div>
               <p className="text-muted-foreground text-sm">
@@ -195,7 +245,34 @@ function Eventos() {
                     Página do atleta
                   </a>
                 </Button>
+                {isAdmin && (
+                  <>
+                    <Button
+                      variant={e.archived ? "secondary" : "outline"}
+                      size="sm"
+                      onClick={() => void toggleArchived(e)}
+                    >
+                      {e.archived ? (
+                        <>
+                          <Eye className="size-4" /> Reativar
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="size-4" /> Inativar
+                        </>
+                      )}
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => setRemoving(e)}>
+                      <Trash2 className="size-4" /> Excluir
+                    </Button>
+                  </>
+                )}
               </div>
+              {e.archived && (
+                <p className="text-muted-foreground pt-1 text-xs">
+                  Evento inativo: invisível para organizadores, atendentes e atletas.
+                </p>
+              )}
 
             </CardContent>
           </Card>
@@ -321,6 +398,23 @@ function Eventos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={!!removing} onOpenChange={(v) => !v && setRemoving(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir o evento {removing?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é definitiva e apaga também atletas, kits, estoque e entregas desse evento. Se
+              quiser apenas esconder o evento de todos, use "Inativar".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction disabled={busy} onClick={() => void removeEvent()}>
+              Excluir definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }

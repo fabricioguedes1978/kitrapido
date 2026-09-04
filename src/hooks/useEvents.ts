@@ -16,6 +16,7 @@ export type EventRow = {
   modalities: string[];
   custom_field_labels: string[];
   status: string;
+  archived: boolean;
   created_at: string;
 };
 
@@ -37,7 +38,8 @@ export function useEventsQuery() {
 
 /** Evento ativo, persistido no dispositivo do atendente. */
 export function useCurrentEvent() {
-  const { data: events = [], isLoading } = useEventsQuery();
+  const { data: all = [], isLoading } = useEventsQuery();
+  const events = all.filter((e) => !e.archived);
   const qc = useQueryClient();
   const [eventId, setEventId] = useState<string | null>(null);
 
