@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS athletes_event_bib_uidx ON public.athletes (event_id, bib_number) WHERE bib_number IS NOT NULL AND bib_number <> '';

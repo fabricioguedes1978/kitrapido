@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { Download, Plus, QrCode, Upload } from "lucide-react";
+import { AlertTriangle, Download, Plus, QrCode, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -118,6 +118,8 @@ function Atletas() {
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
+  const [dupWarning, setDupWarning] = useState<string | null>(null);
+
 
   const { data: athletes = [], isLoading } = useQuery({
     queryKey: ["athletes", eventId],
@@ -149,6 +151,21 @@ function Atletas() {
       )
       .slice(0, 300);
   }, [athletes, term]);
+
+  const liveDup = useMemo(() => {
+    const cpf = onlyDigits(form.cpf);
+    const bib = form.bib_number.trim();
+    if (cpf.length === 11) {
+      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf);
+      if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
+    }
+    if (bib) {
+      const hit = athletes.find((a) => (a.bib_number ?? "") === bib);
+      if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
+    }
+    return null;
+  }, [athletes, form.cpf, form.bib_number]);
+
 
   async function importRows(rows: Record<string, unknown>[]) {
     if (!eventId) return;
@@ -188,19 +205,37 @@ function Atletas() {
 
     if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
 
+    const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
+    const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
+    let dupCpfCount = 0;
+    let dupBibCount = 0;
+    const unique = parsed.filter((row) => {
+      const cpf = row.cpf ?? "";
+      const bib = row.bib_number ?? "";
+      if (cpf && seenCpf.has(cpf)) { dupCpfCount++; return false; }
+      if (bib && seenBib.has(bib)) { dupBibCount++; return false; }
+      if (cpf) seenCpf.add(cpf);
+      if (bib) seenBib.add(bib);
+      return true;
+    });
+
     let inserted = 0;
-    let duplicates = 0;
-    for (let i = 0; i < parsed.length; i += 200) {
-      const chunk = parsed.slice(i, i + 200);
+    const duplicates = dupCpfCount + dupBibCount;
+    for (let i = 0; i < unique.length; i += 200) {
+      const chunk = unique.slice(i, i + 200);
       const { error, count } = await supabase
         .from("athletes")
         .upsert(chunk, { onConflict: "event_id,cpf", ignoreDuplicates: true, count: "exact" });
       if (error) {
-        toast.error("Erro na importação", { description: error.message });
+        toast.error("Erro na importação", {
+          description:
+            error.code === "23505"
+              ? "Existem CPFs ou números de peito repetidos na planilha ou já cadastrados."
+              : error.message,
+        });
         break;
       }
       inserted += count ?? chunk.length;
-      duplicates += chunk.length - (count ?? chunk.length);
     }
     void logAudit({
       eventId,
@@ -210,7 +245,12 @@ function Atletas() {
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setImporting(false);
-    toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`);
+    toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
+      description:
+        duplicates > 0
+          ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
+          : undefined,
+    });
   }
 
   function handleFile(file: File) {
@@ -238,6 +278,29 @@ function Atletas() {
 
   async function createAthlete() {
     if (!eventId || !form.name.trim()) { toast.error("Informe o nome do atleta."); return; }
+    setDupWarning(null);
+    const cpf = form.cpf ? onlyDigits(form.cpf) : null;
+    const bib = form.bib_number.trim() || null;
+    if (cpf || bib) {
+      const filters: string[] = [];
+      if (cpf) filters.push(`cpf.eq.${cpf}`);
+      if (bib) filters.push(`bib_number.eq.${bib}`);
+      const { data: dups } = await supabase
+        .from("athletes")
+        .select("id,name,cpf,bib_number")
+        .eq("event_id", eventId)
+        .or(filters.join(","));
+      const dupCpf = cpf ? dups?.find((d) => onlyDigits(d.cpf) === cpf) : null;
+      const dupBib = bib ? dups?.find((d) => d.bib_number === bib) : null;
+      if (dupCpf || dupBib) {
+        const msg = dupCpf
+          ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
+          : `O nº de peito ${bib} já está em uso neste evento (${dupBib!.name}).`;
+        setDupWarning(msg);
+        toast.error("Dado duplicado", { description: msg });
+        return;
+      }
+    }
     const { error } = await supabase.from("athletes").insert({
       event_id: eventId,
       name: form.name.trim(),
@@ -246,7 +309,15 @@ function Atletas() {
       modality: form.modality || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
     });
-    if (error) { toast.error("Não foi possível cadastrar", { description: error.message }); return; }
+    if (error) {
+      const dup = error.code === "23505";
+      const msg = dup
+        ? "CPF ou nº de peito já cadastrado neste evento."
+        : error.message;
+      if (dup) setDupWarning(msg);
+      toast.error("Não foi possível cadastrar", { description: msg });
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
     setForm({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
@@ -432,12 +503,18 @@ function Atletas() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={newOpen} onOpenChange={setNewOpen}>
+      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Novo atleta</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
+            {(dupWarning || liveDup) && (
+              <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                <span>{dupWarning ?? liveDup}</span>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Nome</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
