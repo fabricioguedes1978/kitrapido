@@ -40,7 +40,7 @@ function Auditoria() {
 
   return (
     <AppShell>
-      <PageHeader title="Auditoria" subtitle={event?.name} />
+      <PageHeader title="Auditoria" subtitle={event?.name ?? ""} />
       <Card>
         <CardContent className="overflow-x-auto p-0">
           <Table>

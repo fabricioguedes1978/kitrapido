@@ -156,7 +156,7 @@ function Relatorios() {
 
   return (
     <AppShell>
-      <PageHeader title="Relatórios" subtitle={event?.name} />
+      <PageHeader title="Relatórios" subtitle={event?.name ?? ""} />
 
       <div className="grid gap-3 md:grid-cols-2">
         {reports.map((r) => {

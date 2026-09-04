@@ -177,18 +177,18 @@ function Central() {
   function handleScan(raw: string) {
     const parsed = parseQrPayload(raw);
     setMethod("qrcode");
-    if (!parsed) return toast.error("QR Code não reconhecido.");
+    if (!parsed) { toast.error("QR Code não reconhecido."); return; }
     if (parsed.kind === "athlete") {
       const found = roster.find((a) => a.id === parsed.athleteId);
-      if (!found) return toast.error("Atleta não encontrado neste evento.");
+      if (!found) { toast.error("Atleta não encontrado neste evento."); return; }
       setAsThirdParty(false);
       setSelected(found);
       return;
     }
     const auth = authorizations.find((a) => a.qr_code === parsed.code);
-    if (!auth) return toast.error("Autorização inválida ou cancelada.");
+    if (!auth) { toast.error("Autorização inválida ou cancelada."); return; }
     const found = roster.find((a) => a.id === auth.athlete_id);
-    if (!found) return toast.error("Atleta da autorização não encontrado.");
+    if (!found) { toast.error("Atleta da autorização não encontrado."); return; }
     setAsThirdParty(true);
     setSelected(found);
   }
@@ -231,7 +231,7 @@ function Central() {
         setConfirming(false);
         return;
       }
-      return toast.error("Falha ao registrar entrega", { description: error.message });
+      { toast.error("Falha ao registrar entrega", { description: error.message }); return; }
     }
     void logAudit({
       eventId,
@@ -239,7 +239,7 @@ function Central() {
       entity: "deliveries",
       entityId: selected.id,
       newData: payload,
-      userName: profile?.name,
+      userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["deliveries", eventId] });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });

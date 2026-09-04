@@ -70,13 +70,13 @@ function Usuarios() {
     if (!eventId) return;
     const profile = available.find((p) => p.email.toLowerCase() === email.trim().toLowerCase());
     if (!profile)
-      return toast.error("Usuário não encontrado", {
+      { toast.error("Usuário não encontrado", {
         description: "A pessoa precisa criar a conta no sistema antes de ser vinculada.",
-      });
+      }); return; }
     const { error } = await supabase
       .from("event_members")
       .insert({ event_id: eventId, user_id: profile.id, role });
-    if (error) return toast.error("Não foi possível vincular", { description: error.message });
+    if (error) { toast.error("Não foi possível vincular", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["members", eventId] });
     setOpen(false);
     setEmail("");
@@ -85,7 +85,7 @@ function Usuarios() {
 
   async function remove(id: string) {
     const { error } = await supabase.from("event_members").delete().eq("id", id);
-    if (error) return toast.error("Não foi possível remover");
+    if (error) { toast.error("Não foi possível remover"); return; }
     await qc.invalidateQueries({ queryKey: ["members", eventId] });
   }
 
@@ -93,7 +93,7 @@ function Usuarios() {
     <AppShell>
       <PageHeader
         title="Equipe do evento"
-        subtitle={event?.name}
+        subtitle={event?.name ?? ""}
         action={<Button onClick={() => setOpen(true)}>Vincular usuário</Button>}
       />
 

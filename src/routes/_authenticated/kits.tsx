@@ -48,13 +48,13 @@ function Kits() {
   });
 
   async function save() {
-    if (!eventId || !form.name.trim()) return toast.error("Informe o nome do kit.");
+    if (!eventId || !form.name.trim()) { toast.error("Informe o nome do kit."); return; }
     const { data, error } = await supabase
       .from("kits")
       .insert({ event_id: eventId, name: form.name.trim(), description: form.description || null })
       .select("id")
       .single();
-    if (error || !data) return toast.error("Não foi possível salvar o kit");
+    if (error || !data) { toast.error("Não foi possível salvar o kit"); return; }
 
     const items = form.items
       .split("\n")
@@ -74,7 +74,7 @@ function Kits() {
 
   async function remove(id: string) {
     const { error } = await supabase.from("kits").delete().eq("id", id);
-    if (error) return toast.error("Não foi possível excluir");
+    if (error) { toast.error("Não foi possível excluir"); return; }
     await qc.invalidateQueries({ queryKey: ["kits", eventId] });
   }
 
@@ -82,7 +82,7 @@ function Kits() {
     <AppShell>
       <PageHeader
         title="Kits"
-        subtitle={event?.name}
+        subtitle={event?.name ?? ""}
         action={
           <Button onClick={() => setOpen(true)}>
             <Plus className="size-4" /> Novo kit

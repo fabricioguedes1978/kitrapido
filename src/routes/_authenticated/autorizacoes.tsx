@@ -83,9 +83,9 @@ function Autorizacoes() {
   }, [athletes, search]);
 
   async function save() {
-    if (!eventId || !athleteId) return toast.error("Selecione o atleta.");
-    if (!form.name.trim()) return toast.error("Informe o nome do autorizado.");
-    if (!isValidCPF(form.cpf)) return toast.error("CPF do autorizado inválido.");
+    if (!eventId || !athleteId) { toast.error("Selecione o atleta."); return; }
+    if (!form.name.trim()) { toast.error("Informe o nome do autorizado."); return; }
+    if (!isValidCPF(form.cpf)) { toast.error("CPF do autorizado inválido."); return; }
     const { error } = await supabase.from("third_party_authorizations").insert({
       event_id: eventId,
       athlete_id: athleteId,
@@ -93,7 +93,7 @@ function Autorizacoes() {
       cpf: onlyDigits(form.cpf),
       phone: form.phone || null,
     });
-    if (error) return toast.error("Não foi possível salvar", { description: error.message });
+    if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["tpa-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["tpa", eventId] });
     setOpen(false);
@@ -108,7 +108,7 @@ function Autorizacoes() {
       .from("third_party_authorizations")
       .update({ status: "cancelled" })
       .eq("id", id);
-    if (error) return toast.error("Não foi possível cancelar");
+    if (error) { toast.error("Não foi possível cancelar"); return; }
     await qc.invalidateQueries({ queryKey: ["tpa-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["tpa", eventId] });
   }
@@ -117,7 +117,7 @@ function Autorizacoes() {
     <AppShell>
       <PageHeader
         title="Autorizações de terceiros"
-        subtitle={event?.name}
+        subtitle={event?.name ?? ""}
         action={
           <Button onClick={() => setOpen(true)}>
             <Plus className="size-4" /> Nova autorização

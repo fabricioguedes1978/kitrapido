@@ -47,7 +47,7 @@ function Locais() {
   });
 
   async function save() {
-    if (!eventId || !form.name.trim()) return toast.error("Informe o nome do local.");
+    if (!eventId || !form.name.trim()) { toast.error("Informe o nome do local."); return; }
     const { error } = await supabase.from("pickup_locations").insert({
       event_id: eventId,
       name: form.name.trim(),
@@ -56,7 +56,7 @@ function Locais() {
       start_time: form.start_time || null,
       end_time: form.end_time || null,
     });
-    if (error) return toast.error("Não foi possível salvar", { description: error.message });
+    if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["locations-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["locations", eventId] });
     setOpen(false);
@@ -66,7 +66,7 @@ function Locais() {
 
   async function remove(id: string) {
     const { error } = await supabase.from("pickup_locations").delete().eq("id", id);
-    if (error) return toast.error("Não foi possível excluir");
+    if (error) { toast.error("Não foi possível excluir"); return; }
     await qc.invalidateQueries({ queryKey: ["locations-full", eventId] });
   }
 
@@ -74,7 +74,7 @@ function Locais() {
     <AppShell>
       <PageHeader
         title="Locais de retirada"
-        subtitle={event?.name}
+        subtitle={event?.name ?? ""}
         action={
           <Button onClick={() => setOpen(true)}>
             <Plus className="size-4" /> Novo local

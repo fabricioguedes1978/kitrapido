@@ -64,7 +64,7 @@ function Estoque() {
       },
       { onConflict: "event_id,item_type,size" },
     );
-    if (error) return toast.error("Não foi possível salvar", { description: error.message });
+    if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["inventory", eventId] });
     setOpen(false);
     toast.success("Estoque atualizado.");
@@ -75,7 +75,7 @@ function Estoque() {
       .from("inventory")
       .update({ quantity_current: Math.max(current + delta, 0) })
       .eq("id", id);
-    if (error) return toast.error("Não foi possível ajustar");
+    if (error) { toast.error("Não foi possível ajustar"); return; }
     await qc.invalidateQueries({ queryKey: ["inventory", eventId] });
   }
 
@@ -83,7 +83,7 @@ function Estoque() {
     <AppShell>
       <PageHeader
         title="Estoque de camisetas"
-        subtitle={event?.name}
+        subtitle={event?.name ?? ""}
         action={
           <Button onClick={() => setOpen(true)}>
             <Plus className="size-4" /> Definir tamanho

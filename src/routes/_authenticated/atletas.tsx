@@ -157,7 +157,7 @@ function Atletas() {
         kit_type: r.kit_type ?? null,
       }));
 
-    if (parsed.length === 0) return toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'.");
+    if (parsed.length === 0) { toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
 
     let inserted = 0;
     let duplicates = 0;
@@ -177,7 +177,7 @@ function Atletas() {
       eventId,
       action: `Importou ${inserted} atletas`,
       entity: "athletes",
-      userName: profile?.name,
+      userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`);
@@ -203,7 +203,7 @@ function Atletas() {
   }
 
   async function createAthlete() {
-    if (!eventId || !form.name.trim()) return toast.error("Informe o nome do atleta.");
+    if (!eventId || !form.name.trim()) { toast.error("Informe o nome do atleta."); return; }
     const { error } = await supabase.from("athletes").insert({
       event_id: eventId,
       name: form.name.trim(),
@@ -212,7 +212,7 @@ function Atletas() {
       modality: form.modality || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
     });
-    if (error) return toast.error("Não foi possível cadastrar", { description: error.message });
+    if (error) { toast.error("Não foi possível cadastrar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
     setForm({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });

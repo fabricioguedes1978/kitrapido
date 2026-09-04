@@ -77,7 +77,7 @@ function Entregas() {
   }, [deliveries, term]);
 
   async function cancel() {
-    if (!cancelling || !reason.trim()) return toast.error("Descreva o motivo do cancelamento.");
+    if (!cancelling || !reason.trim()) { toast.error("Descreva o motivo do cancelamento."); return; }
     const { error } = await supabase
       .from("deliveries")
       .update({
@@ -86,13 +86,13 @@ function Entregas() {
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", cancelling.id);
-    if (error) return toast.error("Não foi possível cancelar", { description: error.message });
+    if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
       action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}: ${reason.trim()}`,
       entity: "deliveries",
       entityId: cancelling.id,
-      userName: profile?.name,
+      userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["deliveries-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["deliveries", eventId] });
@@ -103,7 +103,7 @@ function Entregas() {
 
   return (
     <AppShell>
-      <PageHeader title="Entregas" subtitle={event?.name} />
+      <PageHeader title="Entregas" subtitle={event?.name ?? ""} />
 
       <Input
         placeholder="Buscar por atleta, nº de peito ou atendente"
