@@ -152,6 +152,21 @@ function Atletas() {
       .slice(0, 300);
   }, [athletes, term]);
 
+  const liveDup = useMemo(() => {
+    const cpf = onlyDigits(form.cpf);
+    const bib = form.bib_number.trim();
+    if (cpf.length === 11) {
+      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf);
+      if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
+    }
+    if (bib) {
+      const hit = athletes.find((a) => (a.bib_number ?? "") === bib);
+      if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
+    }
+    return null;
+  }, [athletes, form.cpf, form.bib_number]);
+
+
   async function importRows(rows: Record<string, unknown>[]) {
     if (!eventId) return;
     const map: Record<string, string> = { ...COLUMN_MAP };
