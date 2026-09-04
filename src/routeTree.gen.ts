@@ -21,6 +21,7 @@ import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticated/eventos'
 import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
+import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated/locais'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -82,6 +83,11 @@ const AuthenticatedKitsRoute = AuthenticatedKitsRouteImport.update({
   path: '/kits',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLocaisRoute = AuthenticatedLocaisRouteImport.update({
+  id: '/locais',
+  path: '/locais',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
   id: '/evento/$slug/kit',
   path: '/evento/$slug/kit',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
+  '/locais': typeof AuthenticatedLocaisRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesByTo {
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
+  '/locais': typeof AuthenticatedLocaisRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesById {
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/eventos': typeof AuthenticatedEventosRoute
   '/_authenticated/kits': typeof AuthenticatedKitsRoute
+  '/_authenticated/locais': typeof AuthenticatedLocaisRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRouteTypes {
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/eventos'
     | '/kits'
+    | '/locais'
     | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/eventos'
     | '/kits'
+    | '/locais'
     | '/evento/$slug/kit'
   id:
     | '__root__'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estoque'
     | '/_authenticated/eventos'
     | '/_authenticated/kits'
+    | '/_authenticated/locais'
     | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
 }
@@ -273,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKitsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/locais': {
+      id: '/_authenticated/locais'
+      path: '/locais'
+      fullPath: '/locais'
+      preLoaderRoute: typeof AuthenticatedLocaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/evento/$slug/kit': {
       id: '/evento/$slug/kit'
       path: '/evento/$slug/kit'
@@ -291,6 +310,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedEventosRoute: typeof AuthenticatedEventosRoute
   AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
+  AuthenticatedLocaisRoute: typeof AuthenticatedLocaisRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -301,6 +321,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedEventosRoute: AuthenticatedEventosRoute,
   AuthenticatedKitsRoute: AuthenticatedKitsRoute,
+  AuthenticatedLocaisRoute: AuthenticatedLocaisRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
