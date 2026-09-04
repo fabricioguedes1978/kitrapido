@@ -29,11 +29,12 @@ import { ROLE_LABEL, type AppRole } from "@/lib/cronochip";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[] };
+type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]; sub?: boolean };
 
 const NAV: NavItem[] = [
   { to: "/central", label: "Central de Entrega", icon: ScanLine, roles: ["admin", "organizer", "attendant"] },
   { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer", "attendant"] },
+  { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
   { to: "/atletas", label: "Atletas", icon: Users, roles: ["admin", "organizer"] },
