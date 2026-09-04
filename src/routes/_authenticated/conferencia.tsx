@@ -96,7 +96,7 @@ function Conferencia() {
   );
 }
 
-function Big({ label, value }: { label: string; value?: string | null }) {
+function Big({ label, value }: { label: string; value?: string | null | undefined }) {
   return (
     <div className="bg-sidebar-accent/30 min-w-0 rounded-2xl p-5">
       <dt className="text-sidebar-foreground/60 text-sm font-semibold tracking-wide uppercase">
