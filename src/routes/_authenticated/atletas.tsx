@@ -120,6 +120,7 @@ function Atletas() {
   const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
   const [dupWarning, setDupWarning] = useState<string | null>(null);
 
+
   const { data: athletes = [], isLoading } = useQuery({
     queryKey: ["athletes", eventId],
     enabled: !!eventId,
