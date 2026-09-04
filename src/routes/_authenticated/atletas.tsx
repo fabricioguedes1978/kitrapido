@@ -238,6 +238,29 @@ function Atletas() {
 
   async function createAthlete() {
     if (!eventId || !form.name.trim()) { toast.error("Informe o nome do atleta."); return; }
+    setDupWarning(null);
+    const cpf = form.cpf ? onlyDigits(form.cpf) : null;
+    const bib = form.bib_number.trim() || null;
+    if (cpf || bib) {
+      const filters: string[] = [];
+      if (cpf) filters.push(`cpf.eq.${cpf}`);
+      if (bib) filters.push(`bib_number.eq.${bib}`);
+      const { data: dups } = await supabase
+        .from("athletes")
+        .select("id,name,cpf,bib_number")
+        .eq("event_id", eventId)
+        .or(filters.join(","));
+      const dupCpf = cpf ? dups?.find((d) => onlyDigits(d.cpf) === cpf) : null;
+      const dupBib = bib ? dups?.find((d) => d.bib_number === bib) : null;
+      if (dupCpf || dupBib) {
+        const msg = dupCpf
+          ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
+          : `O nº de peito ${bib} já está em uso neste evento (${dupBib!.name}).`;
+        setDupWarning(msg);
+        toast.error("Dado duplicado", { description: msg });
+        return;
+      }
+    }
     const { error } = await supabase.from("athletes").insert({
       event_id: eventId,
       name: form.name.trim(),
