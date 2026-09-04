@@ -95,7 +95,7 @@ function Eventos() {
         .split(",")
         .map((m) => m.trim())
         .filter(Boolean),
-      status: form.status as EventRow["status"],
+      status: form.status as "planning",
     };
 
     const { error } = editing

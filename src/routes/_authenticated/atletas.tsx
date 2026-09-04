@@ -141,20 +141,20 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r.name)
+      .filter((r) => r["name"])
       .map((r) => ({
         event_id: eventId,
-        name: r.name!,
-        cpf: r.cpf ? onlyDigits(r.cpf) : null,
-        email: r.email ?? null,
-        phone: r.phone ?? null,
-        registration_number: r.registration_number ?? null,
-        bib_number: r.bib_number ?? null,
-        modality: r.modality ?? null,
-        category: r.category ?? null,
-        distance: r.distance ?? null,
-        shirt_size: r.shirt_size ? r.shirt_size.toUpperCase() : null,
-        kit_type: r.kit_type ?? null,
+        name: r["name"]!,
+        cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
+        email: r["email"] ?? null,
+        phone: r["phone"] ?? null,
+        registration_number: r["registration_number"] ?? null,
+        bib_number: r["bib_number"] ?? null,
+        modality: r["modality"] ?? null,
+        category: r["category"] ?? null,
+        distance: r["distance"] ?? null,
+        shirt_size: r["shirt_size"] ? r["shirt_size"].toUpperCase() : null,
+        kit_type: r["kit_type"] ?? null,
       }));
 
     if (parsed.length === 0) { toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
