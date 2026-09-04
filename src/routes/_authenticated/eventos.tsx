@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Plus, QrCode } from "lucide-react";
+import { Download, Eye, EyeOff, Plus, QrCode, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { downloadCredentialPng } from "@/lib/credential";
 
