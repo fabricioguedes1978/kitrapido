@@ -21,6 +21,11 @@ export type Database = {
           category: string | null
           cpf: string | null
           created_at: string
+          custom_1: string | null
+          custom_2: string | null
+          custom_3: string | null
+          custom_4: string | null
+          custom_5: string | null
           distance: string | null
           email: string | null
           event_id: string
@@ -42,6 +47,11 @@ export type Database = {
           category?: string | null
           cpf?: string | null
           created_at?: string
+          custom_1?: string | null
+          custom_2?: string | null
+          custom_3?: string | null
+          custom_4?: string | null
+          custom_5?: string | null
           distance?: string | null
           email?: string | null
           event_id: string
@@ -63,6 +73,11 @@ export type Database = {
           category?: string | null
           cpf?: string | null
           created_at?: string
+          custom_1?: string | null
+          custom_2?: string | null
+          custom_3?: string | null
+          custom_4?: string | null
+          custom_5?: string | null
           distance?: string | null
           email?: string | null
           event_id?: string
@@ -265,6 +280,7 @@ export type Database = {
           city: string | null
           created_at: string
           created_by: string | null
+          custom_field_labels: string[]
           description: string | null
           event_date: string | null
           event_time: string | null
@@ -281,6 +297,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           created_by?: string | null
+          custom_field_labels?: string[]
           description?: string | null
           event_date?: string | null
           event_time?: string | null
@@ -297,6 +314,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           created_by?: string | null
+          custom_field_labels?: string[]
           description?: string | null
           event_date?: string | null
           event_time?: string | null
@@ -573,6 +591,8 @@ export type Database = {
           athlete_id: string
           bib_number: string
           category: string
+          custom_labels: string[]
+          custom_values: string[]
           delivered_at: string
           event_name: string
           kit_status: Database["public"]["Enums"]["kit_status"]

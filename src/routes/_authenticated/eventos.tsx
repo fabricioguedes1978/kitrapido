@@ -46,6 +46,7 @@ const EMPTY = {
   description: "",
   modalities: "",
   status: "planning",
+  custom_field_labels: ["", "", "", "", ""] as string[],
 };
 
 function Eventos() {
@@ -75,6 +76,7 @@ function Eventos() {
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
+      custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
   }
@@ -96,6 +98,7 @@ function Eventos() {
         .map((m) => m.trim())
         .filter(Boolean),
       status: form.status as "planning",
+      custom_field_labels: form.custom_field_labels.map((l) => l.trim()),
     };
 
     const { error } = editing
@@ -238,6 +241,28 @@ function Eventos() {
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
               />
             </Field>
+
+            <div className="space-y-2 rounded-lg border p-3">
+              <p className="text-sm font-semibold">Campos personalizados</p>
+              <p className="text-muted-foreground text-xs">
+                Dê um nome a até 5 campos extras (ex.: Chip, Ônibus, Lote, Camarote). Eles aparecem na
+                entrega e na tela do atleta somente quando estiverem preenchidos na planilha.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {form.custom_field_labels.map((label, i) => (
+                  <Input
+                    key={i}
+                    placeholder={`Campo ${i + 1}`}
+                    value={label}
+                    onChange={(e) => {
+                      const next = [...form.custom_field_labels];
+                      next[i] = e.target.value;
+                      setForm({ ...form, custom_field_labels: next });
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button onClick={() => void save()} disabled={saving}>

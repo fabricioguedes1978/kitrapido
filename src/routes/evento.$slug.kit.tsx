@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime } from "@/lib/cronochip";
+import { customFields } from "@/lib/display";
 
 export const Route = createFileRoute("/evento/$slug/kit")({
   ssr: false,
@@ -39,6 +40,8 @@ type KitInfo = {
   event_name: string;
   delivered_at: string | null;
   qr_payload: string;
+  custom_labels: string[] | null;
+  custom_values: string[] | null;
 };
 
 function MeuKit() {
@@ -120,6 +123,9 @@ function MeuKit() {
                 <Field label="Categoria" value={result.category} />
                 <Field label="Camiseta" value={result.shirt_size} strong />
                 <Field label="Kit" value={result.kit_type} />
+                {customFields(result.custom_labels, result.custom_values ?? []).map((f) => (
+                  <Field key={f.label} label={f.label} value={f.value} />
+                ))}
               </dl>
 
               {!delivered && (

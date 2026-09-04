@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   ClipboardList,
+  MonitorSmartphone,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
@@ -32,6 +33,7 @@ type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]
 
 const NAV: NavItem[] = [
   { to: "/central", label: "Central de Entrega", icon: ScanLine, roles: ["admin", "organizer", "attendant"] },
+  { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer", "attendant"] },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
   { to: "/atletas", label: "Atletas", icon: Users, roles: ["admin", "organizer"] },

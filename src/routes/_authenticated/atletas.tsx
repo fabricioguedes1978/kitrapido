@@ -58,9 +58,16 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  custom_1?: string | null;
+  custom_2?: string | null;
+  custom_3?: string | null;
+  custom_4?: string | null;
+  custom_5?: string | null;
 };
 
-const COLUMN_MAP: Record<string, keyof Athlete | "distance"> = {
+const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"] as const;
+
+const COLUMN_MAP: Record<string, string> = {
   nome: "name",
   atleta: "name",
   cpf: "cpf",
@@ -79,6 +86,16 @@ const COLUMN_MAP: Record<string, keyof Athlete | "distance"> = {
   camiseta: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
+  extra1: "custom_1",
+  extra2: "custom_2",
+  extra3: "custom_3",
+  extra4: "custom_4",
+  extra5: "custom_5",
+  campo1: "custom_1",
+  campo2: "custom_2",
+  campo3: "custom_3",
+  campo4: "custom_4",
+  campo5: "custom_5",
 };
 
 function normalizeKey(key: string) {
@@ -135,11 +152,15 @@ function Atletas() {
 
   async function importRows(rows: Record<string, unknown>[]) {
     if (!eventId) return;
+    const map: Record<string, string> = { ...COLUMN_MAP };
+    (event?.custom_field_labels ?? []).forEach((label, i) => {
+      if (label?.trim()) map[normalizeKey(label)] = CUSTOM_KEYS[i]!;
+    });
     const parsed = rows
       .map((row) => {
         const out: Record<string, string | null> = {};
         Object.entries(row).forEach(([key, value]) => {
-          const mapped = COLUMN_MAP[normalizeKey(key)];
+          const mapped = map[normalizeKey(key)];
           if (mapped) out[mapped] = value == null || value === "" ? null : String(value).trim();
         });
         return out;
@@ -158,6 +179,11 @@ function Atletas() {
         distance: r["distance"] ?? null,
         shirt_size: r["shirt_size"] ? r["shirt_size"].toUpperCase() : null,
         kit_type: r["kit_type"] ?? null,
+        custom_1: r["custom_1"] ?? null,
+        custom_2: r["custom_2"] ?? null,
+        custom_3: r["custom_3"] ?? null,
+        custom_4: r["custom_4"] ?? null,
+        custom_5: r["custom_5"] ?? null,
       }));
 
     if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
@@ -306,7 +332,8 @@ function Atletas() {
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, cpf, e-mail, telefone, inscrição,
-              peito, modalidade, categoria, distância, camiseta e kit.
+              peito, modalidade, categoria, distância, camiseta, kit e os 5 campos personalizados
+              (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
               <p className="text-muted-foreground mt-2 text-xs">Último arquivo: {lastFile}</p>
@@ -320,8 +347,8 @@ function Atletas() {
                 e.stopPropagation();
                 downloadBlob(
                   "\uFEFF" +
-                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit\n" +
-                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão\n",
+                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
+                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
                   "modelo-atletas.csv",
                   "text/csv;charset=utf-8",
                 );
