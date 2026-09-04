@@ -79,6 +79,16 @@ const COLUMN_MAP: Record<string, keyof Athlete | "distance"> = {
   camiseta: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
+  extra1: "custom_1",
+  extra2: "custom_2",
+  extra3: "custom_3",
+  extra4: "custom_4",
+  extra5: "custom_5",
+  campo1: "custom_1",
+  campo2: "custom_2",
+  campo3: "custom_3",
+  campo4: "custom_4",
+  campo5: "custom_5",
 };
 
 function normalizeKey(key: string) {
