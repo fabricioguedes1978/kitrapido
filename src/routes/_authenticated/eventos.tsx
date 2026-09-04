@@ -158,9 +158,12 @@ function Eventos() {
                   ))}
                 </div>
               )}
-              <div className="flex gap-2 pt-2">
+              <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
                   Editar
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setPoster(e)}>
+                  <QrCode className="size-4" /> QR de check-in
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <a href={`/evento/${e.slug}/kit`} target="_blank" rel="noreferrer">
@@ -168,6 +171,7 @@ function Eventos() {
                   </a>
                 </Button>
               </div>
+
             </CardContent>
           </Card>
         ))}
