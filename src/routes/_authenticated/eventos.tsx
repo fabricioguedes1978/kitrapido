@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventsQuery, type EventRow } from "@/hooks/useEvents";
-import { EVENT_STATUS, formatDate, logAudit, slugify } from "@/lib/cronochip";
+import { EVENT_STATUS, checkinUrl, formatDate, logAudit, slugify } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/eventos")({
   head: () => ({
