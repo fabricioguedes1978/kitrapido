@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Eye, EyeOff, Plus, QrCode, Trash2 } from "lucide-react";
+import { Download, Eye, EyeOff, Plus, QrCode, Trash2, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +33,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useEventsQuery, type EventRow } from "@/hooks/useEvents";
+import { useCurrentEvent, useEventsQuery, type EventRow } from "@/hooks/useEvents";
 import { EVENT_STATUS, checkinUrl, formatDate, logAudit, slugify } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/eventos")({
@@ -66,6 +66,8 @@ function Eventos() {
   const { data: events = [] } = useEventsQuery();
   const { isAdmin, profile, user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const { select } = useCurrentEvent();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<EventRow | null>(null);
   const [form, setForm] = useState(EMPTY);
@@ -236,6 +238,16 @@ function Eventos() {
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
                   Editar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    select(e.id);
+                    void navigate({ to: "/usuarios" });
+                  }}
+                >
+                  <Users className="size-4" /> Gerente e staff
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setPoster(e)}>
                   <QrCode className="size-4" /> QR de check-in

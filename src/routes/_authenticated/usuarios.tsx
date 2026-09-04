@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { KeyRound, ShieldCheck, UserPlus } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,28 +14,44 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
-import { ROLE_LABEL } from "@/lib/cronochip";
+import { saveEventTeamUser } from "@/lib/team.functions";
+import { ROLE_LABEL, formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
     meta: [
-      { title: "Usuários — Cronochip Kit" },
-      { name: "description", content: "Vincule organizadores e atendentes às equipes de cada evento." },
-      { property: "og:title", content: "Usuários — Cronochip Kit" },
-      { property: "og:description", content: "Equipe do evento e permissões de acesso." },
+      { title: "Equipe do evento — Cronochip Kit" },
+      { name: "description", content: "Cadastre o gerente e os staffs de cada evento com acesso por CPF." },
+      { property: "og:title", content: "Equipe do evento — Cronochip Kit" },
+      { property: "og:description", content: "Gerente e staffs com acesso restrito ao evento." },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: Usuarios,
 });
 
+type MemberRow = {
+  id: string;
+  user_id: string;
+  role: string;
+  profiles: { name: string; email: string; cpf: string | null } | null;
+};
+
 function Usuarios() {
   const { event, eventId } = useCurrentEvent();
+  const { isAdmin } = useAuth();
   const qc = useQueryClient();
+  const saveTeamUser = useServerFn(saveEventTeamUser);
+
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"organizer" | "attendant">("attendant");
+
+  const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
+  const [form, setForm] = useState({ name: "", cpf: "", birth: "", password: "" });
+  const [saving, setSaving] = useState(false);
 
   const { data: members = [] } = useQuery({
     queryKey: ["members", eventId],
@@ -41,15 +59,10 @@ function Usuarios() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("event_members")
-        .select("id,user_id,role,profiles:user_id(name,email)")
+        .select("id,user_id,role,profiles:user_id(name,email,cpf)")
         .eq("event_id", eventId!);
       if (error) throw error;
-      return (data ?? []) as unknown as {
-        id: string;
-        user_id: string;
-        role: string;
-        profiles: { name: string; email: string } | null;
-      }[];
+      return (data ?? []) as unknown as MemberRow[];
     },
   });
 
@@ -65,6 +78,41 @@ function Usuarios() {
     () => profiles.filter((p) => !members.some((m) => m.user_id === p.id)),
     [profiles, members],
   );
+
+  function openNew(kind: "organizer" | "attendant") {
+    setForm({ name: "", cpf: "", birth: "", password: "" });
+    setNewOpen(kind);
+  }
+
+  async function saveNew() {
+    if (!eventId || !newOpen) return;
+    const cpf = onlyDigits(form.cpf);
+    if (!isValidCPF(cpf)) { toast.error("Informe um CPF válido."); return; }
+    const password =
+      newOpen === "organizer" ? onlyDigits(form.birth.split("-").reverse().join("")) : form.password;
+    if (newOpen === "organizer" && password.length !== 8) {
+      toast.error("Informe a data de nascimento do gerente.");
+      return;
+    }
+    if (newOpen === "attendant" && password.trim().length < 6) {
+      toast.error("Crie uma senha com pelo menos 6 caracteres para o staff.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveTeamUser({
+        data: { eventId, cpf, name: form.name.trim() || formatCPF(cpf), password, role: newOpen },
+      });
+      await qc.invalidateQueries({ queryKey: ["members", eventId] });
+      setNewOpen(null);
+      toast.success(newOpen === "organizer" ? "Gerente cadastrado." : "Staff cadastrado.", {
+        description: `Entra com o CPF ${formatCPF(cpf)} e a senha definida agora.`,
+      });
+    } catch (err) {
+      toast.error("Não foi possível salvar", { description: (err as Error).message });
+    }
+    setSaving(false);
+  }
 
   async function add() {
     if (!eventId) return;
@@ -94,8 +142,36 @@ function Usuarios() {
       <PageHeader
         title="Equipe do evento"
         subtitle={event?.name ?? ""}
-        action={<Button onClick={() => setOpen(true)}>Vincular usuário</Button>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            {isAdmin && (
+              <Button onClick={() => openNew("organizer")}>
+                <ShieldCheck className="size-4" /> Novo gerente
+              </Button>
+            )}
+            <Button variant={isAdmin ? "outline" : "default"} onClick={() => openNew("attendant")}>
+              <UserPlus className="size-4" /> Novo staff
+            </Button>
+            <Button variant="ghost" onClick={() => setOpen(true)}>
+              Vincular por e-mail
+            </Button>
+          </div>
+        }
       />
+
+      <Card className="mb-4">
+        <CardContent className="text-muted-foreground space-y-1 py-4 text-sm">
+          <p>
+            <strong className="text-foreground">Gerente:</strong> entra com o CPF e a data de
+            nascimento (só números, ex.: 15031990). Pode cadastrar atletas, editar dados e criar os
+            staffs deste evento.
+          </p>
+          <p>
+            <strong className="text-foreground">Staff:</strong> entra com o CPF e a senha criada pelo
+            gerente. Só faz a entrega do kit, inclusive para terceiros informando quem retirou.
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="overflow-x-auto p-0">
@@ -103,7 +179,7 @@ function Usuarios() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>E-mail</TableHead>
+                <TableHead>CPF / acesso</TableHead>
                 <TableHead>Função</TableHead>
                 <TableHead />
               </TableRow>
@@ -112,11 +188,32 @@ function Usuarios() {
               {members.map((m) => (
                 <TableRow key={m.id}>
                   <TableCell className="font-medium">{m.profiles?.name ?? "—"}</TableCell>
-                  <TableCell className="max-w-[220px] truncate">{m.profiles?.email ?? "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{ROLE_LABEL[m.role] ?? m.role}</Badge>
+                  <TableCell className="max-w-[220px] truncate">
+                    {m.profiles?.cpf ? formatCPF(m.profiles.cpf) : (m.profiles?.email ?? "—")}
                   </TableCell>
                   <TableCell>
+                    <Badge variant="secondary">
+                      {m.role === "organizer" ? "Gerente" : (ROLE_LABEL[m.role] ?? m.role)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {m.profiles?.cpf && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setForm({
+                            name: m.profiles?.name ?? "",
+                            cpf: m.profiles?.cpf ?? "",
+                            birth: "",
+                            password: "",
+                          });
+                          setNewOpen(m.role === "organizer" ? "organizer" : "attendant");
+                        }}
+                      >
+                        <KeyRound className="size-4" /> Senha
+                      </Button>
+                    )}
                     <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>
                       Remover
                     </Button>
@@ -126,7 +223,7 @@ function Usuarios() {
               {members.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-muted-foreground">
-                    Nenhum usuário vinculado a este evento.
+                    Nenhuma pessoa vinculada a este evento.
                   </TableCell>
                 </TableRow>
               )}
@@ -134,6 +231,59 @@ function Usuarios() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!newOpen} onOpenChange={(v) => !v && setNewOpen(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {newOpen === "organizer" ? "Gerente do evento" : "Staff de entrega"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Nome</Label>
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Nome da pessoa"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>CPF (usado para entrar)</Label>
+              <Input
+                inputMode="numeric"
+                value={form.cpf}
+                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                placeholder="000.000.000-00"
+              />
+            </div>
+            {newOpen === "organizer" ? (
+              <div className="space-y-1.5">
+                <Label>Data de nascimento (será a senha)</Label>
+                <Input
+                  type="date"
+                  value={form.birth}
+                  onChange={(e) => setForm({ ...form, birth: e.target.value })}
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Label>Senha do staff</Label>
+                <Input
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="mínimo 6 caracteres"
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button disabled={saving} onClick={() => void saveNew()}>
+              Salvar acesso
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
@@ -152,8 +302,8 @@ function Usuarios() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="organizer">Organizador</SelectItem>
-                  <SelectItem value="attendant">Atendente</SelectItem>
+                  <SelectItem value="organizer">Gerente</SelectItem>
+                  <SelectItem value="attendant">Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>
