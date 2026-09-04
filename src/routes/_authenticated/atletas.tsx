@@ -183,6 +183,7 @@ function Atletas() {
       userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
+    setImporting(false);
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`);
   }
 
