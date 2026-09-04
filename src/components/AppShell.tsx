@@ -65,6 +65,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              item.sub && "border-sidebar-border/60 ml-5 border-l py-2 pl-3 text-[13px]",
               active
                 ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-brand"
                 : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
