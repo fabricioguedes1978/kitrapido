@@ -470,6 +470,12 @@ function Atletas() {
             <DialogTitle>Novo atleta</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
+            {(dupWarning || liveDup) && (
+              <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                <span>{dupWarning ?? liveDup}</span>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Nome</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
