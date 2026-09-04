@@ -160,7 +160,7 @@ function Atletas() {
         kit_type: r["kit_type"] ?? null,
       }));
 
-    if (parsed.length === 0) { toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
+    if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
 
     let inserted = 0;
     let duplicates = 0;
@@ -189,6 +189,10 @@ function Atletas() {
 
   function handleFile(file: File) {
     const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
+    if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
+    setLastFile(file.name);
+    setImporting(true);
     if (ext === "csv") {
       Papa.parse<Record<string, unknown>>(file, {
         header: true,
