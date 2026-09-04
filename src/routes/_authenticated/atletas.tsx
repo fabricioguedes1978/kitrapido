@@ -97,6 +97,9 @@ function Atletas() {
   const [term, setTerm] = useState("");
   const [qrAthlete, setQrAthlete] = useState<Athlete | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [lastFile, setLastFile] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
 
   const { data: athletes = [], isLoading } = useQuery({
