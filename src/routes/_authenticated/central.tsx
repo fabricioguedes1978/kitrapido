@@ -2,7 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlertTriangle, Camera, CheckCircle2, Search, UserCheck, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Camera,
+  CheckCircle2,
+  MonitorSmartphone,
+  Search,
+  UserCheck,
+  X,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { QrScanDialog } from "@/components/QrScanDialog";
 import { Button } from "@/components/ui/button";
@@ -21,6 +29,7 @@ import {
   onlyDigits,
   parseQrPayload,
 } from "@/lib/cronochip";
+import { customFields, publishDisplay } from "@/lib/display";
 import {
   cacheAthletes,
   enqueueDelivery,
@@ -55,6 +64,11 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  custom_1?: string | null;
+  custom_2?: string | null;
+  custom_3?: string | null;
+  custom_4?: string | null;
+  custom_5?: string | null;
 };
 
 type Delivery = {
