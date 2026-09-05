@@ -284,6 +284,7 @@ export type Database = {
         Row: {
           address: string | null
           archived: boolean
+          athletes_lock_at: string | null
           city: string | null
           created_at: string
           created_by: string | null
@@ -302,6 +303,7 @@ export type Database = {
         Insert: {
           address?: string | null
           archived?: boolean
+          athletes_lock_at?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -320,6 +322,7 @@ export type Database = {
         Update: {
           address?: string | null
           archived?: boolean
+          athletes_lock_at?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -587,6 +590,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_athletes: { Args: { _event_id: string }; Returns: boolean }
       can_manage_event: { Args: { _event_id: string }; Returns: boolean }
       has_event_access: { Args: { _event_id: string }; Returns: boolean }
       has_role: {
