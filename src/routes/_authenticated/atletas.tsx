@@ -406,6 +406,13 @@ function Atletas() {
       });
       return;
     }
+    const birthIso = parseBrDate(form.birth_date);
+    if (!birthIso) {
+      toast.error("Data de nascimento inválida", {
+        description: "Digite no formato dd/mm/aaaa.",
+      });
+      return;
+    }
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
@@ -432,7 +439,7 @@ function Atletas() {
     }
     const payload = {
       name: form.name.trim(),
-      birth_date: form.birth_date,
+      birth_date: birthIso,
       gender: form.gender,
       city: form.city.trim() || null,
       equipe: form.equipe.trim() || null,
