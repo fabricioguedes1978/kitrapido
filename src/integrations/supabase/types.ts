@@ -613,6 +613,30 @@ export type Database = {
           shirt_size: string
         }[]
       }
+      public_kit_lookup_all: {
+        Args: { _doc: string }
+        Returns: {
+          athlete_id: string
+          bib_number: string
+          category: string
+          city: string
+          custom_labels: string[]
+          custom_values: string[]
+          delivered_at: string
+          event_city: string
+          event_date: string
+          event_id: string
+          event_name: string
+          event_slug: string
+          event_state: string
+          kit_status: Database["public"]["Enums"]["kit_status"]
+          kit_type: string
+          modality: string
+          name: string
+          qr_payload: string
+          shirt_size: string
+        }[]
+      }
       shares_managed_event: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
