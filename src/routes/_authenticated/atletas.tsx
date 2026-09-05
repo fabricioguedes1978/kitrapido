@@ -48,6 +48,8 @@ export const Route = createFileRoute("/_authenticated/atletas")({
 type Athlete = {
   id: string;
   name: string;
+  gender: string | null;
+  birth_date: string | null;
   cpf: string | null;
   email: string | null;
   phone: string | null;
@@ -128,7 +130,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
+          "id,name,gender,birth_date,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
         )
         .eq("event_id", eventId!)
         .order("name");
