@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { AlertTriangle, Download, Plus, QrCode, Upload } from "lucide-react";
+import { AlertTriangle, Download, Pencil, Plus, QrCode, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
