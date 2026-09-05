@@ -131,7 +131,15 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
+  const [form, setForm] = useState({
+    name: "",
+    birth_date: "",
+    gender: "",
+    cpf: "",
+    bib_number: "",
+    modality: "",
+    shirt_size: "",
+  });
   const [dupWarning, setDupWarning] = useState<string | null>(null);
 
 
@@ -196,7 +204,7 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r["name"])
+      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"])
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
