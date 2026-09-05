@@ -198,6 +198,8 @@ function Atletas() {
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
+        gender: r["gender"] ?? null,
+        birth_date: r["birth_date"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
