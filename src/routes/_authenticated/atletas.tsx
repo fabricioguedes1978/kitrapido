@@ -228,7 +228,15 @@ function Atletas() {
         custom_5: r["custom_5"] ?? null,
       }));
 
-    if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
+    const incomplete = rows.length - parsed.length;
+    if (parsed.length === 0) {
+      setImporting(false);
+      toast.error("Nenhuma linha válida encontrada.", {
+        description:
+          "Nome, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
+      });
+      return;
+    }
 
     const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
     const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
@@ -271,10 +279,16 @@ function Atletas() {
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setImporting(false);
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
-      description:
+      description: [
         duplicates > 0
           ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
-          : undefined,
+          : null,
+        incomplete > 0
+          ? `${incomplete} linha(s) ignoradas por falta de nome, nascimento, sexo ou modalidade.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ") || undefined,
     });
   }
 
