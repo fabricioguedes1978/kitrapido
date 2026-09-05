@@ -104,6 +104,20 @@ function AuthPage() {
                   <p className="text-muted-foreground mb-3 text-center text-xs font-medium tracking-wide uppercase">
                     Como você quer entrar?
                   </p>
+                  <Link
+                    to="/checkin"
+                    className="border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors"
+                  >
+                    <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+                      <ClipboardCheck className="size-5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold">Check-in do atleta</span>
+                      <span className="text-muted-foreground block truncate text-xs">
+                        Consulte pelo CPF e gere sua credencial
+                      </span>
+                    </span>
+                  </Link>
                   <ProfileButton
                     icon={<UserCog className="size-5" />}
                     title="Gerente"
@@ -122,20 +136,6 @@ function AuthPage() {
                     description="Acesso total ao sistema"
                     onClick={() => selectProfile("admin")}
                   />
-                  <Link
-                    to="/checkin"
-                    className="border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors"
-                  >
-                    <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
-                      <ClipboardCheck className="size-5" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">Check-in do atleta</span>
-                      <span className="text-muted-foreground block truncate text-xs">
-                        Consulte pelo CPF e gere sua credencial
-                      </span>
-                    </span>
-                  </Link>
                 </div>
               ) : (
                 <form className="space-y-4" onSubmit={signIn}>
@@ -228,10 +228,6 @@ function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
-
-      <Link to="/consulta" className="text-sidebar-foreground/70 hover:text-primary text-xs">
-        Sou atleta — consultar meu kit
-      </Link>
     </div>
   );
 }
