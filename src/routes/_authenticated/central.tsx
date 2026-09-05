@@ -370,21 +370,28 @@ function Central() {
     );
   }
 
+  const stats = useMemo(() => {
+    const total = roster.length;
+    const delivered = deliveries.filter((d) => d.status === "active").length;
+    const pending = total - delivered;
+    const rate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+    return { total, delivered, pending, rate };
+  }, [roster, deliveries]);
+
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
-        <header className="mb-6">
-          <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
-          <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            onClick={() => window.open("/conferencia", "cronochip-display")}
-          >
-            <MonitorSmartphone className="size-4" /> Abrir tela de conferência do atleta
-          </Button>
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
+            <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
+            <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button size="lg" className="h-11 gap-2" onClick={() => setScanOpen(true)}>
+              <ScanLine className="size-5" /> Escanear QR Code
+            </Button>
+          </div>
         </header>
 
         {!selected && (
