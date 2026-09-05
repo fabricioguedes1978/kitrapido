@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { AlertTriangle, Download, Plus, QrCode, Upload } from "lucide-react";
+import { AlertTriangle, Download, Pencil, Plus, QrCode, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,6 +58,7 @@ type Athlete = {
   bib_number: string | null;
   modality: string | null;
   category: string | null;
+  distance: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
@@ -68,7 +69,30 @@ type Athlete = {
   custom_5?: string | null;
 };
 
+const EMPTY_FORM = {
+  name: "",
+  gender: "",
+  birth_date: "",
+  city: "",
+  cpf: "",
+  email: "",
+  phone: "",
+  registration_number: "",
+  bib_number: "",
+  modality: "",
+  category: "",
+  distance: "",
+  shirt_size: "",
+  kit_type: "",
+  custom_1: "",
+  custom_2: "",
+  custom_3: "",
+  custom_4: "",
+  custom_5: "",
+};
+
 const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"] as const;
+
 
 const COLUMN_MAP: Record<string, string> = {
   nome: "name",
@@ -131,15 +155,8 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    birth_date: "",
-    gender: "",
-    cpf: "",
-    bib_number: "",
-    modality: "",
-    shirt_size: "",
-  });
+  const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
 
 
@@ -150,7 +167,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
+          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -178,15 +195,50 @@ function Atletas() {
     const cpf = onlyDigits(form.cpf);
     const bib = form.bib_number.trim();
     if (cpf.length === 11) {
-      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf);
+      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf && a.id !== editingId);
       if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
     }
     if (bib) {
-      const hit = athletes.find((a) => (a.bib_number ?? "") === bib);
+      const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
       if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
     }
     return null;
-  }, [athletes, form.cpf, form.bib_number]);
+  }, [athletes, form.cpf, form.bib_number, editingId]);
+
+  function openNew() {
+    setForm({ ...EMPTY_FORM });
+    setEditingId(null);
+    setDupWarning(null);
+    setNewOpen(true);
+  }
+
+  function openEdit(a: Athlete) {
+    setForm({
+      name: a.name ?? "",
+      gender: a.gender ?? "",
+      birth_date: a.birth_date ?? "",
+      city: a.city ?? "",
+      cpf: a.cpf ?? "",
+      email: a.email ?? "",
+      phone: a.phone ?? "",
+      registration_number: a.registration_number ?? "",
+      bib_number: a.bib_number ?? "",
+      modality: a.modality ?? "",
+      category: a.category ?? "",
+      distance: a.distance ?? "",
+      shirt_size: a.shirt_size ?? "",
+      kit_type: a.kit_type ?? "",
+      custom_1: a.custom_1 ?? "",
+      custom_2: a.custom_2 ?? "",
+      custom_3: a.custom_3 ?? "",
+      custom_4: a.custom_4 ?? "",
+      custom_5: a.custom_5 ?? "",
+    });
+    setEditingId(a.id);
+    setDupWarning(null);
+    setNewOpen(true);
+  }
+
 
 
   async function importRows(rows: Record<string, unknown>[]) {
@@ -315,7 +367,7 @@ function Atletas() {
     reader.readAsArrayBuffer(file);
   }
 
-  async function createAthlete() {
+  async function saveAthlete() {
     if (!eventId) return;
     const missing: string[] = [];
     if (!form.name.trim()) missing.push("nome");
@@ -340,8 +392,9 @@ function Atletas() {
         .select("id,name,cpf,bib_number")
         .eq("event_id", eventId)
         .or(filters.join(","));
-      const dupCpf = cpf ? dups?.find((d) => onlyDigits(d.cpf) === cpf) : null;
-      const dupBib = bib ? dups?.find((d) => d.bib_number === bib) : null;
+      const others = (dups ?? []).filter((d) => d.id !== editingId);
+      const dupCpf = cpf ? others.find((d) => onlyDigits(d.cpf) === cpf) : null;
+      const dupBib = bib ? others.find((d) => d.bib_number === bib) : null;
       if (dupCpf || dupBib) {
         const msg = dupCpf
           ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
@@ -351,30 +404,53 @@ function Atletas() {
         return;
       }
     }
-    const { error } = await supabase.from("athletes").insert({
-      event_id: eventId,
+    const payload = {
       name: form.name.trim(),
       birth_date: form.birth_date,
       gender: form.gender,
-      cpf: form.cpf ? onlyDigits(form.cpf) : null,
-      bib_number: form.bib_number || null,
+      city: form.city.trim() || null,
+      cpf,
+      email: form.email.trim() || null,
+      phone: form.phone.trim() || null,
+      registration_number: form.registration_number.trim() || null,
+      bib_number: bib,
       modality: form.modality.trim(),
+      category: form.category.trim() || null,
+      distance: form.distance.trim() || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
-    });
+      kit_type: form.kit_type.trim() || null,
+      custom_1: form.custom_1.trim() || null,
+      custom_2: form.custom_2.trim() || null,
+      custom_3: form.custom_3.trim() || null,
+      custom_4: form.custom_4.trim() || null,
+      custom_5: form.custom_5.trim() || null,
+    };
+    const { error } = editingId
+      ? await supabase.from("athletes").update(payload).eq("id", editingId)
+      : await supabase.from("athletes").insert({ event_id: eventId, ...payload });
     if (error) {
       const dup = error.code === "23505";
       const msg = dup
         ? "CPF ou nº de peito já cadastrado neste evento."
         : error.message;
       if (dup) setDupWarning(msg);
-      toast.error("Não foi possível cadastrar", { description: msg });
+      toast.error("Não foi possível salvar", { description: msg });
       return;
     }
+    void logAudit({
+      eventId,
+      action: editingId ? `Editou atleta ${payload.name}` : `Cadastrou atleta ${payload.name}`,
+      entity: "athletes",
+      entityId: editingId,
+      userName: profile?.name ?? null,
+    });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
-    setForm({ name: "", birth_date: "", gender: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
-    toast.success("Atleta cadastrado.");
+    setForm({ ...EMPTY_FORM });
+    toast.success(editingId ? "Dados atualizados." : "Atleta cadastrado.");
+    setEditingId(null);
   }
+
 
   function exportCsv() {
     const csv = Papa.unparse(
@@ -409,7 +485,7 @@ function Atletas() {
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
-            <Button onClick={() => setNewOpen(true)}>
+            <Button onClick={openNew}>
               <Plus className="size-4" />
             </Button>
           </div>
@@ -522,7 +598,20 @@ function Atletas() {
               )}
               {filtered.map((a) => (
                 <TableRow key={a.id}>
-                  <TableCell className="max-w-[220px] truncate font-medium">{a.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        title="Editar dados"
+                        onClick={() => openEdit(a)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                      <span className="max-w-[200px] truncate">{a.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
@@ -566,10 +655,10 @@ function Atletas() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); }}>
-        <DialogContent className="max-w-md">
+      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); if (!v) setEditingId(null); }}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Novo atleta</DialogTitle>
+            <DialogTitle>{editingId ? "Editar atleta" : "Novo atleta"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             {(dupWarning || liveDup) && (
@@ -582,7 +671,7 @@ function Atletas() {
               <Label>Nome *</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Data de nascimento *</Label>
                 <Input
@@ -605,15 +694,31 @@ function Atletas() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label>Modalidade *</Label>
-                <Input
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
-                />
+                <Label>Cidade</Label>
+                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>E-mail</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Telefone</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nº de inscrição</Label>
+                <Input
+                  value={form.registration_number}
+                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Nº de peito</Label>
@@ -623,16 +728,53 @@ function Atletas() {
                 />
               </div>
               <div className="space-y-1.5">
+                <Label>Modalidade *</Label>
+                <Input
+                  value={form.modality}
+                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Categoria</Label>
+                <Input
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Distância</Label>
+                <Input
+                  value={form.distance}
+                  onChange={(e) => setForm({ ...form, distance: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
                 <Label>Camiseta</Label>
                 <Input
                   value={form.shirt_size}
                   onChange={(e) => setForm({ ...form, shirt_size: e.target.value })}
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label>Kit</Label>
+                <Input
+                  value={form.kit_type}
+                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
+                />
+              </div>
+              {CUSTOM_KEYS.map((key, i) => (
+                <div key={key} className="space-y-1.5">
+                  <Label>{event?.custom_field_labels?.[i]?.trim() || `Campo extra ${i + 1}`}</Label>
+                  <Input
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void createAthlete()}>Salvar</Button>
+            <Button onClick={() => void saveAthlete()}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
