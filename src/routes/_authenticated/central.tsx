@@ -713,12 +713,6 @@ function Central() {
                 constar como pendente. O estoque será estornado automaticamente.
               </DialogDescription>
             </DialogHeader>
-            <Textarea
-              placeholder="Motivo do cancelamento (ex.: entrega feita para o atleta errado)"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              rows={3}
-            />
             <DialogFooter>
               <Button variant="outline" onClick={() => setCancelOpen(false)}>Voltar</Button>
               <Button variant="destructive" disabled={cancelling} onClick={() => void cancelDelivery()}>
