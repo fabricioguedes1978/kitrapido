@@ -316,7 +316,18 @@ function Atletas() {
   }
 
   async function createAthlete() {
-    if (!eventId || !form.name.trim()) { toast.error("Informe o nome do atleta."); return; }
+    if (!eventId) return;
+    const missing: string[] = [];
+    if (!form.name.trim()) missing.push("nome");
+    if (!form.birth_date) missing.push("data de nascimento");
+    if (!form.gender) missing.push("sexo");
+    if (!form.modality.trim()) missing.push("modalidade");
+    if (missing.length > 0) {
+      toast.error("Campos obrigatórios", {
+        description: `Informe: ${missing.join(", ")}.`,
+      });
+      return;
+    }
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
@@ -343,9 +354,11 @@ function Atletas() {
     const { error } = await supabase.from("athletes").insert({
       event_id: eventId,
       name: form.name.trim(),
+      birth_date: form.birth_date,
+      gender: form.gender,
       cpf: form.cpf ? onlyDigits(form.cpf) : null,
       bib_number: form.bib_number || null,
-      modality: form.modality || null,
+      modality: form.modality.trim(),
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
     });
     if (error) {
@@ -359,7 +372,7 @@ function Atletas() {
     }
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
-    setForm({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
+    setForm({ name: "", birth_date: "", gender: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
     toast.success("Atleta cadastrado.");
   }
 
