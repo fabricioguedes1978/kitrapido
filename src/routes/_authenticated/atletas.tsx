@@ -559,8 +559,8 @@ function Atletas() {
                 e.stopPropagation();
                 downloadBlob(
                   "\uFEFF" +
-                    "nome,sexo,nascimento,cidade,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
-                    "Maria Silva,F,1990-05-15,São Paulo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
+                    "nome,sexo,nascimento,cidade,equipe,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
+                    "Maria Silva,F,1990-05-15,São Paulo,Equipe Exemplo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
                   "modelo-atletas.csv",
                   "text/csv;charset=utf-8",
                 );
@@ -590,6 +590,7 @@ function Atletas() {
                 <TableHead className="hidden sm:table-cell">Sexo</TableHead>
                 <TableHead className="hidden md:table-cell">Nascimento</TableHead>
                 <TableHead className="hidden md:table-cell">Cidade</TableHead>
+                <TableHead className="hidden lg:table-cell">Equipe</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
@@ -623,6 +624,7 @@ function Atletas() {
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{a.equipe ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
