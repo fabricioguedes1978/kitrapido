@@ -646,7 +646,7 @@ function Central() {
                       <p className="text-2xl font-extrabold">{selected.name}</p>
                       <p className="text-muted-foreground text-sm">CPF: {maskCPF(selected.cpf)}</p>
                       <div className="mt-1">
-                        <PaymentBadge athlete={selected} big />
+                        <PaymentBadge athlete={selected} />
                       </div>
                     </div>
                     <Badge
