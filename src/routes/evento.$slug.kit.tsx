@@ -40,6 +40,7 @@ type KitInfo = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  city: string | null;
   event_name: string;
   delivered_at: string | null;
   qr_payload: string;
@@ -157,6 +158,7 @@ function MeuKit() {
                 <Field label="Nº de peito" value={result.bib_number} strong />
                 <Field label="Modalidade" value={result.modality} />
                 <Field label="Categoria" value={result.category} />
+                <Field label="Cidade" value={result.city} />
                 <Field label="Camiseta" value={result.shirt_size} strong />
                 <Field label="Kit" value={result.kit_type} />
                 {customFields(result.custom_labels, result.custom_values ?? []).map((f) => (

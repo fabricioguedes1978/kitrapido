@@ -64,6 +64,7 @@ type Athlete = {
   bib_number: string | null;
   modality: string | null;
   category: string | null;
+  city: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
@@ -106,7 +107,7 @@ function Central() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -527,6 +528,7 @@ function Central() {
                 <Info label="Kit" value={selected.kit_type} />
                 <Info label="Modalidade" value={selected.modality} />
                 <Info label="Categoria" value={selected.category} />
+                <Info label="Cidade" value={selected.city} />
                 <Info label="Inscrição" value={selected.registration_number} />
                 {extras.map((f) => (
                   <Info key={f.label} label={f.label} value={f.value} />
