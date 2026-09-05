@@ -131,7 +131,15 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
+  const [form, setForm] = useState({
+    name: "",
+    birth_date: "",
+    gender: "",
+    cpf: "",
+    bib_number: "",
+    modality: "",
+    shirt_size: "",
+  });
   const [dupWarning, setDupWarning] = useState<string | null>(null);
 
 
@@ -196,7 +204,7 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r["name"])
+      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"])
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
@@ -220,7 +228,15 @@ function Atletas() {
         custom_5: r["custom_5"] ?? null,
       }));
 
-    if (parsed.length === 0) { setImporting(false); toast.error("Nenhuma linha válida encontrada. Verifique a coluna 'nome'."); return; }
+    const incomplete = rows.length - parsed.length;
+    if (parsed.length === 0) {
+      setImporting(false);
+      toast.error("Nenhuma linha válida encontrada.", {
+        description:
+          "Nome, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
+      });
+      return;
+    }
 
     const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
     const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
@@ -263,10 +279,16 @@ function Atletas() {
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setImporting(false);
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
-      description:
+      description: [
         duplicates > 0
           ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
-          : undefined,
+          : null,
+        incomplete > 0
+          ? `${incomplete} linha(s) ignoradas por falta de nome, nascimento, sexo ou modalidade.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ") || undefined,
     });
   }
 
@@ -294,7 +316,18 @@ function Atletas() {
   }
 
   async function createAthlete() {
-    if (!eventId || !form.name.trim()) { toast.error("Informe o nome do atleta."); return; }
+    if (!eventId) return;
+    const missing: string[] = [];
+    if (!form.name.trim()) missing.push("nome");
+    if (!form.birth_date) missing.push("data de nascimento");
+    if (!form.gender) missing.push("sexo");
+    if (!form.modality.trim()) missing.push("modalidade");
+    if (missing.length > 0) {
+      toast.error("Campos obrigatórios", {
+        description: `Informe: ${missing.join(", ")}.`,
+      });
+      return;
+    }
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
@@ -321,9 +354,11 @@ function Atletas() {
     const { error } = await supabase.from("athletes").insert({
       event_id: eventId,
       name: form.name.trim(),
+      birth_date: form.birth_date,
+      gender: form.gender,
       cpf: form.cpf ? onlyDigits(form.cpf) : null,
       bib_number: form.bib_number || null,
-      modality: form.modality || null,
+      modality: form.modality.trim(),
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
     });
     if (error) {
@@ -337,7 +372,7 @@ function Atletas() {
     }
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
-    setForm({ name: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
+    setForm({ name: "", birth_date: "", gender: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
     toast.success("Atleta cadastrado.");
   }
 
@@ -544,10 +579,38 @@ function Atletas() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label>Nome</Label>
+              <Label>Nome *</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Data de nascimento *</Label>
+                <Input
+                  type="date"
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Sexo *</Label>
+                <select
+                  value={form.gender}
+                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Modalidade *</Label>
+                <Input
+                  value={form.modality}
+                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                />
+              </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
@@ -557,13 +620,6 @@ function Atletas() {
                 <Input
                   value={form.bib_number}
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Modalidade</Label>
-                <Input
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
