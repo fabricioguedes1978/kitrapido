@@ -114,6 +114,9 @@ function Central() {
   const [asThirdParty, setAsThirdParty] = useState(false);
   const [success, setSuccess] = useState<{ name: string; bib: string | null; at: string } | null>(null);
   const [locationId, setLocationId] = useState<string>("");
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: athletes = [] } = useQuery({
