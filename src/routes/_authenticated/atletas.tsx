@@ -155,15 +155,8 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    birth_date: "",
-    gender: "",
-    cpf: "",
-    bib_number: "",
-    modality: "",
-    shirt_size: "",
-  });
+  const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
 
 
@@ -174,7 +167,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
+          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -202,15 +195,50 @@ function Atletas() {
     const cpf = onlyDigits(form.cpf);
     const bib = form.bib_number.trim();
     if (cpf.length === 11) {
-      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf);
+      const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf && a.id !== editingId);
       if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
     }
     if (bib) {
-      const hit = athletes.find((a) => (a.bib_number ?? "") === bib);
+      const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
       if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
     }
     return null;
-  }, [athletes, form.cpf, form.bib_number]);
+  }, [athletes, form.cpf, form.bib_number, editingId]);
+
+  function openNew() {
+    setForm({ ...EMPTY_FORM });
+    setEditingId(null);
+    setDupWarning(null);
+    setNewOpen(true);
+  }
+
+  function openEdit(a: Athlete) {
+    setForm({
+      name: a.name ?? "",
+      gender: a.gender ?? "",
+      birth_date: a.birth_date ?? "",
+      city: a.city ?? "",
+      cpf: a.cpf ?? "",
+      email: a.email ?? "",
+      phone: a.phone ?? "",
+      registration_number: a.registration_number ?? "",
+      bib_number: a.bib_number ?? "",
+      modality: a.modality ?? "",
+      category: a.category ?? "",
+      distance: a.distance ?? "",
+      shirt_size: a.shirt_size ?? "",
+      kit_type: a.kit_type ?? "",
+      custom_1: a.custom_1 ?? "",
+      custom_2: a.custom_2 ?? "",
+      custom_3: a.custom_3 ?? "",
+      custom_4: a.custom_4 ?? "",
+      custom_5: a.custom_5 ?? "",
+    });
+    setEditingId(a.id);
+    setDupWarning(null);
+    setNewOpen(true);
+  }
+
 
 
   async function importRows(rows: Record<string, unknown>[]) {
