@@ -389,6 +389,12 @@ function Atletas() {
   }
 
   function handleFile(file: File) {
+    if (locked) {
+      toast.error("Cadastro de atletas encerrado", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
     if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
