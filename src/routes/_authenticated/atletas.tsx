@@ -334,7 +334,7 @@ function Atletas() {
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
       }))
-      .filter((r) => r.birth_date);
+      .filter((r) => r.birth_date && r.cpf && r.cpf.length === 11 && r.bib_number);
 
     const incomplete = rows.length - parsed.length;
     if (parsed.length === 0) {
