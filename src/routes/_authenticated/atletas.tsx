@@ -104,6 +104,12 @@ const COLUMN_MAP: Record<string, string> = {
   campo5: "custom_5",
 };
 
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  return y && m && d ? `${d}/${m}/${y}` : iso;
+}
+
 function normalizeKey(key: string) {
   return key
     .normalize("NFD")
