@@ -573,7 +573,7 @@ function Central() {
                     <Button
                       variant="destructive"
                       className="mt-3"
-                      onClick={() => { setCancelReason(""); setCancelOpen(true); }}
+                      onClick={() => setCancelOpen(true)}
                     >
                       <Undo2 className="size-4" /> Cancelar kit entregue
                     </Button>
