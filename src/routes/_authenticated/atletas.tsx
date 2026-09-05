@@ -840,7 +840,7 @@ function Atletas() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Número</Label>
+                <Label>Número *</Label>
                 <Input
                   value={form.bib_number}
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
