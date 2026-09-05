@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { onlyDigits } from "@/lib/cronochip";
@@ -34,7 +33,6 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [profile, setProfile] = useState<LoginProfile | null>(null);
 
   useEffect(() => {
@@ -61,29 +59,6 @@ function AuthPage() {
     setPassword("");
   }
 
-  async function signUp(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: { emailRedirectTo: window.location.origin, data: { name } },
-    });
-    setLoading(false);
-    if (error) { toast.error("Não foi possível criar a conta", { description: error.message }); return; }
-    if (data.session) return navigate({ to: "/central", replace: true });
-    toast.success("Conta criada", { description: "Confirme o e-mail enviado para ativar o acesso." });
-  }
-
-  async function recover() {
-    if (!email.trim()) { toast.error("Informe seu e-mail para recuperar a senha."); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) { toast.error("Não foi possível enviar o e-mail"); return; }
-    toast.success("Enviamos um link de recuperação para o seu e-mail.");
-  }
-
   return (
     <div className="bg-dark-gradient flex min-h-screen flex-col items-center justify-center gap-6 p-4">
       <Link to="/">
@@ -92,137 +67,86 @@ function AuthPage() {
 
       <Card className="shadow-card w-full max-w-sm">
         <CardContent className="pt-6">
-          <Tabs defaultValue="login">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar conta</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="login">
-              {!profile ? (
-                <div className="space-y-2">
-                  <p className="text-muted-foreground mb-3 text-center text-xs font-medium tracking-wide uppercase">
-                    Como você quer entrar?
-                  </p>
-                  <Link
-                    to="/checkin"
-                    className="border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors"
-                  >
-                    <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
-                      <ClipboardCheck className="size-5" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">Check-in do atleta</span>
-                      <span className="text-muted-foreground block truncate text-xs">
-                        Consulte pelo CPF e gere sua credencial
-                      </span>
-                    </span>
-                  </Link>
-                  <ProfileButton
-                    icon={<UserCog className="size-5" />}
-                    title="Gerente"
-                    description="CPF e senha do evento"
-                    onClick={() => selectProfile("gerente")}
-                  />
-                  <ProfileButton
-                    icon={<Users className="size-5" />}
-                    title="Staff"
-                    description="CPF e senha criada pelo gerente"
-                    onClick={() => selectProfile("staff")}
-                  />
-                  <ProfileButton
-                    icon={<ShieldCheck className="size-5" />}
-                    title="Administrador"
-                    description="Acesso total ao sistema"
-                    onClick={() => selectProfile("admin")}
-                  />
-                </div>
-              ) : (
-                <form className="space-y-4" onSubmit={signIn}>
-                  <button
-                    type="button"
-                    onClick={() => setProfile(null)}
-                    className="text-muted-foreground hover:text-primary flex items-center gap-1 text-xs"
-                  >
-                    <ArrowLeft className="size-3.5" /> Voltar
-                  </button>
-                  <p className="text-sm font-semibold">
-                    Entrar como{" "}
-                    {profile === "admin" ? "Administrador" : profile === "gerente" ? "Gerente" : "Staff"}
-                  </p>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email">{profile === "admin" ? "E-mail" : "CPF"}</Label>
-                    <Input
-                      id="email"
-                      type="text"
-                      autoComplete="username"
-                      required
-                      inputMode={profile === "admin" ? "email" : "numeric"}
-                      placeholder={profile === "admin" ? "seu@email.com" : "Somente números"}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="password">Senha</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    Entrar
-                  </Button>
-                  {profile === "admin" && (
-                    <button
-                      type="button"
-                      onClick={() => void recover()}
-                      className="text-muted-foreground hover:text-primary w-full text-center text-xs"
-                    >
-                      Esqueci minha senha
-                    </button>
-                  )}
-                </form>
-              )}
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form className="space-y-4" onSubmit={signUp}>
-                <div className="space-y-1.5">
-                  <Label htmlFor="name">Nome completo</Label>
-                  <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="email2">E-mail</Label>
-                  <Input
-                    id="email2"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="password2">Senha</Label>
-                  <Input
-                    id="password2"
-                    type="password"
-                    minLength={6}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  Criar conta
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+          {!profile ? (
+            <div className="space-y-2">
+              <p className="text-muted-foreground mb-3 text-center text-xs font-medium tracking-wide uppercase">
+                Como você quer entrar?
+              </p>
+              <Link
+                to="/checkin"
+                className="border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors"
+              >
+                <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+                  <ClipboardCheck className="size-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold">Check-in do atleta</span>
+                  <span className="text-muted-foreground block truncate text-xs">
+                    Consulte pelo CPF e gere sua credencial
+                  </span>
+                </span>
+              </Link>
+              <ProfileButton
+                icon={<UserCog className="size-5" />}
+                title="Gerente"
+                description="CPF e senha do evento"
+                onClick={() => selectProfile("gerente")}
+              />
+              <ProfileButton
+                icon={<Users className="size-5" />}
+                title="Staff"
+                description="CPF e senha criada pelo gerente"
+                onClick={() => selectProfile("staff")}
+              />
+              <ProfileButton
+                icon={<ShieldCheck className="size-5" />}
+                title="Administrador"
+                description="Acesso total ao sistema"
+                onClick={() => selectProfile("admin")}
+              />
+            </div>
+          ) : (
+            <form className="space-y-4" onSubmit={signIn}>
+              <button
+                type="button"
+                onClick={() => setProfile(null)}
+                className="text-muted-foreground hover:text-primary flex items-center gap-1 text-xs"
+              >
+                <ArrowLeft className="size-3.5" /> Voltar
+              </button>
+              <p className="text-sm font-semibold">
+                Entrar como{" "}
+                {profile === "admin" ? "Administrador" : profile === "gerente" ? "Gerente" : "Staff"}
+              </p>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">{profile === "admin" ? "E-mail" : "CPF"}</Label>
+                <Input
+                  id="email"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  inputMode={profile === "admin" ? "email" : "numeric"}
+                  placeholder={profile === "admin" ? "seu@email.com" : "Somente números"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
+                Entrar
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
