@@ -64,7 +64,7 @@ const EMPTY = {
 
 function Eventos() {
   const { data: events = [] } = useEventsQuery();
-  const { isAdmin, profile, user } = useAuth();
+  const { isAdmin, isOrganizer, profile, user } = useAuth();
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { select } = useCurrentEvent();
@@ -202,7 +202,7 @@ function Eventos() {
         title="Eventos"
         subtitle="Provas e entregas de kit gerenciadas pelo Kit Rápido"
         action={
-          isAdmin ? (
+          isAdmin || isOrganizer ? (
             <Button onClick={openNew}>
               <Plus className="size-4" /> Novo evento
             </Button>
