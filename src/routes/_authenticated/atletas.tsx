@@ -180,7 +180,12 @@ function normalizeKey(key: string) {
 
 function Atletas() {
   const { event, eventId } = useCurrentEvent();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
+  const lockAt = event?.athletes_lock_at ?? null;
+  const locked = !isAdmin && !!lockAt && new Date(lockAt).getTime() <= Date.now();
+  const lockLabel = lockAt
+    ? new Date(lockAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+    : null;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [term, setTerm] = useState("");
