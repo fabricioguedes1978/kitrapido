@@ -103,21 +103,28 @@ function Checkin() {
           </Button>
         </form>
 
+        {rows && rows.length > 0 && (
+          <p className="text-muted-foreground mt-6 text-sm">
+            Encontramos <strong>{rows.length}</strong> inscrição{rows.length > 1 ? "ões" : ""} em eventos ativos. 
+            Cada evento tem sua própria credencial para download.
+          </p>
+        )}
+
         {rows?.length === 0 && (
           <p className="text-destructive mt-6 text-sm font-medium">
             Não encontramos nenhuma inscrição com esse CPF nos eventos ativos.
           </p>
         )}
 
-        <div className="mt-6 space-y-6">
-          {rows?.map((row) => <KitCard key={row.athlete_id} row={row} />)}
+        <div className="mt-4 space-y-6">
+          {rows?.map((row, idx) => <KitCard key={row.athlete_id} row={row} index={idx} total={rows.length} />)}
         </div>
       </main>
     </div>
   );
 }
 
-function KitCard({ row }: { row: KitRow }) {
+function KitCard({ row, index, total }: { row: KitRow; index: number; total: number }) {
   const qrRef = useRef<HTMLDivElement>(null);
   const delivered = row.kit_status !== "pending" && row.kit_status !== "blocked";
   const scanUrl = athleteQrUrl(row.event_id, row.athlete_id);
@@ -146,7 +153,8 @@ function KitCard({ row }: { row: KitRow }) {
       ],
       footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",
     };
-    const base = `credencial-${row.name.toLowerCase().replace(/\s+/g, "-")}`;
+    const safeEvent = row.event_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const base = `credencial-${row.name.toLowerCase().replace(/\s+/g, "-")}${safeEvent ? `-${safeEvent}` : ""}${total > 1 ? `-${index + 1}` : ""}`;
     try {
       if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
       else await downloadCredentialPdf(data, svg, `${base}.pdf`);
@@ -158,21 +166,28 @@ function KitCard({ row }: { row: KitRow }) {
   return (
     <Card className="shadow-card">
       <CardContent className="space-y-5 pt-6">
-        <div>
-          <p className="text-xl font-bold">{row.event_name}</p>
-          <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {row.event_date && (
-              <span className="inline-flex items-center gap-1">
-                <CalendarDays className="size-4" /> {formatDate(row.event_date)}
-              </span>
-            )}
-            {row.event_city && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="size-4" /> {row.event_city}
-                {row.event_state ? `/${row.event_state}` : ""}
-              </span>
-            )}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xl font-bold">{row.event_name}</p>
+            <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              {row.event_date && (
+                <span className="inline-flex items-center gap-1">
+                  <CalendarDays className="size-4" /> {formatDate(row.event_date)}
+                </span>
+              )}
+              {row.event_city && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="size-4" /> {row.event_city}
+                  {row.event_state ? `/${row.event_state}` : ""}
+                </span>
+              )}
+            </div>
           </div>
+          {total > 1 && (
+            <span className="bg-primary/10 text-primary shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+              {index + 1}/{total}
+            </span>
+          )}
         </div>
 
         {delivered ? (
