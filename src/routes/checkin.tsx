@@ -153,7 +153,8 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
       ],
       footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",
     };
-    const base = `credencial-${row.name.toLowerCase().replace(/\s+/g, "-")}`;
+    const safeEvent = row.event_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const base = `credencial-${row.name.toLowerCase().replace(/\s+/g, "-")}${safeEvent ? `-${safeEvent}` : ""}${total > 1 ? `-${index + 1}` : ""}`;
     try {
       if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
       else await downloadCredentialPdf(data, svg, `${base}.pdf`);
