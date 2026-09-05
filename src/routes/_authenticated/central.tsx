@@ -103,8 +103,8 @@ type Delivery = {
 };
 
 function isPaid(a: Athlete) {
-  const s = (a.payment_status || "").toLowerCase();
-  return s === "pago" || s === "paid" || s === "confirmada";
+  const s = (a.payment_status || "").toLowerCase().trim();
+  return s === "pago" || s === "paid";
 }
 
 function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolean }) {
