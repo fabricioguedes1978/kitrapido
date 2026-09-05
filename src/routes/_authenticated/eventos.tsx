@@ -318,6 +318,67 @@ function Eventos() {
         )}
       </div>
 
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{viewing?.name}</DialogTitle>
+          </DialogHeader>
+          {viewing && (
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <Detail label="Situação">
+                <Badge variant={viewing.archived ? "destructive" : "secondary"}>
+                  {viewing.archived ? "Inativo" : (EVENT_STATUS[viewing.status] ?? viewing.status)}
+                </Badge>
+              </Detail>
+              <Detail label="Data e horário">
+                {formatDate(viewing.event_date)}{" "}
+                {viewing.event_time ? `às ${viewing.event_time.slice(0, 5)}` : ""}
+              </Detail>
+              <Detail label="Cidade/UF">
+                {[viewing.city, viewing.state].filter(Boolean).join("/") || "—"}
+              </Detail>
+              <Detail label="Endereço">{viewing.address || "—"}</Detail>
+              <Detail label="Modalidades">
+                {viewing.modalities?.length ? viewing.modalities.join(", ") : "—"}
+              </Detail>
+              <Detail label="Fecha cadastro de atletas em">
+                {viewing.athletes_lock_at
+                  ? new Date(viewing.athletes_lock_at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })
+                  : "24h antes do evento (automático)"}
+              </Detail>
+              {viewing.custom_field_labels?.some((l) => l?.trim()) && (
+                <Detail label="Campos personalizados" full>
+                  {viewing.custom_field_labels.filter((l) => l?.trim()).join(", ")}
+                </Detail>
+              )}
+              {viewing.description && (
+                <Detail label="Descrição" full>
+                  {viewing.description}
+                </Detail>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewing(null)}>
+              Fechar
+            </Button>
+            {(isAdmin || isOrganizer) && viewing && (
+              <Button
+                onClick={() => {
+                  openEdit(viewing);
+                  setViewing(null);
+                }}
+              >
+                Editar evento
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!poster} onOpenChange={(v) => !v && setPoster(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
