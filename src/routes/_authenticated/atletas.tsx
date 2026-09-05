@@ -592,7 +592,7 @@ function Atletas() {
                 ];
                 const exemplo = [
                   "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
-                  "maria@email.com", "11999999999", "INS001", "1001", "Corrida", "Feminino Geral",
+                  "maria@email.com", "(31) 9999-9999", "INS001", "1001", "Corrida", "Feminino Geral",
                   "10km", "M", "Kit Padrão", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
