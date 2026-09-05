@@ -165,9 +165,10 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   return (
     <Card className="shadow-card">
       <CardContent className="space-y-5 pt-6">
-        <div>
-          <p className="text-xl font-bold">{row.event_name}</p>
-          <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xl font-bold">{row.event_name}</p>
+            <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             {row.event_date && (
               <span className="inline-flex items-center gap-1">
                 <CalendarDays className="size-4" /> {formatDate(row.event_date)}
