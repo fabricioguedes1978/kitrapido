@@ -634,8 +634,8 @@ function Central() {
                     <QrCodePlaceholder value={selected.id} size={120} />
                   </div>
                   <div className="text-center">
-                    <p className="text-primary text-4xl font-extrabold leading-none">{selected.bib_number || "—"}</p>
-                    <p className="text-muted-foreground text-xs uppercase tracking-wide mt-1">Nº de peito</p>
+                    <p className="text-primary text-7xl font-extrabold leading-none">{selected.bib_number || "—"}</p>
+                    <p className="text-muted-foreground text-sm uppercase tracking-wide mt-2">Número</p>
                   </div>
                 </div>
 
