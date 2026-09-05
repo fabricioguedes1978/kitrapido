@@ -424,9 +424,9 @@ function Atletas() {
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, cpf, e-mail, telefone, inscrição,
-              peito, modalidade, categoria, distância, camiseta, kit e os 5 campos personalizados
-              (use extra1 a extra5 ou o nome que você definiu no evento).
+              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
+              cpf, e-mail, telefone, inscrição, peito, modalidade, categoria, distância, camiseta, kit
+              e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
               <p className="text-muted-foreground mt-2 text-xs">Último arquivo: {lastFile}</p>
@@ -440,8 +440,8 @@ function Atletas() {
                 e.stopPropagation();
                 downloadBlob(
                   "\uFEFF" +
-                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
-                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
+                    "nome,sexo,nascimento,cidade,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
+                    "Maria Silva,F,1990-05-15,São Paulo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
                   "modelo-atletas.csv",
                   "text/csv;charset=utf-8",
                 );
