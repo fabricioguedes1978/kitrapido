@@ -258,6 +258,12 @@ function Atletas() {
   }
 
   function openEdit(a: Athlete) {
+    if (locked) {
+      toast.error("Alteração de atletas encerrada", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
