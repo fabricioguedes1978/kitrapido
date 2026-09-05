@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.guard_event_archived() FROM PUBLIC, anon, authenticated;

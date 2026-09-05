@@ -37,7 +37,7 @@ type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]
 
 const NAV: NavItem[] = [
   { to: "/central", label: "Central de Entrega", icon: ScanLine, roles: ["admin", "organizer", "attendant"] },
-  { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer", "attendant"] },
+  { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer"] },
   { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
