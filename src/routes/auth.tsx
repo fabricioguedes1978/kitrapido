@@ -252,3 +252,33 @@ function AuthPage() {
     </div>
   );
 }
+
+function ProfileButton({
+  icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors",
+      )}
+    >
+      <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold">{title}</span>
+        <span className="text-muted-foreground block truncate text-xs">{description}</span>
+      </span>
+    </button>
+  );
+}
