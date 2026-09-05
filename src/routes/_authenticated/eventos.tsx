@@ -163,6 +163,7 @@ function Eventos() {
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
+      athletes_lock_at: toLocalInput(e.athletes_lock_at),
       custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
