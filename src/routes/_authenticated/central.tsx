@@ -706,6 +706,30 @@ function Central() {
         )}
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
+
+        <Dialog open={cancelOpen} onOpenChange={(v) => !v && setCancelOpen(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancelar kit entregue</DialogTitle>
+              <DialogDescription>
+                A entrega de <strong>{selected?.name}</strong> será cancelada e o atleta voltará a
+                constar como pendente. O estoque será estornado automaticamente.
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              placeholder="Motivo do cancelamento (ex.: entrega feita para o atleta errado)"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCancelOpen(false)}>Voltar</Button>
+              <Button variant="destructive" disabled={cancelling} onClick={() => void cancelDelivery()}>
+                {cancelling ? "Cancelando..." : "Confirmar cancelamento"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
