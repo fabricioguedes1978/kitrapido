@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type EventRow = {
@@ -37,35 +37,58 @@ export function useEventsQuery() {
   });
 }
 
-/** Evento ativo, persistido no dispositivo do atendente. */
+/** Evento ativo compartilhado por todas as telas, persistido no dispositivo. */
+let currentEventId: string | null = null;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const l of listeners) l();
+}
+
+function setCurrentEventId(id: string | null) {
+  if (currentEventId === id) return;
+  currentEventId = id;
+  if (typeof window !== "undefined" && id) window.localStorage.setItem(STORAGE_KEY, id);
+  emit();
+}
+
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
 export function useCurrentEvent() {
   const { data: all = [], isLoading } = useEventsQuery();
   const events = all.filter((e) => !e.archived);
   const qc = useQueryClient();
-  const [eventId, setEventId] = useState<string | null>(null);
+  const eventId = useSyncExternalStore(
+    subscribe,
+    () => currentEventId,
+    () => null,
+  );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setEventId(window.localStorage.getItem(STORAGE_KEY));
+    if (typeof window === "undefined" || currentEventId) return;
+    setCurrentEventId(window.localStorage.getItem(STORAGE_KEY));
   }, []);
 
   useEffect(() => {
     if (isLoading || events.length === 0) return;
     if (!eventId || !events.some((e) => e.id === eventId)) {
-      const next = events[0]!.id;
-      setEventId(next);
-      window.localStorage.setItem(STORAGE_KEY, next);
+      setCurrentEventId(events[0]!.id);
     }
   }, [events, eventId, isLoading]);
 
   const select = useCallback(
     (id: string) => {
-      window.localStorage.setItem(STORAGE_KEY, id);
-      setEventId(id);
+      setCurrentEventId(id);
       void qc.invalidateQueries();
     },
     [qc],
   );
+
 
   const event = events.find((e) => e.id === eventId) ?? null;
   return { events, event, eventId: event?.id ?? null, select, isLoading };
