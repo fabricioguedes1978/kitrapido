@@ -392,6 +392,20 @@ function Eventos() {
                 </SelectContent>
               </Select>
             </Field>
+            {isAdmin && (
+              <Field label="Fechar cadastro e alteração de atletas em">
+                <Input
+                  type="datetime-local"
+                  value={form.athletes_lock_at}
+                  onChange={(e) => setForm({ ...form, athletes_lock_at: e.target.value })}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Depois desta data e horário, gerentes e equipe não conseguem mais incluir nem
+                  alterar atletas. Se deixar em branco, o sistema usa automaticamente 24 horas antes
+                  do início do evento. Somente o administrador pode mudar este prazo.
+                </p>
+              </Field>
+            )}
             <Field label="Descrição">
               <Textarea
                 value={form.description}
