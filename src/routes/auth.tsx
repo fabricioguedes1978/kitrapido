@@ -10,8 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { cn, onlyDigits } from "@/lib/utils";
-import { onlyDigits as cpfDigits } from "@/lib/cronochip";
+import { cn } from "@/lib/utils";
+import { onlyDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
 
 type LoginProfile = "admin" | "gerente" | "staff";
