@@ -374,6 +374,18 @@ function Eventos() {
             <Button variant="outline" onClick={() => setViewing(null)}>
               Fechar
             </Button>
+            {viewing && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  select(viewing.id);
+                  setViewing(null);
+                  void navigate({ to: "/central" });
+                }}
+              >
+                <FolderOpen className="size-4" /> Trabalhar neste evento
+              </Button>
+            )}
             {(isAdmin || isOrganizer) && viewing && (
               <Button
                 onClick={() => {
