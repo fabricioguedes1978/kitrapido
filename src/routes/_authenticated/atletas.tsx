@@ -63,6 +63,7 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  payment_status: string;
   custom_1?: string | null;
   custom_2?: string | null;
   custom_3?: string | null;
@@ -86,6 +87,7 @@ const EMPTY_FORM = {
   distance: "",
   shirt_size: "",
   kit_type: "",
+  payment_status: "pago",
   custom_1: "",
   custom_2: "",
   custom_3: "",
@@ -122,6 +124,10 @@ const COLUMN_MAP: Record<string, string> = {
   camiseta: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
+  status: "payment_status",
+  pagamento: "payment_status",
+  "status pagamento": "payment_status",
+  situacao: "payment_status",
   extra1: "custom_1",
   extra2: "custom_2",
   extra3: "custom_3",
@@ -138,6 +144,10 @@ function formatDate(iso: string | null) {
   if (!iso) return "—";
   const [y, m, d] = iso.split("-");
   return y && m && d ? `${d}/${m}/${y}` : iso;
+}
+
+function normPayment(value: string | null | undefined): string {
+  return /pend/i.test(value ?? "") ? "pendente" : "pago";
 }
 
 function parseBrDate(value: string): string | null {
@@ -191,7 +201,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -253,6 +263,7 @@ function Atletas() {
       distance: a.distance ?? "",
       shirt_size: a.shirt_size ?? "",
       kit_type: a.kit_type ?? "",
+      payment_status: a.payment_status ?? "pago",
       custom_1: a.custom_1 ?? "",
       custom_2: a.custom_2 ?? "",
       custom_3: a.custom_3 ?? "",
@@ -299,6 +310,7 @@ function Atletas() {
         distance: r["distance"] ?? null,
         shirt_size: r["shirt_size"] ? r["shirt_size"].toUpperCase() : null,
         kit_type: r["kit_type"] ?? null,
+        payment_status: normPayment(r["payment_status"]),
         custom_1: r["custom_1"] ?? null,
         custom_2: r["custom_2"] ?? null,
         custom_3: r["custom_3"] ?? null,
@@ -454,6 +466,7 @@ function Atletas() {
       distance: form.distance.trim() || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
       kit_type: form.kit_type.trim() || null,
+      payment_status: form.payment_status,
       custom_1: form.custom_1.trim() || null,
       custom_2: form.custom_2.trim() || null,
       custom_3: form.custom_3.trim() || null,
@@ -502,6 +515,7 @@ function Atletas() {
         Categoria: a.category,
         Camiseta: a.shirt_size,
         Kit: a.kit_type,
+        Pagamento: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
         Status: KIT_STATUS[a.kit_status] ?? a.kit_status,
       })),
     );
@@ -572,7 +586,8 @@ function Atletas() {
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
-              cpf, e-mail, telefone, inscrição, numero, modalidade, categoria, distância, camiseta, kit
+              cpf, e-mail, telefone, inscrição, numero, modalidade, categoria, distância, camiseta, kit,
+              status (Pago ou Pendente pagamento)
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -588,12 +603,12 @@ function Atletas() {
                 const headers = [
                   "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
                   "inscricao", "numero", "modalidade", "categoria", "distancia", "camiseta", "kit",
-                  "extra1", "extra2", "extra3", "extra4", "extra5",
+                  "status", "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
                   "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
                   "maria@email.com", "(31) 9999-9999", "INS001", "1001", "Corrida", "Feminino Geral",
-                  "10km", "M", "Kit Padrão", "", "", "", "", "",
+                  "10km", "M", "Kit Padrão", "Pago", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
@@ -636,6 +651,7 @@ function Atletas() {
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
                 <TableHead>Camiseta</TableHead>
+                <TableHead>Pagamento</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead />
               </TableRow>
@@ -643,7 +659,7 @@ function Atletas() {
             <TableBody>
               {isLoading && (
                 <TableRow>
-                  <TableCell colSpan={10}>Carregando…</TableCell>
+                  <TableCell colSpan={11}>Carregando…</TableCell>
                 </TableRow>
               )}
               {filtered.map((a) => (
@@ -671,6 +687,11 @@ function Atletas() {
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
                   <TableCell>{a.shirt_size ?? "—"}</TableCell>
                   <TableCell>
+                    <Badge variant={a.payment_status === "pendente" ? "destructive" : "outline"}>
+                      {a.payment_status === "pendente" ? "Pendente pagamento" : "Pago"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <Badge variant={a.kit_status === "pending" ? "secondary" : "default"}>
                       {KIT_STATUS[a.kit_status] ?? a.kit_status}
                     </Badge>
@@ -684,7 +705,7 @@ function Atletas() {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-muted-foreground">
+                  <TableCell colSpan={11} className="text-muted-foreground">
                     Nenhum atleta encontrado. Importe a lista de inscritos em CSV ou Excel.
                   </TableCell>
                 </TableRow>
@@ -817,6 +838,17 @@ function Atletas() {
                   value={form.kit_type}
                   onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
                 />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Status</Label>
+                <select
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  value={form.payment_status}
+                  onChange={(e) => setForm({ ...form, payment_status: e.target.value })}
+                >
+                  <option value="pago">Pago</option>
+                  <option value="pendente">Pendente pagamento</option>
+                </select>
               </div>
               {CUSTOM_KEYS.map((key, i) => (
                 <div key={key} className="space-y-1.5">
