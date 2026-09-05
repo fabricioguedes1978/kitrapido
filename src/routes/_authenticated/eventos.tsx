@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Eye, EyeOff, Plus, QrCode, Trash2, Users } from "lucide-react";
+import { Download, Eye, EyeOff, FolderOpen, Plus, QrCode, Trash2, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,6 +85,7 @@ function Eventos() {
   const [poster, setPoster] = useState<EventRow | null>(null);
   const posterRef = useRef<HTMLDivElement>(null);
   const [removing, setRemoving] = useState<EventRow | null>(null);
+  const [viewing, setViewing] = useState<EventRow | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function toggleArchived(e: EventRow) {
@@ -254,9 +255,14 @@ function Eventos() {
                 </div>
               )}
               <div className="flex flex-wrap gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
-                  Editar
+                <Button variant="outline" size="sm" onClick={() => setViewing(e)}>
+                  <FolderOpen className="size-4" /> Abrir
                 </Button>
+                {(isAdmin || isOrganizer) && (
+                  <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
+                    Editar
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -311,6 +317,67 @@ function Eventos() {
           <p className="text-muted-foreground text-sm">Nenhum evento cadastrado.</p>
         )}
       </div>
+
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{viewing?.name}</DialogTitle>
+          </DialogHeader>
+          {viewing && (
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <Detail label="Situação">
+                <Badge variant={viewing.archived ? "destructive" : "secondary"}>
+                  {viewing.archived ? "Inativo" : (EVENT_STATUS[viewing.status] ?? viewing.status)}
+                </Badge>
+              </Detail>
+              <Detail label="Data e horário">
+                {formatDate(viewing.event_date)}{" "}
+                {viewing.event_time ? `às ${viewing.event_time.slice(0, 5)}` : ""}
+              </Detail>
+              <Detail label="Cidade/UF">
+                {[viewing.city, viewing.state].filter(Boolean).join("/") || "—"}
+              </Detail>
+              <Detail label="Endereço">{viewing.address || "—"}</Detail>
+              <Detail label="Modalidades">
+                {viewing.modalities?.length ? viewing.modalities.join(", ") : "—"}
+              </Detail>
+              <Detail label="Fecha cadastro de atletas em">
+                {viewing.athletes_lock_at
+                  ? new Date(viewing.athletes_lock_at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })
+                  : "24h antes do evento (automático)"}
+              </Detail>
+              {viewing.custom_field_labels?.some((l) => l?.trim()) && (
+                <Detail label="Campos personalizados" full>
+                  {viewing.custom_field_labels.filter((l) => l?.trim()).join(", ")}
+                </Detail>
+              )}
+              {viewing.description && (
+                <Detail label="Descrição" full>
+                  {viewing.description}
+                </Detail>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewing(null)}>
+              Fechar
+            </Button>
+            {(isAdmin || isOrganizer) && viewing && (
+              <Button
+                onClick={() => {
+                  openEdit(viewing);
+                  setViewing(null);
+                }}
+              >
+                Editar evento
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!poster} onOpenChange={(v) => !v && setPoster(null)}>
         <DialogContent className="max-w-sm">
@@ -468,6 +535,23 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1.5">
       <Label>{label}</Label>
       {children}
+    </div>
+  );
+}
+
+function Detail({
+  label,
+  children,
+  full,
+}: {
+  label: string;
+  children: React.ReactNode;
+  full?: boolean;
+}) {
+  return (
+    <div className={full ? "sm:col-span-2" : undefined}>
+      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{label}</p>
+      <div className="mt-0.5">{children}</div>
     </div>
   );
 }
