@@ -15,9 +15,9 @@ import { KIT_STATUS, downloadBlob, formatDateTime, maskCPF } from "@/lib/cronoch
 export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({
     meta: [
-      { title: "Relatórios — Cronochip Kit" },
+      { title: "Relatórios — Kit Rápido" },
       { name: "description", content: "Exporte entregas, pendentes e estoque em PDF, Excel ou CSV." },
-      { property: "og:title", content: "Relatórios — Cronochip Kit" },
+      { property: "og:title", content: "Relatórios — Kit Rápido" },
       { property: "og:description", content: "Relatórios completos da operação de entrega de kits." },
       { name: "robots", content: "noindex" },
     ],
@@ -143,7 +143,7 @@ function Relatorios() {
     doc.setFontSize(14);
     doc.text(`${title} — ${event?.name ?? ""}`, 14, 14);
     doc.setFontSize(9);
-    doc.text(`Gerado em ${formatDateTime(new Date().toISOString())} · Cronochip Kit`, 14, 20);
+    doc.text(`Gerado em ${formatDateTime(new Date().toISOString())} · Kit Rápido`, 14, 20);
     autoTable(doc, {
       startY: 25,
       head: [Object.keys(rows[0] ?? { Vazio: "" })],

@@ -17,9 +17,9 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 export const Route = createFileRoute("/_authenticated/kits")({
   head: () => ({
     meta: [
-      { title: "Kits — Cronochip Kit" },
+      { title: "Kits — Kit Rápido" },
       { name: "description", content: "Monte os tipos de kit e os itens que compõem cada um." },
-      { property: "og:title", content: "Kits — Cronochip Kit" },
+      { property: "og:title", content: "Kits — Kit Rápido" },
       { property: "og:description", content: "Composição de kits por evento." },
       { name: "robots", content: "noindex" },
     ],

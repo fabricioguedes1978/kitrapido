@@ -16,9 +16,9 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Entrar — Cronochip Kit" },
-      { name: "description", content: "Acesse o painel de entrega de kits da Cronochip." },
-      { property: "og:title", content: "Entrar — Cronochip Kit" },
+      { title: "Entrar — Kit Rápido" },
+      { name: "description", content: "Acesse o painel de entrega de kits do Kit Rápido." },
+      { property: "og:title", content: "Entrar — Kit Rápido" },
       { property: "og:description", content: "Acesso restrito a organizadores e atendentes." },
       { name: "robots", content: "noindex" },
     ],

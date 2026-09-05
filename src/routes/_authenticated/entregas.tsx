@@ -18,9 +18,9 @@ import { formatDateTime, logAudit } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/entregas")({
   head: () => ({
     meta: [
-      { title: "Entregas — Cronochip Kit" },
+      { title: "Entregas — Kit Rápido" },
       { name: "description", content: "Histórico completo de entregas, reentregas e cancelamentos." },
-      { property: "og:title", content: "Entregas — Cronochip Kit" },
+      { property: "og:title", content: "Entregas — Kit Rápido" },
       { property: "og:description", content: "Rastreabilidade de cada kit entregue." },
       { name: "robots", content: "noindex" },
     ],
