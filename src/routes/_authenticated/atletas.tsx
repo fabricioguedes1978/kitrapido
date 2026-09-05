@@ -245,6 +245,12 @@ function Atletas() {
   }, [athletes, form.cpf, form.bib_number, editingId]);
 
   function openNew() {
+    if (locked) {
+      toast.error("Cadastro de atletas encerrado", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setDupWarning(null);
