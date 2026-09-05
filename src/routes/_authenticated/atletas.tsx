@@ -140,6 +140,26 @@ function formatDate(iso: string | null) {
   return y && m && d ? `${d}/${m}/${y}` : iso;
 }
 
+function parseBrDate(value: string): string | null {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 8) {
+    const d = digits.slice(0, 2);
+    const m = digits.slice(2, 4);
+    const y = digits.slice(4, 8);
+    return `${y}-${m}-${d}`;
+  }
+  // aceita formato yyyy-mm-dd se colar
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  return null;
+}
+
+function maskBrDate(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
 function normalizeKey(key: string) {
   return key
     .normalize("NFD")
@@ -685,9 +705,14 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Data de nascimento *</Label>
                 <Input
-                  type="date"
-                  value={form.birth_date}
-                  onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                  inputMode="numeric"
+                  placeholder="dd/mm/aaaa"
+                  value={form.birth_date ? formatDate(form.birth_date) : ""}
+                  onChange={(e) => {
+                    const masked = maskBrDate(e.target.value);
+                    const iso = parseBrDate(masked);
+                    setForm({ ...form, birth_date: iso ?? "" });
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
