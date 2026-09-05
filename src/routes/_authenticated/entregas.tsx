@@ -170,10 +170,6 @@ function Entregas() {
           <DialogHeader>
             <DialogTitle>Cancelar entrega e liberar reentrega</DialogTitle>
           </DialogHeader>
-          <div className="space-y-1.5">
-            <Label>Motivo (opcional)</Label>
-            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Descreva o motivo se desejar" />
-          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCancelling(null)}>Voltar</Button>
             <Button variant="destructive" onClick={() => void cancel()}>
