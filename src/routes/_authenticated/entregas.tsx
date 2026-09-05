@@ -78,19 +78,19 @@ function Entregas() {
   }, [deliveries, term]);
 
   async function cancel() {
-    if (!cancelling || !reason.trim()) { toast.error("Descreva o motivo do cancelamento."); return; }
+    if (!cancelling) return;
     const { error } = await supabase
       .from("deliveries")
       .update({
         status: "cancelled",
-        cancel_reason: reason.trim(),
+        cancel_reason: reason.trim() || null,
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", cancelling.id);
     if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
-      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}: ${reason.trim()}`,
+      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}${reason.trim() ? `: ${reason.trim()}` : ""}`,
       entity: "deliveries",
       entityId: cancelling.id,
       userName: profile?.name ?? null,
@@ -171,10 +171,11 @@ function Entregas() {
             <DialogTitle>Cancelar entrega e liberar reentrega</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label>Motivo (obrigatório)</Label>
-            <Input value={reason} onChange={(e) => setReason(e.target.value)} />
+            <Label>Motivo (opcional)</Label>
+            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Descreva o motivo se desejar" />
           </div>
           <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelling(null)}>Voltar</Button>
             <Button variant="destructive" onClick={() => void cancel()}>
               Confirmar cancelamento
             </Button>
