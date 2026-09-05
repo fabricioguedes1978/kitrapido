@@ -9,12 +9,12 @@ import { CalendarDays, MapPin } from "lucide-react";
 export const Route = createFileRoute("/consulta")({
   head: () => ({
     meta: [
-      { title: "Consultar meu kit — Kit Fácil" },
+      { title: "Consultar meu kit — Kit Rápido" },
       {
         name: "description",
         content: "Escolha seu evento e consulte o local, o horário e o QR Code de retirada do kit.",
       },
-      { property: "og:title", content: "Consultar meu kit — Kit Fácil" },
+      { property: "og:title", content: "Consultar meu kit — Kit Rápido" },
       {
         property: "og:description",
         content: "Consulte a retirada do seu kit de corrida pelo CPF ou número de inscrição.",

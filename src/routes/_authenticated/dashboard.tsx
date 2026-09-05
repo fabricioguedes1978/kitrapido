@@ -22,9 +22,9 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Kit Fácil" },
+      { title: "Dashboard — Kit Rápido" },
       { name: "description", content: "Acompanhe em tempo real a entrega de kits do seu evento." },
-      { property: "og:title", content: "Dashboard — Kit Fácil" },
+      { property: "og:title", content: "Dashboard — Kit Rápido" },
       { property: "og:description", content: "Indicadores de retirada, estoque e ritmo de entrega." },
       { name: "robots", content: "noindex" },
     ],

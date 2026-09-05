@@ -17,12 +17,12 @@ export const Route = createFileRoute("/_authenticated/tela-atleta")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Fundo da Tela do Atleta — Kit Fácil" },
+      { title: "Fundo da Tela do Atleta — Kit Rápido" },
       {
         name: "description",
         content: "Envie uma imagem de fundo personalizada para a tela de conferência do atleta.",
       },
-      { property: "og:title", content: "Fundo da Tela do Atleta — Kit Fácil" },
+      { property: "og:title", content: "Fundo da Tela do Atleta — Kit Rápido" },
       {
         property: "og:description",
         content: "Personalize o visual do monitor de conferência do atleta.",
@@ -178,7 +178,7 @@ function TelaAtleta() {
               <div className="relative w-full max-w-3xl text-center text-white">
                 <p className="text-xs font-bold tracking-[0.2em] uppercase">Confira seus dados</p>
                 <p className="mt-1 text-3xl font-extrabold">Nome do Atleta</p>
-                <p className="text-sm opacity-80">Prova Exemplo — Kit Fácil</p>
+                <p className="text-sm opacity-80">Prova Exemplo — Kit Rápido</p>
                 <div className="mt-6 grid grid-cols-3 gap-3 text-left">
                   <div className="rounded-xl bg-white/10 p-3">
                     <p className="text-[10px] uppercase opacity-70">Número de peito</p>

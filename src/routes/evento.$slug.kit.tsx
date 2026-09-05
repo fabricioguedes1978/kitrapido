@@ -18,13 +18,13 @@ export const Route = createFileRoute("/evento/$slug/kit")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Meu Kit — Kit Fácil" },
+      { title: "Meu Kit — Kit Rápido" },
       {
         name: "description",
         content:
           "Consulte pelo CPF ou número de inscrição a situação do seu kit e apresente o QR Code na retirada.",
       },
-      { property: "og:title", content: "Meu Kit — Kit Fácil" },
+      { property: "og:title", content: "Meu Kit — Kit Rápido" },
       { property: "og:description", content: "QR Code e dados da retirada do seu kit de corrida." },
     ],
   }),

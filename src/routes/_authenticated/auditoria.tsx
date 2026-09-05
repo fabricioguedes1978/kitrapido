@@ -10,9 +10,9 @@ import { formatDateTime } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
     meta: [
-      { title: "Auditoria — Kit Fácil" },
+      { title: "Auditoria — Kit Rápido" },
       { name: "description", content: "Registro de todas as ações realizadas na operação de entrega." },
-      { property: "og:title", content: "Auditoria — Kit Fácil" },
+      { property: "og:title", content: "Auditoria — Kit Rápido" },
       { property: "og:description", content: "Rastreabilidade completa de quem fez o quê e quando." },
       { name: "robots", content: "noindex" },
     ],

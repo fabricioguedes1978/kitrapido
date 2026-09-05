@@ -19,9 +19,9 @@ import { isValidCPF, maskCPF, onlyDigits } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/autorizacoes")({
   head: () => ({
     meta: [
-      { title: "Autorizações — Kit Fácil" },
+      { title: "Autorizações — Kit Rápido" },
       { name: "description", content: "Autorize terceiros a retirar o kit e gere o QR Code de retirada." },
-      { property: "og:title", content: "Autorizações — Kit Fácil" },
+      { property: "og:title", content: "Autorizações — Kit Rápido" },
       { property: "og:description", content: "Retirada por terceiros com registro e QR Code." },
       { name: "robots", content: "noindex" },
     ],

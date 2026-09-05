@@ -39,9 +39,9 @@ import { EVENT_STATUS, checkinUrl, formatDate, logAudit, slugify } from "@/lib/c
 export const Route = createFileRoute("/_authenticated/eventos")({
   head: () => ({
     meta: [
-      { title: "Eventos — Kit Fácil" },
+      { title: "Eventos — Kit Rápido" },
       { name: "description", content: "Cadastre e gerencie os eventos esportivos e suas entregas de kit." },
-      { property: "og:title", content: "Eventos — Kit Fácil" },
+      { property: "og:title", content: "Eventos — Kit Rápido" },
       { property: "og:description", content: "Gestão de eventos, datas, locais e modalidades." },
       { name: "robots", content: "noindex" },
     ],
@@ -200,7 +200,7 @@ function Eventos() {
     <AppShell>
       <PageHeader
         title="Eventos"
-        subtitle="Provas e entregas de kit gerenciadas pelo Kit Fácil"
+        subtitle="Provas e entregas de kit gerenciadas pelo Kit Rápido"
         action={
           isAdmin ? (
             <Button onClick={openNew}>

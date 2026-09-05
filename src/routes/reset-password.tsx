@@ -12,9 +12,9 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Redefinir senha — Kit Fácil" },
-      { name: "description", content: "Defina uma nova senha de acesso ao Kit Fácil." },
-      { property: "og:title", content: "Redefinir senha — Kit Fácil" },
+      { title: "Redefinir senha — Kit Rápido" },
+      { name: "description", content: "Defina uma nova senha de acesso ao Kit Rápido." },
+      { property: "og:title", content: "Redefinir senha — Kit Rápido" },
       { property: "og:description", content: "Defina uma nova senha de acesso." },
       { name: "robots", content: "noindex" },
     ],

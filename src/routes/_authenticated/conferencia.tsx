@@ -18,12 +18,12 @@ export const Route = createFileRoute("/_authenticated/conferencia")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Conferência do Atleta — Kit Fácil" },
+      { title: "Conferência do Atleta — Kit Rápido" },
       {
         name: "description",
         content: "Tela ampliada para o atleta conferir seus dados antes de receber o kit.",
       },
-      { property: "og:title", content: "Conferência do Atleta — Kit Fácil" },
+      { property: "og:title", content: "Conferência do Atleta — Kit Rápido" },
       { property: "og:description", content: "Monitor de conferência de dados na retirada do kit." },
       { name: "robots", content: "noindex" },
     ],

@@ -22,9 +22,9 @@ import { ROLE_LABEL, formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
     meta: [
-      { title: "Equipe do evento — Kit Fácil" },
+      { title: "Equipe do evento — Kit Rápido" },
       { name: "description", content: "Cadastre o gerente e os staffs de cada evento com acesso por CPF." },
-      { property: "og:title", content: "Equipe do evento — Kit Fácil" },
+      { property: "og:title", content: "Equipe do evento — Kit Rápido" },
       { property: "og:description", content: "Gerente e staffs com acesso restrito ao evento." },
       { name: "robots", content: "noindex" },
     ],

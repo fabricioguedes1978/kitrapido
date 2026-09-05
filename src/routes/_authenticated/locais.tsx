@@ -16,9 +16,9 @@ import { formatDate } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/locais")({
   head: () => ({
     meta: [
-      { title: "Locais de Retirada — Kit Fácil" },
+      { title: "Locais de Retirada — Kit Rápido" },
       { name: "description", content: "Cadastre pontos, datas e horários de retirada dos kits." },
-      { property: "og:title", content: "Locais de Retirada — Kit Fácil" },
+      { property: "og:title", content: "Locais de Retirada — Kit Rápido" },
       { property: "og:description", content: "Pontos de retirada por evento." },
       { name: "robots", content: "noindex" },
     ],
