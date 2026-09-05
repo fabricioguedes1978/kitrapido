@@ -341,7 +341,7 @@ function Atletas() {
       setImporting(false);
       toast.error("Nenhuma linha válida encontrada.", {
         description:
-          "Nome, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
+          "Nome, CPF, número, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
       });
       return;
     }
