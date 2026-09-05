@@ -485,7 +485,7 @@ function Atletas() {
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
-            <Button onClick={() => setNewOpen(true)}>
+            <Button onClick={openNew}>
               <Plus className="size-4" />
             </Button>
           </div>
