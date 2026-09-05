@@ -2,13 +2,17 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 import {
   AlertTriangle,
   Camera,
   CheckCircle2,
   MonitorSmartphone,
+  Package,
+  ScanLine,
   Search,
   UserCheck,
+  Users,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -19,9 +23,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {
+  athleteQrUrl,
   formatDateTime,
   formatTime,
   logAudit,
@@ -370,21 +376,28 @@ function Central() {
     );
   }
 
+  const stats = useMemo(() => {
+    const total = roster.length;
+    const delivered = deliveries.filter((d) => d.status === "active").length;
+    const pending = total - delivered;
+    const rate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+    return { total, delivered, pending, rate };
+  }, [roster, deliveries]);
+
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
-        <header className="mb-6">
-          <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
-          <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            onClick={() => window.open("/conferencia", "cronochip-display")}
-          >
-            <MonitorSmartphone className="size-4" /> Abrir tela de conferência do atleta
-          </Button>
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
+            <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
+            <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button size="lg" className="h-11 gap-2" onClick={() => setScanOpen(true)}>
+              <ScanLine className="size-5" /> Escanear QR Code
+            </Button>
+          </div>
         </header>
 
         {!selected && (
@@ -472,14 +485,24 @@ function Central() {
                 </CardContent>
               </Card>
             </section>
+
+            <section className="mt-8">
+              <h2 className="text-lg font-bold mb-3">Resumo do evento</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard label="Kits Entregues" value={stats.delivered} icon={CheckCircle2} color="text-primary" />
+                <StatCard label="Atletas Inscritos" value={stats.total} icon={Users} color="text-chart-3" />
+                <StatCard label="Kits Restantes" value={stats.pending} icon={Package} color="text-warning" />
+                <StatCard label="Taxa de Entrega" value={`${stats.rate}%`} icon={Search} color="text-success" />
+              </div>
+            </section>
           </>
         )}
 
         {selected && (
-          <Card className="shadow-card">
-            <CardContent className="space-y-5 pt-6">
+          <Card className="shadow-card overflow-hidden">
+            <CardContent className="p-0">
               {(activeDelivery || queuedOffline) && (
-                <div className="border-destructive/40 bg-destructive/10 rounded-xl border p-4">
+                <div className="border-destructive/40 bg-destructive/10 border-b p-4">
                   <p className="text-destructive flex items-center gap-2 text-lg font-extrabold">
                     <AlertTriangle className="size-6" /> KIT JÁ ENTREGUE
                   </p>
@@ -507,7 +530,7 @@ function Central() {
               )}
 
               {asThirdParty && authorization && (
-                <div className="border-warning/40 bg-warning/15 rounded-xl border p-4">
+                <div className="border-warning/40 bg-warning/15 border-b p-4">
                   <p className="flex items-center gap-2 text-base font-extrabold">
                     <UserCheck className="size-5" /> RETIRADA POR TERCEIRO
                   </p>
@@ -517,84 +540,112 @@ function Central() {
                 </div>
               )}
 
-              <div>
-                <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
-                <p className="text-2xl font-extrabold">{selected.name}</p>
+              <div className="grid gap-6 p-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:p-6">
+                <div className="bg-primary/5 flex flex-col items-center justify-center gap-3 rounded-2xl border border-primary/10 p-5">
+                  <div className="bg-white p-3 rounded-xl shadow-sm">
+                    <QrCodePlaceholder value={selected.id} size={120} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-primary text-4xl font-extrabold leading-none">{selected.bib_number || "—"}</p>
+                    <p className="text-muted-foreground text-xs uppercase tracking-wide mt-1">Nº de peito</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
+                      <p className="text-2xl font-extrabold">{selected.name}</p>
+                      <p className="text-muted-foreground text-sm">CPF: {maskCPF(selected.cpf)}</p>
+                    </div>
+                    <Badge
+                      className="mt-2 w-fit sm:mt-0"
+                      variant={activeDelivery || queuedOffline ? "destructive" : "default"}
+                    >
+                      {activeDelivery || queuedOffline ? "Entregue" : "Pendente"}
+                    </Badge>
+                  </div>
+
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
+                    <Info label="Tipo de Kit" value={selected.kit_type} />
+                    <Info label="Tamanho da Camiseta" value={selected.shirt_size} />
+                    <Info label="Modalidade" value={selected.modality} />
+                    <Info label="Categoria" value={selected.category} />
+                    <Info label="Cidade" value={selected.city} />
+                    <Info label="Inscrição" value={selected.registration_number} />
+                    {extras.map((f) => (
+                      <Info key={f.label} label={f.label} value={f.value} />
+                    ))}
+                  </dl>
+                </div>
               </div>
 
-              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <Info label="Nº peito" value={selected.bib_number} big />
-                <Info label="Camiseta" value={selected.shirt_size} big />
-                <Info label="Kit" value={selected.kit_type} />
-                <Info label="Modalidade" value={selected.modality} />
-                <Info label="Categoria" value={selected.category} />
-                <Info label="Cidade" value={selected.city} />
-                <Info label="Inscrição" value={selected.registration_number} />
-                {extras.map((f) => (
-                  <Info key={f.label} label={f.label} value={f.value} />
-                ))}
-              </dl>
-
               {locations.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-muted-foreground text-xs tracking-wide uppercase">Local de retirada</p>
-                  <Select value={locationId} onValueChange={setLocationId}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Selecione o local" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map((l) => (
-                        <SelectItem key={l.id} value={l.id}>
-                          {l.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="border-t px-5 py-4 sm:px-6">
+                  <div className="space-y-1.5">
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">Local de retirada</p>
+                    <Select value={locationId} onValueChange={setLocationId}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecione o local" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map((l) => (
+                          <SelectItem key={l.id} value={l.id}>
+                            {l.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
 
               {!activeDelivery && !queuedOffline && authorization && !asThirdParty && (
-                <Button variant="outline" className="w-full" onClick={() => setAsThirdParty(true)}>
-                  <UserCheck className="size-4" /> Entregar a terceiro autorizado ({authorization.name})
-                </Button>
+                <div className="border-t px-5 pb-4 sm:px-6">
+                  <Button variant="outline" className="w-full" onClick={() => setAsThirdParty(true)}>
+                    <UserCheck className="size-4" /> Entregar a terceiro autorizado ({authorization.name})
+                  </Button>
+                </div>
               )}
 
-              {confirming ? (
-                <div className="bg-muted space-y-3 rounded-xl p-4">
-                  <p className="text-center font-semibold">Confirme a entrega do kit para este atleta.</p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Button size="lg" className="h-14" onClick={() => void confirmDelivery()}>
-                      CONFIRMAR ENTREGA
+              <div className="border-t px-5 py-4 sm:px-6">
+                {confirming ? (
+                  <div className="bg-muted space-y-3 rounded-xl p-4">
+                    <p className="text-center font-semibold">Confirme a entrega do kit para este atleta.</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Button size="lg" className="h-14" onClick={() => void confirmDelivery()}>
+                        CONFIRMAR ENTREGA
+                      </Button>
+                      <Button size="lg" variant="outline" className="h-14" onClick={() => setConfirming(false)}>
+                        CANCELAR
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <Button
+                      size="lg"
+                      className="h-16 text-lg"
+                      disabled={!!activeDelivery || queuedOffline}
+                      onClick={() => setConfirming(true)}
+                    >
+                      ENTREGAR KIT
                     </Button>
-                    <Button size="lg" variant="outline" className="h-14" onClick={() => setConfirming(false)}>
-                      CANCELAR
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="h-16"
+                      onClick={() => {
+                        setSelected(null);
+                        setAsThirdParty(false);
+                        publishDisplay({ status: "idle" });
+                      }}
+                    >
+                      <X className="size-5" /> Voltar
                     </Button>
                   </div>
-                </div>
-              ) : (
-                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-                  <Button
-                    size="lg"
-                    className="h-16 text-lg"
-                    disabled={!!activeDelivery || queuedOffline}
-                    onClick={() => setConfirming(true)}
-                  >
-                    ENTREGAR KIT
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-16"
-                    onClick={() => {
-                      setSelected(null);
-                      setAsThirdParty(false);
-                      publishDisplay({ status: "idle" });
-                    }}
-                  >
-                    <X className="size-5" /> Voltar
-                  </Button>
-                </div>
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
@@ -602,6 +653,41 @@ function Central() {
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
       </div>
     </AppShell>
+  );
+}
+
+function QrCodePlaceholder({ value, size = 120 }: { value: string; size?: number }) {
+  const url = athleteQrUrl("", value);
+  return (
+    <div className="rounded-lg">
+      <QRCodeSVG value={url} size={size} level="M" includeMargin={false} />
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  icon: typeof Users;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="flex items-center gap-4 p-4">
+        <div className={cn("bg-muted flex size-11 items-center justify-center rounded-full", color)}>
+          <Icon className="size-5" />
+        </div>
+        <div>
+          <p className="text-2xl font-extrabold leading-tight">{value}</p>
+          <p className="text-muted-foreground text-xs">{label}</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -18,6 +18,8 @@ import {
   ClipboardList,
   MonitorSmartphone,
   ImageUp,
+  Flag,
+  User,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
@@ -29,6 +31,7 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 import { ROLE_LABEL, type AppRole } from "@/lib/cronochip";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]; sub?: boolean };
 
@@ -119,18 +122,48 @@ export function EventSelector({ className }: { className?: string }) {
   const { events, eventId, select } = useCurrentEvent();
   if (events.length === 0) return null;
   return (
-    <Select value={eventId ?? ""} onValueChange={select}>
-      <SelectTrigger className={cn("h-9 w-full max-w-[16rem]", className)}>
-        <SelectValue placeholder="Selecione o evento" />
-      </SelectTrigger>
-      <SelectContent>
-        {events.map((e) => (
-          <SelectItem key={e.id} value={e.id}>
-            {e.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={cn("flex items-center gap-2", className)}>
+      <Flag className="text-primary size-4 shrink-0" />
+      <Select value={eventId ?? ""} onValueChange={select}>
+        <SelectTrigger className="h-9 w-full max-w-[18rem] border-transparent bg-transparent shadow-none hover:bg-muted/50">
+          <SelectValue placeholder="Selecione o evento" />
+        </SelectTrigger>
+        <SelectContent>
+          {events.map((e) => (
+            <SelectItem key={e.id} value={e.id}>
+              {e.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function UserAvatar() {
+  const { profile, role } = useAuth();
+  const initials = (profile?.name || profile?.email || "U")
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <div className="flex items-center gap-3">
+      <div className="hidden min-w-0 text-right sm:block">
+        <p className="truncate text-sm font-semibold leading-tight">
+          {profile?.name || profile?.email || "Usuário"}
+        </p>
+        <p className="text-muted-foreground truncate text-xs leading-tight">
+          {role ? ROLE_LABEL[role] : "Sem perfil"}
+        </p>
+      </div>
+      <Avatar className="size-9 border-2 border-primary/20">
+        <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
+          {initials || <User className="size-4" />}
+        </AvatarFallback>
+      </Avatar>
+    </div>
   );
 }
 
@@ -144,7 +177,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="bg-card/90 sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto]">
+        <header className="bg-card/90 sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-2.5 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0 lg:hidden">
@@ -160,7 +193,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="min-w-0">
             <EventSelector />
           </div>
-          <OnlineIndicator className="shrink-0" />
+          <div className="flex items-center gap-3">
+            <OnlineIndicator className="shrink-0" />
+            <UserAvatar />
+          </div>
         </header>
 
         <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
