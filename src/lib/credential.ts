@@ -35,7 +35,7 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, W, H);
 
-  // Faixa superior verde Cronochip
+  // Faixa superior verde Kit Fácil
   ctx.fillStyle = "#0f7b3f";
   ctx.fillRect(0, 0, W, 150);
   ctx.fillStyle = "#ffffff";
