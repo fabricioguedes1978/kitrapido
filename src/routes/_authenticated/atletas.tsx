@@ -642,10 +642,10 @@ function Atletas() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); }}>
-        <DialogContent className="max-w-md">
+      <Dialog open={newOpen} onOpenChange={(v) => { setNewOpen(v); setDupWarning(null); if (!v) setEditingId(null); }}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Novo atleta</DialogTitle>
+            <DialogTitle>{editingId ? "Editar atleta" : "Novo atleta"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             {(dupWarning || liveDup) && (
@@ -658,7 +658,7 @@ function Atletas() {
               <Label>Nome *</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Data de nascimento *</Label>
                 <Input
@@ -681,15 +681,31 @@ function Atletas() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label>Modalidade *</Label>
-                <Input
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
-                />
+                <Label>Cidade</Label>
+                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>E-mail</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Telefone</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nº de inscrição</Label>
+                <Input
+                  value={form.registration_number}
+                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Nº de peito</Label>
@@ -699,18 +715,57 @@ function Atletas() {
                 />
               </div>
               <div className="space-y-1.5">
+                <Label>Modalidade *</Label>
+                <Input
+                  value={form.modality}
+                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Categoria</Label>
+                <Input
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Distância</Label>
+                <Input
+                  value={form.distance}
+                  onChange={(e) => setForm({ ...form, distance: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
                 <Label>Camiseta</Label>
                 <Input
                   value={form.shirt_size}
                   onChange={(e) => setForm({ ...form, shirt_size: e.target.value })}
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label>Kit</Label>
+                <Input
+                  value={form.kit_type}
+                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
+                />
+              </div>
+              {CUSTOM_KEYS.map((key, i) => (
+                <div key={key} className="space-y-1.5">
+                  <Label>{event?.custom_field_labels?.[i]?.trim() || `Campo extra ${i + 1}`}</Label>
+                  <Input
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void createAthlete()}>Salvar</Button>
+            <Button onClick={() => void saveAthlete()}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
       </Dialog>
     </AppShell>
   );
