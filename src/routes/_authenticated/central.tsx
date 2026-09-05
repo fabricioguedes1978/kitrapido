@@ -643,6 +643,15 @@ function Central() {
   );
 }
 
+function QrCodePlaceholder({ value, size = 120 }: { value: string; size?: number }) {
+  const url = athleteQrUrl("", value);
+  return (
+    <div className="rounded-lg">
+      <QRCodeSVG value={url} size={size} level="M" includeMargin={false} />
+    </div>
+  );
+}
+
 function Info({ label, value, big }: { label: string; value?: string | null; big?: boolean }) {
   return (
     <div className="min-w-0">
