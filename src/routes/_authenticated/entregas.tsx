@@ -43,7 +43,8 @@ type DeliveryRow = {
 
 function Entregas() {
   const { event, eventId } = useCurrentEvent();
-  const { isAdmin, profile } = useAuth();
+  const { isAdmin, isOrganizer, profile } = useAuth();
+  const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
   const [term, setTerm] = useState("");
   const [cancelling, setCancelling] = useState<DeliveryRow | null>(null);
@@ -122,7 +123,7 @@ function Entregas() {
                 <TableHead className="hidden md:table-cell">Atendente</TableHead>
                 <TableHead className="hidden sm:table-cell">Tipo</TableHead>
                 <TableHead>Status</TableHead>
-                {isAdmin && <TableHead />}
+                {canManage && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -141,7 +142,7 @@ function Entregas() {
                       {d.status === "active" ? "Ativa" : "Cancelada"}
                     </Badge>
                   </TableCell>
-                  {isAdmin && (
+                  {canManage && (
                     <TableCell>
                       {d.status === "active" && (
                         <Button variant="ghost" size="sm" onClick={() => setCancelling(d)}>
