@@ -187,6 +187,13 @@ function Eventos() {
         .filter(Boolean),
       status: form.status as "planning",
       custom_field_labels: form.custom_field_labels.map((l) => l.trim()),
+      ...(isAdmin
+        ? {
+            athletes_lock_at: form.athletes_lock_at
+              ? new Date(form.athletes_lock_at).toISOString()
+              : null,
+          }
+        : {}),
     };
 
     const { error } = editing
