@@ -579,10 +579,38 @@ function Atletas() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label>Nome</Label>
+              <Label>Nome *</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Data de nascimento *</Label>
+                <Input
+                  type="date"
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Sexo *</Label>
+                <select
+                  value={form.gender}
+                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Modalidade *</Label>
+                <Input
+                  value={form.modality}
+                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                />
+              </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
@@ -592,13 +620,6 @@ function Atletas() {
                 <Input
                   value={form.bib_number}
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Modalidade</Label>
-                <Input
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
