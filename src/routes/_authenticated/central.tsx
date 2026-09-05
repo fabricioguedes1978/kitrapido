@@ -8,9 +8,11 @@ import {
   Camera,
   CheckCircle2,
   MonitorSmartphone,
+  Package,
   ScanLine,
   Search,
   UserCheck,
+  Users,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
