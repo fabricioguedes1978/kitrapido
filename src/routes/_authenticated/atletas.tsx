@@ -50,6 +50,7 @@ type Athlete = {
   name: string;
   gender: string | null;
   birth_date: string | null;
+  city: string | null;
   cpf: string | null;
   email: string | null;
   phone: string | null;
@@ -76,6 +77,7 @@ const COLUMN_MAP: Record<string, string> = {
   genero: "gender",
   nascimento: "birth_date",
   "data de nascimento": "birth_date",
+  cidade: "city",
   cpf: "cpf",
   email: "email",
   "e-mail": "email",
@@ -140,7 +142,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
+          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -200,6 +202,7 @@ function Atletas() {
         name: r["name"]!,
         gender: r["gender"] ?? null,
         birth_date: r["birth_date"] ?? null,
+        city: r["city"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
@@ -342,11 +345,16 @@ function Atletas() {
     const csv = Papa.unparse(
       athletes.map((a) => ({
         Nome: a.name,
+        Sexo: a.gender,
+        Nascimento: a.birth_date,
+        Cidade: a.city,
         CPF: a.cpf,
         Inscricao: a.registration_number,
         Peito: a.bib_number,
         Modalidade: a.modality,
+        Categoria: a.category,
         Camiseta: a.shirt_size,
+        Kit: a.kit_type,
         Status: KIT_STATUS[a.kit_status] ?? a.kit_status,
       })),
     );
@@ -416,9 +424,9 @@ function Atletas() {
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, cpf, e-mail, telefone, inscrição,
-              peito, modalidade, categoria, distância, camiseta, kit e os 5 campos personalizados
-              (use extra1 a extra5 ou o nome que você definiu no evento).
+              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
+              cpf, e-mail, telefone, inscrição, peito, modalidade, categoria, distância, camiseta, kit
+              e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
               <p className="text-muted-foreground mt-2 text-xs">Último arquivo: {lastFile}</p>
@@ -432,8 +440,8 @@ function Atletas() {
                 e.stopPropagation();
                 downloadBlob(
                   "\uFEFF" +
-                    "nome,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
-                    "Maria Silva,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
+                    "nome,sexo,nascimento,cidade,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
+                    "Maria Silva,F,1990-05-15,São Paulo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
                   "modelo-atletas.csv",
                   "text/csv;charset=utf-8",
                 );
@@ -462,6 +470,7 @@ function Atletas() {
                 <TableHead>Atleta</TableHead>
                 <TableHead className="hidden sm:table-cell">Sexo</TableHead>
                 <TableHead className="hidden md:table-cell">Nascimento</TableHead>
+                <TableHead className="hidden md:table-cell">Cidade</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
@@ -473,7 +482,7 @@ function Atletas() {
             <TableBody>
               {isLoading && (
                 <TableRow>
-                  <TableCell colSpan={7}>Carregando…</TableCell>
+                  <TableCell colSpan={10}>Carregando…</TableCell>
                 </TableRow>
               )}
               {filtered.map((a) => (
@@ -481,6 +490,7 @@ function Atletas() {
                   <TableCell className="max-w-[220px] truncate font-medium">{a.name}</TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
+                  <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
@@ -499,7 +509,7 @@ function Atletas() {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-muted-foreground">
+                  <TableCell colSpan={10} className="text-muted-foreground">
                     Nenhum atleta encontrado. Importe a lista de inscritos em CSV ou Excel.
                   </TableCell>
                 </TableRow>
