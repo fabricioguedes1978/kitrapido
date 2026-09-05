@@ -177,7 +177,7 @@ function Entregas() {
       Cidade: row.athlete.city ?? "",
       Equipe: row.athlete.equipe ?? "",
       "Nº inscrição": row.athlete.registration_number ?? "",
-      "Nº de peito": row.athlete.bib_number ?? "",
+      "Numero": row.athlete.bib_number ?? "",
       Modalidade: row.athlete.modality ?? "",
       Categoria: row.athlete.category ?? "",
       Distância: row.athlete.distance ?? "",

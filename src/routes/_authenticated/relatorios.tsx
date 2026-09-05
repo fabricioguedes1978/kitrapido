@@ -75,7 +75,7 @@ function Relatorios() {
           .filter((d) => d.status === "active")
           .map((d) => ({
             Atleta: d.athletes?.name ?? "",
-            Peito: d.athletes?.bib_number ?? "",
+            Numero: d.athletes?.bib_number ?? "",
             Camiseta: d.athletes?.shirt_size ?? "",
             "Data/hora": formatDateTime(d.delivered_at),
             Atendente: d.delivered_by_name ?? "",
@@ -92,7 +92,7 @@ function Relatorios() {
           .map((a) => ({
             Atleta: a.name,
             CPF: maskCPF(a.cpf),
-            Peito: a.bib_number ?? "",
+            Numero: a.bib_number ?? "",
             Modalidade: a.modality ?? "",
             Camiseta: a.shirt_size ?? "",
           })),
