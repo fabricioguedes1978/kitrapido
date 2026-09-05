@@ -92,7 +92,7 @@ function Relatorios() {
           .map((a) => ({
             Atleta: a.name,
             CPF: maskCPF(a.cpf),
-            Peito: a.bib_number ?? "",
+            Numero: a.bib_number ?? "",
             Modalidade: a.modality ?? "",
             Camiseta: a.shirt_size ?? "",
           })),
