@@ -664,6 +664,32 @@ function QrCodePlaceholder({ value, size = 120 }: { value: string; size?: number
   );
 }
 
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  icon: typeof Users;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="flex items-center gap-4 p-4">
+        <div className={cn("bg-muted flex size-11 items-center justify-center rounded-full", color)}>
+          <Icon className="size-5" />
+        </div>
+        <div>
+          <p className="text-2xl font-extrabold leading-tight">{value}</p>
+          <p className="text-muted-foreground text-xs">{label}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function Info({ label, value, big }: { label: string; value?: string | null; big?: boolean }) {
   return (
     <div className="min-w-0">
