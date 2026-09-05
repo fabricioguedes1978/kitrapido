@@ -574,28 +574,6 @@ function Central() {
         {selected && (
           <Card className="shadow-card overflow-hidden">
             <CardContent className="p-0">
-              <div
-                className={cn(
-                  "flex items-center justify-between border-b px-4 py-3",
-                  isPaid(selected)
-                    ? "border-success/30 bg-success/10"
-                    : "border-destructive/30 bg-destructive/10",
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  {!isPaid(selected) && <AlertTriangle className="text-destructive size-5" />}
-                  <span
-                    className={cn(
-                      "text-sm font-extrabold uppercase tracking-wide",
-                      isPaid(selected) ? "text-success" : "text-destructive",
-                    )}
-                  >
-                    Pagamento {isPaid(selected) ? "confirmado" : "pendente"}
-                  </span>
-                </div>
-                <PaymentBadge athlete={selected} big />
-              </div>
-
               {(activeDelivery || queuedOffline) && (
                 <div className="border-destructive/40 bg-destructive/10 border-b p-4">
                   <p className="text-destructive flex items-center gap-2 text-lg font-extrabold">
@@ -661,6 +639,14 @@ function Central() {
                       <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
                       <p className="text-2xl font-extrabold">{selected.name}</p>
                       <p className="text-muted-foreground text-sm">CPF: {maskCPF(selected.cpf)}</p>
+                      <p
+                        className={cn(
+                          "text-sm font-bold",
+                          isPaid(selected) ? "text-success" : "text-destructive",
+                        )}
+                      >
+                        Pagamento: {isPaid(selected) ? "Pago" : "Pendente"}
+                      </p>
                     </div>
                     <Badge
                       className="mt-2 w-fit sm:mt-0"
