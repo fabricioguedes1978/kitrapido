@@ -102,6 +102,29 @@ type Delivery = {
   status: string;
 };
 
+function isPaid(a: Athlete) {
+  const s = (a.payment_status || "").toLowerCase();
+  return s === "pago" || s === "paid" || s === "confirmada";
+}
+
+function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolean }) {
+  const paid = isPaid(athlete);
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-bold",
+        paid
+          ? "border-success/30 bg-success/15 text-success"
+          : "border-destructive/30 bg-destructive/15 text-destructive",
+        big ? "text-base" : "text-xs",
+      )}
+    >
+      <span className={cn("size-2 rounded-full", paid ? "bg-success" : "bg-destructive")} />
+      {paid ? "PAGO" : "PENDENTE"}
+    </div>
+  );
+}
+
 function Central() {
   const { event, eventId } = useCurrentEvent();
   const { user, profile, isAttendant } = useAuth();
