@@ -97,7 +97,9 @@ function Entregas() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("athletes")
-        .select("id,name,bib_number,modality,category,shirt_size,kit_status")
+        .select(
+          "id,name,cpf,birth_date,gender,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,registration_status,payment_status,kit_status,city,custom_1,custom_2,custom_3,custom_4,custom_5",
+        )
         .eq("event_id", eventId!)
         .order("name");
       if (error) throw error;
