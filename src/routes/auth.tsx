@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ShieldCheck, UserCog, Users, ClipboardCheck, ArrowLeft } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { cn } from "@/lib/utils";
 import { onlyDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
+
+type LoginProfile = "admin" | "gerente" | "staff";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -32,6 +36,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [profile, setProfile] = useState<LoginProfile | null>(null);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -49,6 +54,12 @@ function AuthPage() {
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
     navigate({ to: "/central", replace: true });
+  }
+
+  function selectProfile(p: LoginProfile) {
+    setProfile(p);
+    setEmail("");
+    setPassword("");
   }
 
   async function signUp(e: React.FormEvent) {
@@ -98,40 +109,98 @@ function AuthPage() {
             </TabsList>
 
             <TabsContent value="login">
-              <form className="space-y-4" onSubmit={signIn}>
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">E-mail ou CPF</Label>
-                  <Input
-                    id="email"
-                    type="text"
-                    autoComplete="username"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+              {!profile ? (
+                <div className="space-y-2">
+                  <p className="text-muted-foreground mb-3 text-center text-xs font-medium tracking-wide uppercase">
+                    Como você quer entrar?
+                  </p>
+                  <ProfileButton
+                    icon={<ShieldCheck className="size-5" />}
+                    title="Administrador"
+                    description="Acesso total ao sistema"
+                    onClick={() => selectProfile("admin")}
                   />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                  <ProfileButton
+                    icon={<UserCog className="size-5" />}
+                    title="Gerente"
+                    description="CPF e senha do evento"
+                    onClick={() => selectProfile("gerente")}
                   />
+                  <ProfileButton
+                    icon={<Users className="size-5" />}
+                    title="Staff"
+                    description="CPF e senha criada pelo gerente"
+                    onClick={() => selectProfile("staff")}
+                  />
+                  <Link
+                    to="/checkin"
+                    className="border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors"
+                  >
+                    <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+                      <ClipboardCheck className="size-5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold">Check-in do atleta</span>
+                      <span className="text-muted-foreground block truncate text-xs">
+                        Consulte pelo CPF e gere sua credencial
+                      </span>
+                    </span>
+                  </Link>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  Entrar
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => void recover()}
-                  className="text-muted-foreground hover:text-primary w-full text-center text-xs"
-                >
-                  Esqueci minha senha
-                </button>
-              </form>
+              ) : (
+                <form className="space-y-4" onSubmit={signIn}>
+                  <button
+                    type="button"
+                    onClick={() => setProfile(null)}
+                    className="text-muted-foreground hover:text-primary flex items-center gap-1 text-xs"
+                  >
+                    <ArrowLeft className="size-3.5" /> Voltar
+                  </button>
+                  <p className="text-sm font-semibold">
+                    Entrar como{" "}
+                    {profile === "admin" ? "Administrador" : profile === "gerente" ? "Gerente" : "Staff"}
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email">{profile === "admin" ? "E-mail" : "CPF"}</Label>
+                    <Input
+                      id="email"
+                      type="text"
+                      autoComplete="username"
+                      required
+                      inputMode={profile === "admin" ? "email" : "numeric"}
+                      placeholder={profile === "admin" ? "seu@email.com" : "Somente números"}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="password">Senha</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      placeholder={
+                        profile === "gerente" ? "Senha inicial: data de nascimento (ddmmaaaa)" : undefined
+                      }
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    Entrar
+                  </Button>
+                  {profile === "admin" && (
+                    <button
+                      type="button"
+                      onClick={() => void recover()}
+                      className="text-muted-foreground hover:text-primary w-full text-center text-xs"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  )}
+                </form>
+              )}
             </TabsContent>
 
             <TabsContent value="signup">
@@ -181,5 +250,35 @@ function AuthPage() {
         Sou atleta — consultar meu kit
       </Link>
     </div>
+  );
+}
+
+function ProfileButton({
+  icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "border-border hover:border-primary hover:bg-primary/5 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors",
+      )}
+    >
+      <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold">{title}</span>
+        <span className="text-muted-foreground block truncate text-xs">{description}</span>
+      </span>
+    </button>
   );
 }
