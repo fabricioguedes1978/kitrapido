@@ -48,6 +48,8 @@ export const Route = createFileRoute("/_authenticated/atletas")({
 type Athlete = {
   id: string;
   name: string;
+  gender: string | null;
+  birth_date: string | null;
   cpf: string | null;
   email: string | null;
   phone: string | null;
@@ -70,6 +72,10 @@ const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"]
 const COLUMN_MAP: Record<string, string> = {
   nome: "name",
   atleta: "name",
+  sexo: "gender",
+  genero: "gender",
+  nascimento: "birth_date",
+  "data de nascimento": "birth_date",
   cpf: "cpf",
   email: "email",
   "e-mail": "email",
@@ -97,6 +103,12 @@ const COLUMN_MAP: Record<string, string> = {
   campo4: "custom_4",
   campo5: "custom_5",
 };
+
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  return y && m && d ? `${d}/${m}/${y}` : iso;
+}
 
 function normalizeKey(key: string) {
   return key
@@ -128,7 +140,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
+          "id,name,gender,birth_date,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -186,6 +198,8 @@ function Atletas() {
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
+        gender: r["gender"] ?? null,
+        birth_date: r["birth_date"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
@@ -446,6 +460,8 @@ function Atletas() {
             <TableHeader>
               <TableRow>
                 <TableHead>Atleta</TableHead>
+                <TableHead className="hidden sm:table-cell">Sexo</TableHead>
+                <TableHead className="hidden md:table-cell">Nascimento</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
@@ -463,6 +479,8 @@ function Atletas() {
               {filtered.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell className="max-w-[220px] truncate font-medium">{a.name}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
