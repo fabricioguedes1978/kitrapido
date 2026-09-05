@@ -103,14 +103,21 @@ function Checkin() {
           </Button>
         </form>
 
+        {rows && rows.length > 0 && (
+          <p className="text-muted-foreground mt-6 text-sm">
+            Encontramos <strong>{rows.length}</strong> inscrição{rows.length > 1 ? "ões" : ""} em eventos ativos. 
+            Cada evento tem sua própria credencial para download.
+          </p>
+        )}
+
         {rows?.length === 0 && (
           <p className="text-destructive mt-6 text-sm font-medium">
             Não encontramos nenhuma inscrição com esse CPF nos eventos ativos.
           </p>
         )}
 
-        <div className="mt-6 space-y-6">
-          {rows?.map((row) => <KitCard key={row.athlete_id} row={row} />)}
+        <div className="mt-4 space-y-6">
+          {rows?.map((row, idx) => <KitCard key={row.athlete_id} row={row} index={idx} total={rows.length} />)}
         </div>
       </main>
     </div>
