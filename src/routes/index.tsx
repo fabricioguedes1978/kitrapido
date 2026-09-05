@@ -55,8 +55,8 @@ const FEATURES = [
   },
   {
     icon: Boxes,
-    title: "Estoque em tempo real",
-    text: "Baixa automática de camisetas por tamanho. Alerta quando um item está acabando.",
+    title: "Acompanhe tudo ao vivo",
+    text: "Veja entregas por hora, por tamanho e por local em um dashboard que atualiza enquanto acontece.",
   },
   {
     icon: Gauge,
