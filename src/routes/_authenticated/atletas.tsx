@@ -778,8 +778,6 @@ function Atletas() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      </Dialog>
     </AppShell>
   );
 }
