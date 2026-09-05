@@ -170,9 +170,6 @@ function AuthPage() {
                       type="password"
                       autoComplete="current-password"
                       required
-                      placeholder={
-                        profile === "gerente" ? "Senha inicial: data de nascimento (ddmmaaaa)" : undefined
-                      }
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
