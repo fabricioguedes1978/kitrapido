@@ -645,7 +645,7 @@ function Central() {
                           isPaid(selected) ? "text-success" : "text-destructive",
                         )}
                       >
-                        Pagamento: {isPaid(selected) ? "Pago" : "Pendente"}
+                        {isPaid(selected) ? "Pago" : "Pendente"}
                       </p>
                     </div>
                     <Badge
