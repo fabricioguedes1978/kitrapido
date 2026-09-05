@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -116,7 +116,6 @@ function Central() {
   const [success, setSuccess] = useState<{ name: string; bib: string | null; at: string } | null>(null);
   const [locationId, setLocationId] = useState<string>("");
   const [cancelOpen, setCancelOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
