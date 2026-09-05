@@ -240,7 +240,7 @@ function Atletas() {
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
-      birth_date: a.birth_date ?? "",
+      birth_date: a.birth_date ? formatDate(a.birth_date) : "",
       city: a.city ?? "",
       equipe: a.equipe ?? "",
       cpf: a.cpf ?? "",
@@ -406,6 +406,13 @@ function Atletas() {
       });
       return;
     }
+    const birthIso = parseBrDate(form.birth_date);
+    if (!birthIso) {
+      toast.error("Data de nascimento inválida", {
+        description: "Digite no formato dd/mm/aaaa.",
+      });
+      return;
+    }
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
@@ -432,7 +439,7 @@ function Atletas() {
     }
     const payload = {
       name: form.name.trim(),
-      birth_date: form.birth_date,
+      birth_date: birthIso,
       gender: form.gender,
       city: form.city.trim() || null,
       equipe: form.equipe.trim() || null,
@@ -707,12 +714,8 @@ function Atletas() {
                 <Input
                   inputMode="numeric"
                   placeholder="dd/mm/aaaa"
-                  value={form.birth_date ? formatDate(form.birth_date) : ""}
-                  onChange={(e) => {
-                    const masked = maskBrDate(e.target.value);
-                    const iso = parseBrDate(masked);
-                    setForm({ ...form, birth_date: iso ?? "" });
-                  }}
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
                 />
               </div>
               <div className="space-y-1.5">
