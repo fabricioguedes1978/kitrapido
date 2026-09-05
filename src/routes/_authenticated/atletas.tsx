@@ -441,7 +441,7 @@ function Atletas() {
       eventId,
       action: editingId ? `Editou atleta ${payload.name}` : `Cadastrou atleta ${payload.name}`,
       entity: "athletes",
-      entityId: editingId ?? undefined,
+      entityId: editingId,
       userName: profile?.name ?? null,
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
