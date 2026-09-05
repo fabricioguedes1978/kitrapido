@@ -515,8 +515,8 @@ function Central() {
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <PaymentBadge athlete={a} />
-                      <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"}>
-                        {a.kit_status === "pending" ? "Pendente" : "Entregue"}
+                      <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"} className="font-bold uppercase">
+                        {a.kit_status === "pending" ? "PENDENTE" : "ENTREGUE"}
                       </Badge>
                     </div>
                   </button>
@@ -649,10 +649,10 @@ function Central() {
                       </p>
                     </div>
                     <Badge
-                      className="mt-2 w-fit sm:mt-0"
+                      className="mt-2 w-fit font-bold uppercase sm:mt-0"
                       variant={activeDelivery || queuedOffline ? "destructive" : "default"}
                     >
-                      {activeDelivery || queuedOffline ? "Entregue" : "Pendente"}
+                      {activeDelivery || queuedOffline ? "ENTREGUE" : "PENDENTE"}
                     </Badge>
                   </div>
 
