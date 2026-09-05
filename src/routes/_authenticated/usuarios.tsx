@@ -41,7 +41,8 @@ type MemberRow = {
 
 function Usuarios() {
   const { event, eventId } = useCurrentEvent();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isOrganizer } = useAuth();
+  const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
   const saveTeamUser = useServerFn(saveEventTeamUser);
 
@@ -144,12 +145,12 @@ function Usuarios() {
         subtitle={event?.name ?? ""}
         action={
           <div className="flex flex-wrap gap-2">
-            {isAdmin && (
+            {canManage && (
               <Button onClick={() => openNew("organizer")}>
                 <ShieldCheck className="size-4" /> Novo gerente
               </Button>
             )}
-            <Button variant={isAdmin ? "outline" : "default"} onClick={() => openNew("attendant")}>
+            <Button variant={canManage ? "outline" : "default"} onClick={() => openNew("attendant")}>
               <UserPlus className="size-4" /> Novo staff
             </Button>
             <Button variant="ghost" onClick={() => setOpen(true)}>

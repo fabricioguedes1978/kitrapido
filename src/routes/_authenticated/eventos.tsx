@@ -64,7 +64,8 @@ const EMPTY = {
 
 function Eventos() {
   const { data: events = [] } = useEventsQuery();
-  const { isAdmin, profile, user } = useAuth();
+  const { isAdmin, isOrganizer, profile, user } = useAuth();
+  const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { select } = useCurrentEvent();
@@ -257,7 +258,7 @@ function Eventos() {
                     Página do atleta
                   </a>
                 </Button>
-                {isAdmin && (
+                {canManage && (
                   <>
                     <Button
                       variant={e.archived ? "secondary" : "outline"}
