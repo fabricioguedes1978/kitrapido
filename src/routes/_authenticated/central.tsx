@@ -333,13 +333,11 @@ function Central() {
 
   async function cancelDelivery() {
     if (!activeDelivery || !selected) return;
-    if (!cancelReason.trim()) { toast.error("Descreva o motivo do cancelamento."); return; }
     setCancelling(true);
     const { error } = await supabase
       .from("deliveries")
       .update({
         status: "cancelled",
-        cancel_reason: cancelReason.trim(),
         cancelled_at: new Date().toISOString(),
         cancelled_by: user?.id ?? null,
       })
@@ -348,7 +346,7 @@ function Central() {
     if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
-      action: `Cancelou a entrega de ${selected.name} (nº ${selected.bib_number ?? "—"}): ${cancelReason.trim()}`,
+      action: `Cancelou a entrega de ${selected.name} (nº ${selected.bib_number ?? "—"})`,
       entity: "deliveries",
       entityId: activeDelivery.id,
       userName: profile?.name ?? null,
@@ -357,7 +355,6 @@ function Central() {
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     await qc.invalidateQueries({ queryKey: ["inventory", eventId] });
     setCancelOpen(false);
-    setCancelReason("");
     publishDisplay({ status: "idle" });
     toast.success("Entrega cancelada. O atleta voltou para pendente.");
   }
