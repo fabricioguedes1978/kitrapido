@@ -83,14 +83,13 @@ function Entregas() {
       .from("deliveries")
       .update({
         status: "cancelled",
-        cancel_reason: reason.trim() || null,
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", cancelling.id);
     if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
-      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}${reason.trim() ? `: ${reason.trim()}` : ""}`,
+      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}`,
       entity: "deliveries",
       entityId: cancelling.id,
       userName: profile?.name ?? null,
@@ -98,7 +97,6 @@ function Entregas() {
     await qc.invalidateQueries({ queryKey: ["deliveries-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["deliveries", eventId] });
     setCancelling(null);
-    setReason("");
     toast.success("Entrega cancelada. O atleta voltou para pendente.");
   }
 
