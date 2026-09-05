@@ -255,9 +255,14 @@ function Eventos() {
                 </div>
               )}
               <div className="flex flex-wrap gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
-                  Editar
+                <Button variant="outline" size="sm" onClick={() => setViewing(e)}>
+                  <FolderOpen className="size-4" /> Abrir
                 </Button>
+                {(isAdmin || isOrganizer) && (
+                  <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
+                    Editar
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
