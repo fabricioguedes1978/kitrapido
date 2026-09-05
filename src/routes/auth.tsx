@@ -75,15 +75,6 @@ function AuthPage() {
     toast.success("Conta criada", { description: "Confirme o e-mail enviado para ativar o acesso." });
   }
 
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) { toast.error("Falha no login com Google"); return; }
-    if (result.redirected) return;
-    navigate({ to: "/central", replace: true });
-  }
-
   async function recover() {
     if (!email.trim()) { toast.error("Informe seu e-mail para recuperar a senha."); return; }
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
