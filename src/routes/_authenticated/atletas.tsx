@@ -72,6 +72,10 @@ const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"]
 const COLUMN_MAP: Record<string, string> = {
   nome: "name",
   atleta: "name",
+  sexo: "gender",
+  genero: "gender",
+  nascimento: "birth_date",
+  "data de nascimento": "birth_date",
   cpf: "cpf",
   email: "email",
   "e-mail": "email",
@@ -448,6 +452,8 @@ function Atletas() {
             <TableHeader>
               <TableRow>
                 <TableHead>Atleta</TableHead>
+                <TableHead className="hidden sm:table-cell">Sexo</TableHead>
+                <TableHead className="hidden md:table-cell">Nascimento</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
@@ -465,6 +471,8 @@ function Atletas() {
               {filtered.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell className="max-w-[220px] truncate font-medium">{a.name}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
