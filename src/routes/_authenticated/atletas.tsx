@@ -58,6 +58,7 @@ type Athlete = {
   bib_number: string | null;
   modality: string | null;
   category: string | null;
+  distance: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
@@ -68,7 +69,30 @@ type Athlete = {
   custom_5?: string | null;
 };
 
+const EMPTY_FORM = {
+  name: "",
+  gender: "",
+  birth_date: "",
+  city: "",
+  cpf: "",
+  email: "",
+  phone: "",
+  registration_number: "",
+  bib_number: "",
+  modality: "",
+  category: "",
+  distance: "",
+  shirt_size: "",
+  kit_type: "",
+  custom_1: "",
+  custom_2: "",
+  custom_3: "",
+  custom_4: "",
+  custom_5: "",
+};
+
 const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"] as const;
+
 
 const COLUMN_MAP: Record<string, string> = {
   nome: "name",
