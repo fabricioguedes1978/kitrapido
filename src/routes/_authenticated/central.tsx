@@ -84,6 +84,7 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  payment_status: string;
   custom_1?: string | null;
   custom_2?: string | null;
   custom_3?: string | null;
@@ -100,6 +101,29 @@ type Delivery = {
   location_id: string | null;
   status: string;
 };
+
+function isPaid(a: Athlete) {
+  const s = (a.payment_status || "").toLowerCase();
+  return s === "pago" || s === "paid" || s === "confirmada";
+}
+
+function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolean }) {
+  const paid = isPaid(athlete);
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-bold",
+        paid
+          ? "border-success/30 bg-success/15 text-success"
+          : "border-destructive/30 bg-destructive/15 text-destructive",
+        big ? "text-base" : "text-xs",
+      )}
+    >
+      <span className={cn("size-2 rounded-full", paid ? "bg-success" : "bg-destructive")} />
+      {paid ? "PAGO" : "PENDENTE"}
+    </div>
+  );
+}
 
 function Central() {
   const { event, eventId } = useCurrentEvent();
@@ -127,7 +151,7 @@ function Central() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -489,9 +513,12 @@ function Central() {
                         Nº {a.bib_number ?? "—"} · {a.modality ?? "—"} · {maskCPF(a.cpf)}
                       </p>
                     </div>
-                    <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"}>
-                      {a.kit_status === "pending" ? "Pendente" : "Entregue"}
-                    </Badge>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <PaymentBadge athlete={a} />
+                      <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"}>
+                        {a.kit_status === "pending" ? "Pendente" : "Entregue"}
+                      </Badge>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -547,6 +574,28 @@ function Central() {
         {selected && (
           <Card className="shadow-card overflow-hidden">
             <CardContent className="p-0">
+              <div
+                className={cn(
+                  "flex items-center justify-between border-b px-4 py-3",
+                  isPaid(selected)
+                    ? "border-success/30 bg-success/10"
+                    : "border-destructive/30 bg-destructive/10",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {!isPaid(selected) && <AlertTriangle className="text-destructive size-5" />}
+                  <span
+                    className={cn(
+                      "text-sm font-extrabold uppercase tracking-wide",
+                      isPaid(selected) ? "text-success" : "text-destructive",
+                    )}
+                  >
+                    Pagamento {isPaid(selected) ? "confirmado" : "pendente"}
+                  </span>
+                </div>
+                <PaymentBadge athlete={selected} big />
+              </div>
+
               {(activeDelivery || queuedOffline) && (
                 <div className="border-destructive/40 bg-destructive/10 border-b p-4">
                   <p className="text-destructive flex items-center gap-2 text-lg font-extrabold">
