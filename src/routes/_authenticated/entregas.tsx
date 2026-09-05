@@ -48,7 +48,7 @@ function Entregas() {
   const qc = useQueryClient();
   const [term, setTerm] = useState("");
   const [cancelling, setCancelling] = useState<DeliveryRow | null>(null);
-  const [reason, setReason] = useState("");
+  
 
   const { data: deliveries = [] } = useQuery({
     queryKey: ["deliveries-full", eventId],
