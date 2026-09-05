@@ -130,11 +130,18 @@ function KitCard({ row }: { row: KitRow }) {
       eventName: row.event_name,
       name: row.name,
       rows: [
+        { label: "Data", value: row.event_date ? formatDate(row.event_date) : "—" },
+        {
+          label: "Local",
+          value: row.event_city ? `${row.event_city}${row.event_state ? `/${row.event_state}` : ""}` : "—",
+        },
+        { label: "Status", value: delivered ? `Kit retirado ${formatDateTime(row.delivered_at)}` : "Kit disponível para retirada" },
         { label: "Nº de peito", value: row.bib_number || "—" },
         { label: "Kit", value: row.kit_type || "—" },
         { label: "Camiseta", value: row.shirt_size || "—" },
         { label: "Modalidade", value: row.modality || "—" },
         { label: "Categoria", value: row.category || "—" },
+        { label: "Cidade", value: row.city || "—" },
         ...extras.map((f) => ({ label: f.label, value: f.value })),
       ],
       footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",

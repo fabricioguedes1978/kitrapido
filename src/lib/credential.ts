@@ -26,7 +26,12 @@ async function svgToImage(svg: SVGElement, size: number) {
 
 export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElement) {
   const W = 900;
-  const H = 1280;
+  // Altura dinâmica: cresce conforme a quantidade de linhas de dados
+  const qrSize = 420;
+  const dataStart = 300;
+  const rowStep = 78;
+  const dataEnd = dataStart + data.rows.length * rowStep;
+  const H = Math.max(1280, dataEnd + 40 + qrSize + 48 + 190);
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -49,21 +54,23 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   ctx.font = "bold 46px Helvetica, Arial, sans-serif";
   ctx.fillText(data.name.slice(0, 30), 48, 230);
 
-  // Dados
-  let y = 300;
-  ctx.font = "22px Helvetica, Arial, sans-serif";
-  for (const row of data.rows) {
+  // Dados (duas colunas quando houver muitas linhas)
+  const twoCol = data.rows.length > 6;
+  const colW = (W - 96) / 2;
+  data.rows.forEach((row, i) => {
+    const col = twoCol ? i % 2 : 0;
+    const idx = twoCol ? Math.floor(i / 2) : i;
+    const x = 48 + col * colW;
+    const yy = dataStart + idx * rowStep;
     ctx.fillStyle = "#6b7280";
     ctx.font = "20px Helvetica, Arial, sans-serif";
-    ctx.fillText(row.label.toUpperCase(), 48, y);
+    ctx.fillText(row.label.toUpperCase(), x, yy);
     ctx.fillStyle = "#111827";
-    ctx.font = "bold 30px Helvetica, Arial, sans-serif";
-    ctx.fillText(row.value.slice(0, 40), 48, y + 36);
-    y += 78;
-  }
+    ctx.font = "bold 26px Helvetica, Arial, sans-serif";
+    ctx.fillText(row.value.slice(0, 34), x, yy + 34);
+  });
 
   // QR Code
-  const qrSize = 420;
   const img = await svgToImage(qrSvg, qrSize);
   const qrX = (W - qrSize) / 2;
   const qrY = H - qrSize - 170;
