@@ -513,9 +513,12 @@ function Central() {
                         Nº {a.bib_number ?? "—"} · {a.modality ?? "—"} · {maskCPF(a.cpf)}
                       </p>
                     </div>
-                    <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"}>
-                      {a.kit_status === "pending" ? "Pendente" : "Entregue"}
-                    </Badge>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <PaymentBadge athlete={a} />
+                      <Badge variant={a.kit_status === "pending" ? "secondary" : "outline"}>
+                        {a.kit_status === "pending" ? "Pendente" : "Entregue"}
+                      </Badge>
+                    </div>
                   </button>
                 ))}
               </div>
