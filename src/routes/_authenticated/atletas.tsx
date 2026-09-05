@@ -555,15 +555,27 @@ function Atletas() {
             <Button variant="outline" onClick={exportCsv}>
               <Download className="size-4" />
             </Button>
-            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
-            <Button onClick={openNew}>
+            <Button disabled={locked} onClick={openNew}>
               <Plus className="size-4" />
             </Button>
           </div>
         }
       />
+
+      {lockAt && (
+        <Card className="mb-4">
+          <CardContent
+            className={`p-3 text-sm ${locked ? "text-destructive font-semibold" : "text-muted-foreground"}`}
+          >
+            {locked
+              ? `Cadastro e alteração de atletas encerrados em ${lockLabel}. Somente o administrador pode alterar este prazo.`
+              : `Cadastro e alteração de atletas ficam disponíveis até ${lockLabel}.`}
+          </CardContent>
+        </Card>
+      )}
 
       <input
         ref={fileRef}
