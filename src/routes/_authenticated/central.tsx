@@ -110,18 +110,17 @@ function isPaid(a: Athlete) {
 function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolean }) {
   const paid = isPaid(athlete);
   return (
-    <div
+    <Badge
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-bold",
+        "font-bold uppercase",
         paid
           ? "border-success/30 bg-success/15 text-success"
           : "border-destructive/30 bg-destructive/15 text-destructive",
         big ? "text-base" : "text-xs",
       )}
     >
-      <span className={cn("size-2 rounded-full", paid ? "bg-success" : "bg-destructive")} />
       {paid ? "PAGO" : "PENDENTE PAGAMENTO"}
-    </div>
+    </Badge>
   );
 }
 
