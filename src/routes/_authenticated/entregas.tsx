@@ -165,13 +165,30 @@ function Entregas() {
   }, [rows, statusFilter, term]);
 
   function exportExcel() {
+    const labels = event?.custom_field_labels ?? [];
     const data = filtered.map((row) => ({
       Atleta: row.athlete.name,
+      CPF: formatCPF(row.athlete.cpf),
+      "Data de nascimento": row.athlete.birth_date ? formatDate(row.athlete.birth_date) : "",
+      Sexo: row.athlete.gender ?? "",
+      Email: row.athlete.email ?? "",
+      Telefone: row.athlete.phone ?? "",
+      Cidade: row.athlete.city ?? "",
+      "Nº inscrição": row.athlete.registration_number ?? "",
       "Nº de peito": row.athlete.bib_number ?? "",
       Modalidade: row.athlete.modality ?? "",
       Categoria: row.athlete.category ?? "",
+      Distância: row.athlete.distance ?? "",
       Camiseta: row.athlete.shirt_size ?? "",
-      Status:
+      Kit: row.athlete.kit_type ?? "",
+      "Status inscrição": row.athlete.registration_status ?? "",
+      "Status pagamento": row.athlete.payment_status ?? "",
+      [labels[0] ?? "Campo personalizado 1"]: row.athlete.custom_1 ?? "",
+      [labels[1] ?? "Campo personalizado 2"]: row.athlete.custom_2 ?? "",
+      [labels[2] ?? "Campo personalizado 3"]: row.athlete.custom_3 ?? "",
+      [labels[3] ?? "Campo personalizado 4"]: row.athlete.custom_4 ?? "",
+      [labels[4] ?? "Campo personalizado 5"]: row.athlete.custom_5 ?? "",
+      "Status do kit":
         row.status === "delivered"
           ? row.delivery?.delivery_type === "third_party"
             ? "Kit entregue - terceiro"
