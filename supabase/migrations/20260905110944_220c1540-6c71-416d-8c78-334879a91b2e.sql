@@ -1,0 +1,1 @@
+ALTER TABLE public.athletes ADD COLUMN IF NOT EXISTS equipe text;

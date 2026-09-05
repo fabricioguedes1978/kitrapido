@@ -51,6 +51,7 @@ type Athlete = {
   gender: string | null;
   birth_date: string | null;
   city: string | null;
+  equipe: string | null;
   cpf: string | null;
   email: string | null;
   phone: string | null;
@@ -74,6 +75,7 @@ const EMPTY_FORM = {
   gender: "",
   birth_date: "",
   city: "",
+  equipe: "",
   cpf: "",
   email: "",
   phone: "",
@@ -102,6 +104,8 @@ const COLUMN_MAP: Record<string, string> = {
   nascimento: "birth_date",
   "data de nascimento": "birth_date",
   cidade: "city",
+  equipe: "equipe",
+  time: "equipe",
   cpf: "cpf",
   email: "email",
   "e-mail": "email",
@@ -167,7 +171,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -218,6 +222,7 @@ function Atletas() {
       gender: a.gender ?? "",
       birth_date: a.birth_date ?? "",
       city: a.city ?? "",
+      equipe: a.equipe ?? "",
       cpf: a.cpf ?? "",
       email: a.email ?? "",
       phone: a.phone ?? "",
@@ -263,6 +268,7 @@ function Atletas() {
         gender: r["gender"] ?? null,
         birth_date: r["birth_date"] ?? null,
         city: r["city"] ?? null,
+        equipe: r["equipe"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
@@ -409,6 +415,7 @@ function Atletas() {
       birth_date: form.birth_date,
       gender: form.gender,
       city: form.city.trim() || null,
+      equipe: form.equipe.trim() || null,
       cpf,
       email: form.email.trim() || null,
       phone: form.phone.trim() || null,
@@ -459,6 +466,7 @@ function Atletas() {
         Sexo: a.gender,
         Nascimento: a.birth_date,
         Cidade: a.city,
+        Equipe: a.equipe,
         CPF: a.cpf,
         Inscricao: a.registration_number,
         Peito: a.bib_number,
@@ -551,8 +559,8 @@ function Atletas() {
                 e.stopPropagation();
                 downloadBlob(
                   "\uFEFF" +
-                    "nome,sexo,nascimento,cidade,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
-                    "Maria Silva,F,1990-05-15,São Paulo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
+                    "nome,sexo,nascimento,cidade,equipe,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
+                    "Maria Silva,F,1990-05-15,São Paulo,Equipe Exemplo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
                   "modelo-atletas.csv",
                   "text/csv;charset=utf-8",
                 );
@@ -582,6 +590,7 @@ function Atletas() {
                 <TableHead className="hidden sm:table-cell">Sexo</TableHead>
                 <TableHead className="hidden md:table-cell">Nascimento</TableHead>
                 <TableHead className="hidden md:table-cell">Cidade</TableHead>
+                <TableHead className="hidden lg:table-cell">Equipe</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
@@ -615,6 +624,7 @@ function Atletas() {
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{a.equipe ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
@@ -696,6 +706,10 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
                 <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Equipe</Label>
+                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
