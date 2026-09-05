@@ -497,7 +497,7 @@ function Atletas() {
         Equipe: a.equipe,
         CPF: a.cpf,
         Inscricao: a.registration_number,
-        Peito: a.bib_number,
+        Numero: a.bib_number,
         Modalidade: a.modality,
         Categoria: a.category,
         Camiseta: a.shirt_size,
@@ -572,7 +572,7 @@ function Atletas() {
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
-              cpf, e-mail, telefone, inscrição, peito, modalidade, categoria, distância, camiseta, kit
+              cpf, e-mail, telefone, inscrição, numero, modalidade, categoria, distância, camiseta, kit
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -587,7 +587,7 @@ function Atletas() {
                 e.stopPropagation();
                 const headers = [
                   "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
-                  "inscricao", "peito", "modalidade", "categoria", "distancia", "camiseta", "kit",
+                  "inscricao", "numero", "modalidade", "categoria", "distancia", "camiseta", "kit",
                   "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
@@ -777,7 +777,7 @@ function Atletas() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Nº de peito</Label>
+                <Label>Número</Label>
                 <Input
                   value={form.bib_number}
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
