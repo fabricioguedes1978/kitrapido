@@ -78,19 +78,19 @@ function Entregas() {
   }, [deliveries, term]);
 
   async function cancel() {
-    if (!cancelling || !reason.trim()) { toast.error("Descreva o motivo do cancelamento."); return; }
+    if (!cancelling) return;
     const { error } = await supabase
       .from("deliveries")
       .update({
         status: "cancelled",
-        cancel_reason: reason.trim(),
+        cancel_reason: reason.trim() || null,
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", cancelling.id);
     if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
-      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}: ${reason.trim()}`,
+      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}${reason.trim() ? `: ${reason.trim()}` : ""}`,
       entity: "deliveries",
       entityId: cancelling.id,
       userName: profile?.name ?? null,
