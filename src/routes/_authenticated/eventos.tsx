@@ -59,8 +59,18 @@ const EMPTY = {
   description: "",
   modalities: "",
   status: "planning",
+  athletes_lock_at: "",
   custom_field_labels: ["", "", "", "", ""] as string[],
 };
+
+/** ISO -> valor do input datetime-local (horário local do navegador). */
+function toLocalInput(iso: string | null) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 function Eventos() {
   const { data: events = [] } = useEventsQuery();
@@ -153,6 +163,7 @@ function Eventos() {
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
+      athletes_lock_at: toLocalInput(e.athletes_lock_at),
       custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
@@ -176,6 +187,13 @@ function Eventos() {
         .filter(Boolean),
       status: form.status as "planning",
       custom_field_labels: form.custom_field_labels.map((l) => l.trim()),
+      ...(isAdmin
+        ? {
+            athletes_lock_at: form.athletes_lock_at
+              ? new Date(form.athletes_lock_at).toISOString()
+              : null,
+          }
+        : {}),
     };
 
     const { error } = editing
@@ -374,6 +392,20 @@ function Eventos() {
                 </SelectContent>
               </Select>
             </Field>
+            {isAdmin && (
+              <Field label="Fechar cadastro e alteração de atletas em">
+                <Input
+                  type="datetime-local"
+                  value={form.athletes_lock_at}
+                  onChange={(e) => setForm({ ...form, athletes_lock_at: e.target.value })}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Depois desta data e horário, gerentes e equipe não conseguem mais incluir nem
+                  alterar atletas. Se deixar em branco, o sistema usa automaticamente 24 horas antes
+                  do início do evento. Somente o administrador pode mudar este prazo.
+                </p>
+              </Field>
+            )}
             <Field label="Descrição">
               <Textarea
                 value={form.description}

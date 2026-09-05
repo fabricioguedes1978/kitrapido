@@ -180,7 +180,12 @@ function normalizeKey(key: string) {
 
 function Atletas() {
   const { event, eventId } = useCurrentEvent();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
+  const lockAt = event?.athletes_lock_at ?? null;
+  const locked = !isAdmin && !!lockAt && new Date(lockAt).getTime() <= Date.now();
+  const lockLabel = lockAt
+    ? new Date(lockAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+    : null;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [term, setTerm] = useState("");
@@ -240,6 +245,12 @@ function Atletas() {
   }, [athletes, form.cpf, form.bib_number, editingId]);
 
   function openNew() {
+    if (locked) {
+      toast.error("Cadastro de atletas encerrado", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setDupWarning(null);
@@ -247,6 +258,12 @@ function Atletas() {
   }
 
   function openEdit(a: Athlete) {
+    if (locked) {
+      toast.error("Alteração de atletas encerrada", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
@@ -384,6 +401,12 @@ function Atletas() {
   }
 
   function handleFile(file: File) {
+    if (locked) {
+      toast.error("Cadastro de atletas encerrado", {
+        description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
+      });
+      return;
+    }
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
     if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
@@ -532,15 +555,27 @@ function Atletas() {
             <Button variant="outline" onClick={exportCsv}>
               <Download className="size-4" />
             </Button>
-            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
-            <Button onClick={openNew}>
+            <Button disabled={locked} onClick={openNew}>
               <Plus className="size-4" />
             </Button>
           </div>
         }
       />
+
+      {lockAt && (
+        <Card className="mb-4">
+          <CardContent
+            className={`p-3 text-sm ${locked ? "text-destructive font-semibold" : "text-muted-foreground"}`}
+          >
+            {locked
+              ? `Cadastro e alteração de atletas encerrados em ${lockLabel}. Somente o administrador pode alterar este prazo.`
+              : `Cadastro e alteração de atletas ficam disponíveis até ${lockLabel}.`}
+          </CardContent>
+        </Card>
+      )}
 
       <input
         ref={fileRef}
