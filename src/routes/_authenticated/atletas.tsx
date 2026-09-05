@@ -51,6 +51,7 @@ type Athlete = {
   gender: string | null;
   birth_date: string | null;
   city: string | null;
+  equipe: string | null;
   cpf: string | null;
   email: string | null;
   phone: string | null;
@@ -74,6 +75,7 @@ const EMPTY_FORM = {
   gender: "",
   birth_date: "",
   city: "",
+  equipe: "",
   cpf: "",
   email: "",
   phone: "",
@@ -102,6 +104,8 @@ const COLUMN_MAP: Record<string, string> = {
   nascimento: "birth_date",
   "data de nascimento": "birth_date",
   cidade: "city",
+  equipe: "equipe",
+  time: "equipe",
   cpf: "cpf",
   email: "email",
   "e-mail": "email",
@@ -167,7 +171,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -218,6 +222,7 @@ function Atletas() {
       gender: a.gender ?? "",
       birth_date: a.birth_date ?? "",
       city: a.city ?? "",
+      equipe: a.equipe ?? "",
       cpf: a.cpf ?? "",
       email: a.email ?? "",
       phone: a.phone ?? "",
@@ -263,6 +268,7 @@ function Atletas() {
         gender: r["gender"] ?? null,
         birth_date: r["birth_date"] ?? null,
         city: r["city"] ?? null,
+        equipe: r["equipe"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
@@ -409,6 +415,7 @@ function Atletas() {
       birth_date: form.birth_date,
       gender: form.gender,
       city: form.city.trim() || null,
+      equipe: form.equipe.trim() || null,
       cpf,
       email: form.email.trim() || null,
       phone: form.phone.trim() || null,
@@ -459,6 +466,7 @@ function Atletas() {
         Sexo: a.gender,
         Nascimento: a.birth_date,
         Cidade: a.city,
+        Equipe: a.equipe,
         CPF: a.cpf,
         Inscricao: a.registration_number,
         Peito: a.bib_number,
@@ -696,6 +704,10 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
                 <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Equipe</Label>
+                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
