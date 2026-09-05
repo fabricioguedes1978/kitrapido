@@ -705,9 +705,14 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Data de nascimento *</Label>
                 <Input
-                  type="date"
-                  value={form.birth_date}
-                  onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                  inputMode="numeric"
+                  placeholder="dd/mm/aaaa"
+                  value={form.birth_date ? formatDate(form.birth_date) : ""}
+                  onChange={(e) => {
+                    const masked = maskBrDate(e.target.value);
+                    const iso = parseBrDate(masked);
+                    setForm({ ...form, birth_date: iso ?? "" });
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
