@@ -84,6 +84,7 @@ type Athlete = {
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
+  payment_status: string;
   custom_1?: string | null;
   custom_2?: string | null;
   custom_3?: string | null;
