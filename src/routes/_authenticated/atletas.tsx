@@ -598,7 +598,20 @@ function Atletas() {
               )}
               {filtered.map((a) => (
                 <TableRow key={a.id}>
-                  <TableCell className="max-w-[220px] truncate font-medium">{a.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        title="Editar dados"
+                        onClick={() => openEdit(a)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                      <span className="max-w-[200px] truncate">{a.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
