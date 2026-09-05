@@ -228,10 +228,6 @@ function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
-
-      <Link to="/consulta" className="text-sidebar-foreground/70 hover:text-primary text-xs">
-        Sou atleta — consultar meu kit
-      </Link>
     </div>
   );
 }
