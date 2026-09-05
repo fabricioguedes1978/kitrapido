@@ -11,6 +11,7 @@ import {
   Package,
   ScanLine,
   Search,
+  Undo2,
   UserCheck,
   Users,
   X,
@@ -22,6 +23,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -93,7 +103,8 @@ type Delivery = {
 
 function Central() {
   const { event, eventId } = useCurrentEvent();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin, isOrganizer } = useAuth();
+  const canCancel = isAdmin || isOrganizer;
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
@@ -104,6 +115,9 @@ function Central() {
   const [asThirdParty, setAsThirdParty] = useState(false);
   const [success, setSuccess] = useState<{ name: string; bib: string | null; at: string } | null>(null);
   const [locationId, setLocationId] = useState<string>("");
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: athletes = [] } = useQuery({
@@ -318,6 +332,37 @@ function Central() {
     finish();
   }
 
+  async function cancelDelivery() {
+    if (!activeDelivery || !selected) return;
+    if (!cancelReason.trim()) { toast.error("Descreva o motivo do cancelamento."); return; }
+    setCancelling(true);
+    const { error } = await supabase
+      .from("deliveries")
+      .update({
+        status: "cancelled",
+        cancel_reason: cancelReason.trim(),
+        cancelled_at: new Date().toISOString(),
+        cancelled_by: user?.id ?? null,
+      })
+      .eq("id", activeDelivery.id);
+    setCancelling(false);
+    if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
+    void logAudit({
+      eventId,
+      action: `Cancelou a entrega de ${selected.name} (nº ${selected.bib_number ?? "—"}): ${cancelReason.trim()}`,
+      entity: "deliveries",
+      entityId: activeDelivery.id,
+      userName: profile?.name ?? null,
+    });
+    await qc.invalidateQueries({ queryKey: ["deliveries", eventId] });
+    await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
+    await qc.invalidateQueries({ queryKey: ["inventory", eventId] });
+    setCancelOpen(false);
+    setCancelReason("");
+    publishDisplay({ status: "idle" });
+    toast.success("Entrega cancelada. O atleta voltou para pendente.");
+  }
+
   function finish() {
     setSuccess({
       name: selected!.name,
@@ -526,8 +571,17 @@ function Central() {
                     {!activeDelivery && queuedOffline && <p>Registrada offline, aguardando sincronização.</p>}
                   </dl>
                   <p className="text-muted-foreground mt-3 text-xs">
-                    Uma nova entrega só pode ser autorizada por um administrador na tela de Entregas.
+                    Se a entrega foi feita para o atleta errado, cancele para liberar o kit novamente.
                   </p>
+                  {activeDelivery && canCancel && (
+                    <Button
+                      variant="destructive"
+                      className="mt-3"
+                      onClick={() => { setCancelReason(""); setCancelOpen(true); }}
+                    >
+                      <Undo2 className="size-4" /> Cancelar kit entregue
+                    </Button>
+                  )}
                 </div>
               )}
 
@@ -653,6 +707,30 @@ function Central() {
         )}
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
+
+        <Dialog open={cancelOpen} onOpenChange={(v) => !v && setCancelOpen(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancelar kit entregue</DialogTitle>
+              <DialogDescription>
+                A entrega de <strong>{selected?.name}</strong> será cancelada e o atleta voltará a
+                constar como pendente. O estoque será estornado automaticamente.
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              placeholder="Motivo do cancelamento (ex.: entrega feita para o atleta errado)"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCancelOpen(false)}>Voltar</Button>
+              <Button variant="destructive" disabled={cancelling} onClick={() => void cancelDelivery()}>
+                {cancelling ? "Cancelando..." : "Confirmar cancelamento"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
