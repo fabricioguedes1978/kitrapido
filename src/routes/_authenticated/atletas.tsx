@@ -817,7 +817,7 @@ function Atletas() {
                 <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label>CPF</Label>
+                <Label>CPF *</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
               </div>
               <div className="space-y-1.5">
