@@ -570,8 +570,17 @@ function Central() {
                     {!activeDelivery && queuedOffline && <p>Registrada offline, aguardando sincronização.</p>}
                   </dl>
                   <p className="text-muted-foreground mt-3 text-xs">
-                    Uma nova entrega só pode ser autorizada por um administrador na tela de Entregas.
+                    Se a entrega foi feita para o atleta errado, cancele para liberar o kit novamente.
                   </p>
+                  {activeDelivery && canCancel && (
+                    <Button
+                      variant="destructive"
+                      className="mt-3"
+                      onClick={() => { setCancelReason(""); setCancelOpen(true); }}
+                    >
+                      <Undo2 className="size-4" /> Cancelar kit entregue
+                    </Button>
+                  )}
                 </div>
               )}
 
