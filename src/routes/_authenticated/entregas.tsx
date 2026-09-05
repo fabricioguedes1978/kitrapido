@@ -32,11 +32,27 @@ export const Route = createFileRoute("/_authenticated/entregas")({
 type AthleteRow = {
   id: string;
   name: string;
+  cpf: string | null;
+  birth_date: string | null;
+  gender: string | null;
+  email: string | null;
+  phone: string | null;
+  registration_number: string | null;
   bib_number: string | null;
   modality: string | null;
   category: string | null;
+  distance: string | null;
   shirt_size: string | null;
+  kit_type: string | null;
+  registration_status: string | null;
+  payment_status: string | null;
   kit_status: string;
+  city: string | null;
+  custom_1: string | null;
+  custom_2: string | null;
+  custom_3: string | null;
+  custom_4: string | null;
+  custom_5: string | null;
 };
 
 type DeliveryRow = {
