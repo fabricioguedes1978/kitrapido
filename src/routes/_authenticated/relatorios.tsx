@@ -75,7 +75,7 @@ function Relatorios() {
           .filter((d) => d.status === "active")
           .map((d) => ({
             Atleta: d.athletes?.name ?? "",
-            Peito: d.athletes?.bib_number ?? "",
+            Numero: d.athletes?.bib_number ?? "",
             Camiseta: d.athletes?.shirt_size ?? "",
             "Data/hora": formatDateTime(d.delivered_at),
             Atendente: d.delivered_by_name ?? "",
