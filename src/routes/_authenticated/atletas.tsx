@@ -286,7 +286,7 @@ function Atletas() {
         event_id: eventId,
         name: r["name"]!,
         gender: r["gender"] ?? null,
-        birth_date: r["birth_date"] ?? null,
+        birth_date: r["birth_date"] ? parseBrDate(r["birth_date"]) : null,
         city: r["city"] ?? null,
         equipe: r["equipe"] ?? null,
         cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
@@ -304,7 +304,8 @@ function Atletas() {
         custom_3: r["custom_3"] ?? null,
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
-      }));
+      }))
+      .filter((r) => r.birth_date);
 
     const incomplete = rows.length - parsed.length;
     if (parsed.length === 0) {
