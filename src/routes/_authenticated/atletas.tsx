@@ -392,7 +392,7 @@ function Atletas() {
           ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
           : null,
         incomplete > 0
-          ? `${incomplete} linha(s) ignoradas por falta de nome, nascimento, sexo ou modalidade.`
+          ? `${incomplete} linha(s) ignoradas por falta de nome, CPF, número, nascimento, sexo ou modalidade.`
           : null,
       ]
         .filter(Boolean)
