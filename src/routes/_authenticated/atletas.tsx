@@ -436,10 +436,17 @@ function Atletas() {
     if (!form.birth_date) missing.push("data de nascimento");
     if (!form.gender) missing.push("sexo");
     if (!form.modality.trim()) missing.push("modalidade");
+    if (!form.cpf.trim()) missing.push("CPF");
+    if (!form.bib_number.trim()) missing.push("número");
     if (missing.length > 0) {
       toast.error("Campos obrigatórios", {
         description: `Informe: ${missing.join(", ")}.`,
       });
+      return;
+    }
+    const cpfDigits = onlyDigits(form.cpf);
+    if (cpfDigits.length !== 11) {
+      toast.error("CPF inválido", { description: "Digite um CPF com 11 dígitos." });
       return;
     }
     const birthIso = parseBrDate(form.birth_date);
