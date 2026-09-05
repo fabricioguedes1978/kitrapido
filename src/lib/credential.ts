@@ -40,7 +40,7 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   ctx.fillRect(0, 0, W, 150);
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 40px Helvetica, Arial, sans-serif";
-  ctx.fillText("CRONOCHIP KIT", 48, 70);
+  ctx.fillText("KIT RÁPIDO", 48, 70);
   ctx.font = "24px Helvetica, Arial, sans-serif";
   ctx.fillText(data.eventName.slice(0, 46), 48, 110);
 

@@ -23,7 +23,7 @@ export function Brand({
               inverted ? "text-sidebar-foreground" : "text-foreground",
             )}
           >
-            CRONOCHIP <span className="text-primary">KIT</span>
+            KIT <span className="text-primary">RÁPIDO</span>
           </span>
           <span
             className={cn(
@@ -31,7 +31,7 @@ export function Brand({
               inverted ? "text-sidebar-foreground/60" : "text-muted-foreground",
             )}
           >
-            Cronometragem Esportiva
+            Entrega de Kits
           </span>
         </span>
       )}
