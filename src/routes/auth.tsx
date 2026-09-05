@@ -36,6 +36,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [profile, setProfile] = useState<LoginProfile | null>(null);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -53,6 +54,12 @@ function AuthPage() {
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
     navigate({ to: "/central", replace: true });
+  }
+
+  function selectProfile(p: LoginProfile) {
+    setProfile(p);
+    setEmail("");
+    setPassword("");
   }
 
   async function signUp(e: React.FormEvent) {
