@@ -19,6 +19,7 @@ export type Database = {
           bib_number: string | null
           birth_date: string | null
           category: string | null
+          city: string | null
           cpf: string | null
           created_at: string
           custom_1: string | null
@@ -45,6 +46,7 @@ export type Database = {
           bib_number?: string | null
           birth_date?: string | null
           category?: string | null
+          city?: string | null
           cpf?: string | null
           created_at?: string
           custom_1?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           bib_number?: string | null
           birth_date?: string | null
           category?: string | null
+          city?: string | null
           cpf?: string | null
           created_at?: string
           custom_1?: string | null
@@ -597,6 +600,7 @@ export type Database = {
           athlete_id: string
           bib_number: string
           category: string
+          city: string
           custom_labels: string[]
           custom_values: string[]
           delivered_at: string
