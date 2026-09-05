@@ -120,7 +120,7 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
       )}
     >
       <span className={cn("size-2 rounded-full", paid ? "bg-success" : "bg-destructive")} />
-      {paid ? "PAGO" : "PENDENTE"}
+      {paid ? "PAGO" : "PENDENTE PAGAMENTO"}
     </div>
   );
 }
@@ -645,7 +645,7 @@ function Central() {
                           isPaid(selected) ? "text-success" : "text-destructive",
                         )}
                       >
-                        {isPaid(selected) ? "Pago" : "Pendente"}
+                        {isPaid(selected) ? "Pago" : "Pendente pagamento"}
                       </p>
                     </div>
                     <Badge
