@@ -29,6 +29,7 @@ export type Database = {
           custom_5: string | null
           distance: string | null
           email: string | null
+          equipe: string | null
           event_id: string
           gender: string | null
           id: string
@@ -56,6 +57,7 @@ export type Database = {
           custom_5?: string | null
           distance?: string | null
           email?: string | null
+          equipe?: string | null
           event_id: string
           gender?: string | null
           id?: string
@@ -83,6 +85,7 @@ export type Database = {
           custom_5?: string | null
           distance?: string | null
           email?: string | null
+          equipe?: string | null
           event_id?: string
           gender?: string | null
           id?: string
