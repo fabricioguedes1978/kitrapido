@@ -255,8 +255,17 @@ function Eventos() {
                 </div>
               )}
               <div className="flex flex-wrap gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => setViewing(e)}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    select(e.id);
+                    void navigate({ to: "/central" });
+                  }}
+                >
                   <FolderOpen className="size-4" /> Abrir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setViewing(e)}>
+                  Detalhes
                 </Button>
                 {(isAdmin || isOrganizer) && (
                   <Button variant="outline" size="sm" onClick={() => openEdit(e)}>
