@@ -58,8 +58,12 @@ function Landing() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link to="/consulta">Sou atleta — consultar meu kit</Link>
+            <Link to="/checkin">Sou atleta — check-in pelo CPF</Link>
           </Button>
+          <Button asChild size="lg" variant="ghost">
+            <Link to="/consulta">Consultar por evento</Link>
+          </Button>
+
         </div>
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
