@@ -48,7 +48,7 @@ function Entregas() {
   const qc = useQueryClient();
   const [term, setTerm] = useState("");
   const [cancelling, setCancelling] = useState<DeliveryRow | null>(null);
-  const [reason, setReason] = useState("");
+  
 
   const { data: deliveries = [] } = useQuery({
     queryKey: ["deliveries-full", eventId],
@@ -83,14 +83,13 @@ function Entregas() {
       .from("deliveries")
       .update({
         status: "cancelled",
-        cancel_reason: reason.trim() || null,
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", cancelling.id);
     if (error) { toast.error("Não foi possível cancelar", { description: error.message }); return; }
     void logAudit({
       eventId,
-      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}${reason.trim() ? `: ${reason.trim()}` : ""}`,
+      action: `Cancelou a entrega de ${cancelling.athletes?.name ?? "atleta"}`,
       entity: "deliveries",
       entityId: cancelling.id,
       userName: profile?.name ?? null,
@@ -98,7 +97,6 @@ function Entregas() {
     await qc.invalidateQueries({ queryKey: ["deliveries-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["deliveries", eventId] });
     setCancelling(null);
-    setReason("");
     toast.success("Entrega cancelada. O atleta voltou para pendente.");
   }
 
@@ -170,10 +168,6 @@ function Entregas() {
           <DialogHeader>
             <DialogTitle>Cancelar entrega e liberar reentrega</DialogTitle>
           </DialogHeader>
-          <div className="space-y-1.5">
-            <Label>Motivo (opcional)</Label>
-            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Descreva o motivo se desejar" />
-          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCancelling(null)}>Voltar</Button>
             <Button variant="destructive" onClick={() => void cancel()}>
