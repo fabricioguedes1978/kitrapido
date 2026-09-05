@@ -122,18 +122,21 @@ export function EventSelector({ className }: { className?: string }) {
   const { events, eventId, select } = useCurrentEvent();
   if (events.length === 0) return null;
   return (
-    <Select value={eventId ?? ""} onValueChange={select}>
-      <SelectTrigger className={cn("h-9 w-full max-w-[16rem]", className)}>
-        <SelectValue placeholder="Selecione o evento" />
-      </SelectTrigger>
-      <SelectContent>
-        {events.map((e) => (
-          <SelectItem key={e.id} value={e.id}>
-            {e.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={cn("flex items-center gap-2", className)}>
+      <Flag className="text-primary size-4 shrink-0" />
+      <Select value={eventId ?? ""} onValueChange={select}>
+        <SelectTrigger className="h-9 w-full max-w-[18rem] border-transparent bg-transparent shadow-none hover:bg-muted/50">
+          <SelectValue placeholder="Selecione o evento" />
+        </SelectTrigger>
+        <SelectContent>
+          {events.map((e) => (
+            <SelectItem key={e.id} value={e.id}>
+              {e.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
