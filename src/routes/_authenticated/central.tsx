@@ -102,7 +102,8 @@ type Delivery = {
 
 function Central() {
   const { event, eventId } = useCurrentEvent();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
+  const { canManage } = useCurrentEventRole();
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
