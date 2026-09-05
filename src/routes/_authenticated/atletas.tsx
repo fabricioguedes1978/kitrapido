@@ -591,7 +591,7 @@ function Atletas() {
                   "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
-                  "Maria Silva", "F", "1990-05-15", "São Paulo", "Equipe Exemplo", "12345678909",
+                  "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
                   "maria@email.com", "11999999999", "INS001", "1001", "Corrida", "Feminino Geral",
                   "10km", "M", "Kit Padrão", "", "", "", "", "",
                 ];
