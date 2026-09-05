@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Cronochip Kit — Entrega de kits de corrida" },
+      { title: "Kit Fácil — Entrega de kits de corrida" },
       {
         name: "description",
         content:
           "Sistema de gestão e entrega de kits de corrida: QR Code, estoque, relatórios e controle em tempo real.",
       },
-      { name: "author", content: "Cronochip Cronometragem Esportiva" },
-      { property: "og:title", content: "Cronochip Kit" },
+      { name: "author", content: "Kit Fácil" },
+      { property: "og:title", content: "Kit Fácil" },
       { property: "og:description", content: "Gestão completa da entrega de kits de corrida." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

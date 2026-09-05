@@ -7,13 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Cronochip Kit — Gestão de entrega de kits de corrida" },
+      { title: "Kit Fácil — Gestão de entrega de kits de corrida" },
       {
         name: "description",
         content:
-          "Plataforma da Cronochip para entrega de kits: leitura de QR Code, bloqueio de duplicidade, estoque de camisetas e dashboard em tempo real.",
+          "Plataforma do Kit Fácil para entrega de kits: leitura de QR Code, bloqueio de duplicidade, estoque de camisetas e dashboard em tempo real.",
       },
-      { property: "og:title", content: "Cronochip Kit — Entrega de kits de corrida" },
+      { property: "og:title", content: "Kit Fácil — Entrega de kits de corrida" },
       {
         property: "og:description",
         content: "Velocidade na retirada, controle de estoque e rastreabilidade total.",
@@ -42,7 +42,7 @@ function Landing() {
 
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:pt-16">
         <span className="border-primary/30 bg-primary/10 text-primary inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-wide uppercase">
-          Cronochip Cronometragem Esportiva
+          Kit Fácil
         </span>
         <h1 className="mt-5 max-w-3xl text-4xl leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
           A entrega de kits da sua corrida, <span className="text-primary">rápida e sob controle</span>.
@@ -79,7 +79,7 @@ function Landing() {
 
       <footer className="border-t">
         <p className="text-muted-foreground mx-auto max-w-6xl px-4 py-6 text-xs">
-          © {new Date().getFullYear()} Cronochip Cronometragem Esportiva — dados pessoais tratados
+          © {new Date().getFullYear()} Kit Fácil — dados pessoais tratados
           conforme a LGPD.
         </p>
       </footer>

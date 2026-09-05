@@ -19,7 +19,7 @@ export const KIT_STATUS: Record<string, string> = {
 };
 
 export const ROLE_LABEL: Record<string, string> = {
-  admin: "Administrador Cronochip",
+  admin: "Administrador Kit Fácil",
   organizer: "Organizador",
   attendant: "Atendente",
 };

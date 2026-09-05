@@ -17,9 +17,9 @@ import { SHIRT_SIZES } from "@/lib/cronochip";
 export const Route = createFileRoute("/_authenticated/estoque")({
   head: () => ({
     meta: [
-      { title: "Estoque — Cronochip Kit" },
+      { title: "Estoque — Kit Fácil" },
       { name: "description", content: "Controle de camisetas por tamanho com baixa automática nas entregas." },
-      { property: "og:title", content: "Estoque — Cronochip Kit" },
+      { property: "og:title", content: "Estoque — Kit Fácil" },
       { property: "og:description", content: "Saldo por tamanho e alertas de estoque baixo." },
       { name: "robots", content: "noindex" },
     ],

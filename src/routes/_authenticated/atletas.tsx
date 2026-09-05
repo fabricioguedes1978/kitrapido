@@ -35,9 +35,9 @@ import {
 export const Route = createFileRoute("/_authenticated/atletas")({
   head: () => ({
     meta: [
-      { title: "Atletas — Cronochip Kit" },
+      { title: "Atletas — Kit Fácil" },
       { name: "description", content: "Importe, cadastre e acompanhe os atletas inscritos no evento." },
-      { property: "og:title", content: "Atletas — Cronochip Kit" },
+      { property: "og:title", content: "Atletas — Kit Fácil" },
       { property: "og:description", content: "Base de inscritos com importação de CSV e Excel." },
       { name: "robots", content: "noindex" },
     ],

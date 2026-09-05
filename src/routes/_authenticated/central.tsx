@@ -57,9 +57,9 @@ import {
 export const Route = createFileRoute("/_authenticated/central")({
   head: () => ({
     meta: [
-      { title: "Central de Entrega — Cronochip Kit" },
+      { title: "Central de Entrega — Kit Fácil" },
       { name: "description", content: "Leia o QR Code ou pesquise o atleta e registre a entrega do kit." },
-      { property: "og:title", content: "Central de Entrega — Cronochip Kit" },
+      { property: "og:title", content: "Central de Entrega — Kit Fácil" },
       { property: "og:description", content: "Entrega de kits em segundos, com bloqueio de duplicidade." },
       { name: "robots", content: "noindex" },
     ],
@@ -432,7 +432,7 @@ function Central() {
       <div className="mx-auto max-w-3xl">
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Cronochip Kit</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Kit Fácil</p>
             <h1 className="text-3xl font-extrabold sm:text-4xl">Central de Entrega</h1>
             <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
           </div>
