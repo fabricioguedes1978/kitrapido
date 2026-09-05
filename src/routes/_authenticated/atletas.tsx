@@ -367,7 +367,7 @@ function Atletas() {
     reader.readAsArrayBuffer(file);
   }
 
-  async function createAthlete() {
+  async function saveAthlete() {
     if (!eventId) return;
     const missing: string[] = [];
     if (!form.name.trim()) missing.push("nome");
@@ -392,8 +392,9 @@ function Atletas() {
         .select("id,name,cpf,bib_number")
         .eq("event_id", eventId)
         .or(filters.join(","));
-      const dupCpf = cpf ? dups?.find((d) => onlyDigits(d.cpf) === cpf) : null;
-      const dupBib = bib ? dups?.find((d) => d.bib_number === bib) : null;
+      const others = (dups ?? []).filter((d) => d.id !== editingId);
+      const dupCpf = cpf ? others.find((d) => onlyDigits(d.cpf) === cpf) : null;
+      const dupBib = bib ? others.find((d) => d.bib_number === bib) : null;
       if (dupCpf || dupBib) {
         const msg = dupCpf
           ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
@@ -403,30 +404,53 @@ function Atletas() {
         return;
       }
     }
-    const { error } = await supabase.from("athletes").insert({
-      event_id: eventId,
+    const payload = {
       name: form.name.trim(),
       birth_date: form.birth_date,
       gender: form.gender,
-      cpf: form.cpf ? onlyDigits(form.cpf) : null,
-      bib_number: form.bib_number || null,
+      city: form.city.trim() || null,
+      cpf,
+      email: form.email.trim() || null,
+      phone: form.phone.trim() || null,
+      registration_number: form.registration_number.trim() || null,
+      bib_number: bib,
       modality: form.modality.trim(),
+      category: form.category.trim() || null,
+      distance: form.distance.trim() || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
-    });
+      kit_type: form.kit_type.trim() || null,
+      custom_1: form.custom_1.trim() || null,
+      custom_2: form.custom_2.trim() || null,
+      custom_3: form.custom_3.trim() || null,
+      custom_4: form.custom_4.trim() || null,
+      custom_5: form.custom_5.trim() || null,
+    };
+    const { error } = editingId
+      ? await supabase.from("athletes").update(payload).eq("id", editingId)
+      : await supabase.from("athletes").insert({ event_id: eventId, ...payload });
     if (error) {
       const dup = error.code === "23505";
       const msg = dup
         ? "CPF ou nº de peito já cadastrado neste evento."
         : error.message;
       if (dup) setDupWarning(msg);
-      toast.error("Não foi possível cadastrar", { description: msg });
+      toast.error("Não foi possível salvar", { description: msg });
       return;
     }
+    void logAudit({
+      eventId,
+      action: editingId ? `Editou atleta ${payload.name}` : `Cadastrou atleta ${payload.name}`,
+      entity: "athletes",
+      entityId: editingId ?? undefined,
+      userName: profile?.name ?? null,
+    });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setNewOpen(false);
-    setForm({ name: "", birth_date: "", gender: "", cpf: "", bib_number: "", modality: "", shirt_size: "" });
-    toast.success("Atleta cadastrado.");
+    setForm({ ...EMPTY_FORM });
+    toast.success(editingId ? "Dados atualizados." : "Atleta cadastrado.");
+    setEditingId(null);
   }
+
 
   function exportCsv() {
     const csv = Papa.unparse(
