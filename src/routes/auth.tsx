@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ShieldCheck, UserCog, Users, ClipboardCheck, ArrowLeft } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { onlyDigits } from "@/lib/cronochip";
+import { cn, onlyDigits } from "@/lib/utils";
+import { onlyDigits as cpfDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
+
+type LoginProfile = "admin" | "gerente" | "staff";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
