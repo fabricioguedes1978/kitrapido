@@ -309,7 +309,7 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"])
+      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"] && r["cpf"] && r["bib_number"])
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
