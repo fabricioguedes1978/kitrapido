@@ -342,6 +342,14 @@ function Central() {
     }, 4000);
   }
 
+  const stats = useMemo(() => {
+    const total = roster.length;
+    const delivered = deliveries.filter((d) => d.status === "active").length;
+    const pending = total - delivered;
+    const rate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+    return { total, delivered, pending, rate };
+  }, [roster, deliveries]);
+
   if (!eventId) {
     return (
       <AppShell>
@@ -376,13 +384,7 @@ function Central() {
     );
   }
 
-  const stats = useMemo(() => {
-    const total = roster.length;
-    const delivered = deliveries.filter((d) => d.status === "active").length;
-    const pending = total - delivered;
-    const rate = total > 0 ? Math.round((delivered / total) * 100) : 0;
-    return { total, delivered, pending, rate };
-  }, [roster, deliveries]);
+
 
   return (
     <AppShell>
