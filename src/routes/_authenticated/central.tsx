@@ -639,6 +639,14 @@ function Central() {
                       <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
                       <p className="text-2xl font-extrabold">{selected.name}</p>
                       <p className="text-muted-foreground text-sm">CPF: {maskCPF(selected.cpf)}</p>
+                      <p
+                        className={cn(
+                          "text-sm font-bold",
+                          isPaid(selected) ? "text-success" : "text-destructive",
+                        )}
+                      >
+                        Pagamento: {isPaid(selected) ? "Pago" : "Pendente"}
+                      </p>
                     </div>
                     <Badge
                       className="mt-2 w-fit sm:mt-0"
