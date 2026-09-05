@@ -584,12 +584,25 @@ function Atletas() {
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
+                const headers = [
+                  "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
+                  "inscricao", "peito", "modalidade", "categoria", "distancia", "camiseta", "kit",
+                  "extra1", "extra2", "extra3", "extra4", "extra5",
+                ];
+                const exemplo = [
+                  "Maria Silva", "F", "1990-05-15", "São Paulo", "Equipe Exemplo", "12345678909",
+                  "maria@email.com", "11999999999", "INS001", "1001", "Corrida", "Feminino Geral",
+                  "10km", "M", "Kit Padrão", "", "", "", "", "",
+                ];
+                const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
+                ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Atletas");
+                const out = XLSX.write(wb, { bookType: "xlsx", type: "array" }) as ArrayBuffer;
                 downloadBlob(
-                  "\uFEFF" +
-                    "nome,sexo,nascimento,cidade,equipe,cpf,email,telefone,inscricao,peito,modalidade,categoria,distancia,camiseta,kit,extra1,extra2,extra3,extra4,extra5\n" +
-                    "Maria Silva,F,1990-05-15,São Paulo,Equipe Exemplo,12345678909,maria@email.com,11999999999,INS001,1001,Corrida,Feminino Geral,10km,M,Kit Padrão,,,,,\n",
-                  "modelo-atletas.csv",
-                  "text/csv;charset=utf-8",
+                  out,
+                  "modelo-atletas.xlsx",
+                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 );
               }}
             >
