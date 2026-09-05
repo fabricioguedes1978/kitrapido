@@ -105,12 +105,6 @@ function AuthPage() {
                     Como você quer entrar?
                   </p>
                   <ProfileButton
-                    icon={<ShieldCheck className="size-5" />}
-                    title="Administrador"
-                    description="Acesso total ao sistema"
-                    onClick={() => selectProfile("admin")}
-                  />
-                  <ProfileButton
                     icon={<UserCog className="size-5" />}
                     title="Gerente"
                     description="CPF e senha do evento"
@@ -121,6 +115,12 @@ function AuthPage() {
                     title="Staff"
                     description="CPF e senha criada pelo gerente"
                     onClick={() => selectProfile("staff")}
+                  />
+                  <ProfileButton
+                    icon={<ShieldCheck className="size-5" />}
+                    title="Administrador"
+                    description="Acesso total ao sistema"
+                    onClick={() => selectProfile("admin")}
                   />
                   <Link
                     to="/checkin"
