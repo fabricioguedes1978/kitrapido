@@ -18,6 +18,8 @@ import {
   ClipboardList,
   MonitorSmartphone,
   ImageUp,
+  Flag,
+  User,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
@@ -29,6 +31,7 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 import { ROLE_LABEL, type AppRole } from "@/lib/cronochip";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]; sub?: boolean };
 
