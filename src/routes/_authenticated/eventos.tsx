@@ -538,3 +538,20 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function Detail({
+  label,
+  children,
+  full,
+}: {
+  label: string;
+  children: React.ReactNode;
+  full?: boolean;
+}) {
+  return (
+    <div className={full ? "sm:col-span-2" : undefined}>
+      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{label}</p>
+      <div className="mt-0.5">{children}</div>
+    </div>
+  );
+}
