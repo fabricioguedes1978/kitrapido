@@ -169,18 +169,24 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
           <div>
             <p className="text-xl font-bold">{row.event_name}</p>
             <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {row.event_date && (
-              <span className="inline-flex items-center gap-1">
-                <CalendarDays className="size-4" /> {formatDate(row.event_date)}
-              </span>
-            )}
-            {row.event_city && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="size-4" /> {row.event_city}
-                {row.event_state ? `/${row.event_state}` : ""}
-              </span>
-            )}
+              {row.event_date && (
+                <span className="inline-flex items-center gap-1">
+                  <CalendarDays className="size-4" /> {formatDate(row.event_date)}
+                </span>
+              )}
+              {row.event_city && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="size-4" /> {row.event_city}
+                  {row.event_state ? `/${row.event_state}` : ""}
+                </span>
+              )}
+            </div>
           </div>
+          {total > 1 && (
+            <span className="bg-primary/10 text-primary shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+              {index + 1}/{total}
+            </span>
+          )}
         </div>
 
         {delivered ? (
