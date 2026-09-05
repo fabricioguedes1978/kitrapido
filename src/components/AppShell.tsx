@@ -120,11 +120,16 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
 export function EventSelector({ className }: { className?: string }) {
   const { events, eventId, select } = useCurrentEvent();
+  const navigate = useNavigate();
   if (events.length === 0) return null;
+  const handleSelect = (id: string) => {
+    select(id);
+    void navigate({ to: "/central" });
+  };
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <Flag className="text-primary size-4 shrink-0" />
-      <Select value={eventId ?? ""} onValueChange={select}>
+      <Select value={eventId ?? ""} onValueChange={handleSelect}>
         <SelectTrigger className="h-9 w-full max-w-[18rem] border-transparent bg-transparent shadow-none hover:bg-muted/50">
           <SelectValue placeholder="Selecione o evento" />
         </SelectTrigger>
