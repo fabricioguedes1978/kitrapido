@@ -240,7 +240,7 @@ function Atletas() {
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
-      birth_date: a.birth_date ?? "",
+      birth_date: a.birth_date ? formatDate(a.birth_date) : "",
       city: a.city ?? "",
       equipe: a.equipe ?? "",
       cpf: a.cpf ?? "",
@@ -707,12 +707,8 @@ function Atletas() {
                 <Input
                   inputMode="numeric"
                   placeholder="dd/mm/aaaa"
-                  value={form.birth_date ? formatDate(form.birth_date) : ""}
-                  onChange={(e) => {
-                    const masked = maskBrDate(e.target.value);
-                    const iso = parseBrDate(masked);
-                    setForm({ ...form, birth_date: iso ?? "" });
-                  }}
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
                 />
               </div>
               <div className="space-y-1.5">
