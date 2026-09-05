@@ -309,7 +309,7 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"])
+      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"] && r["cpf"] && r["bib_number"])
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
@@ -334,14 +334,14 @@ function Atletas() {
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
       }))
-      .filter((r) => r.birth_date);
+      .filter((r) => r.birth_date && r.cpf && r.cpf.length === 11 && r.bib_number);
 
     const incomplete = rows.length - parsed.length;
     if (parsed.length === 0) {
       setImporting(false);
       toast.error("Nenhuma linha válida encontrada.", {
         description:
-          "Nome, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
+          "Nome, CPF, número, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
       });
       return;
     }
@@ -392,7 +392,7 @@ function Atletas() {
           ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
           : null,
         incomplete > 0
-          ? `${incomplete} linha(s) ignoradas por falta de nome, nascimento, sexo ou modalidade.`
+          ? `${incomplete} linha(s) ignoradas por falta de nome, CPF, número, nascimento, sexo ou modalidade.`
           : null,
       ]
         .filter(Boolean)
@@ -436,10 +436,17 @@ function Atletas() {
     if (!form.birth_date) missing.push("data de nascimento");
     if (!form.gender) missing.push("sexo");
     if (!form.modality.trim()) missing.push("modalidade");
+    if (!form.cpf.trim()) missing.push("CPF");
+    if (!form.bib_number.trim()) missing.push("número");
     if (missing.length > 0) {
       toast.error("Campos obrigatórios", {
         description: `Informe: ${missing.join(", ")}.`,
       });
+      return;
+    }
+    const cpfDigits = onlyDigits(form.cpf);
+    if (cpfDigits.length !== 11) {
+      toast.error("CPF inválido", { description: "Digite um CPF com 11 dígitos." });
       return;
     }
     const birthIso = parseBrDate(form.birth_date);
@@ -810,7 +817,7 @@ function Atletas() {
                 <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label>CPF</Label>
+                <Label>CPF *</Label>
                 <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
               </div>
               <div className="space-y-1.5">
@@ -833,7 +840,7 @@ function Atletas() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Número</Label>
+                <Label>Número *</Label>
                 <Input
                   value={form.bib_number}
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
