@@ -7,6 +7,7 @@ import {
   Camera,
   CheckCircle2,
   MonitorSmartphone,
+  ScanLine,
   Search,
   UserCheck,
   X,
