@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { cn } from "@/lib/utils";
 import { onlyDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
@@ -76,15 +75,6 @@ function AuthPage() {
     toast.success("Conta criada", { description: "Confirme o e-mail enviado para ativar o acesso." });
   }
 
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) { toast.error("Falha no login com Google"); return; }
-    if (result.redirected) return;
-    navigate({ to: "/central", replace: true });
-  }
-
   async function recover() {
     if (!email.trim()) { toast.error("Informe seu e-mail para recuperar a senha."); return; }
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
@@ -115,12 +105,6 @@ function AuthPage() {
                     Como você quer entrar?
                   </p>
                   <ProfileButton
-                    icon={<ShieldCheck className="size-5" />}
-                    title="Administrador"
-                    description="Acesso total ao sistema"
-                    onClick={() => selectProfile("admin")}
-                  />
-                  <ProfileButton
                     icon={<UserCog className="size-5" />}
                     title="Gerente"
                     description="CPF e senha do evento"
@@ -131,6 +115,12 @@ function AuthPage() {
                     title="Staff"
                     description="CPF e senha criada pelo gerente"
                     onClick={() => selectProfile("staff")}
+                  />
+                  <ProfileButton
+                    icon={<ShieldCheck className="size-5" />}
+                    title="Administrador"
+                    description="Acesso total ao sistema"
+                    onClick={() => selectProfile("admin")}
                   />
                   <Link
                     to="/checkin"
@@ -236,13 +226,6 @@ function AuthPage() {
               </form>
             </TabsContent>
           </Tabs>
-
-          <div className="text-muted-foreground my-4 flex items-center gap-3 text-xs">
-            <span className="bg-border h-px flex-1" /> ou <span className="bg-border h-px flex-1" />
-          </div>
-          <Button variant="outline" className="w-full" onClick={() => void google()}>
-            Continuar com Google
-          </Button>
         </CardContent>
       </Card>
 
