@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Eye, EyeOff, Plus, QrCode, Trash2, Users } from "lucide-react";
+import { Download, Eye, EyeOff, FolderOpen, Plus, QrCode, Trash2, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,6 +85,7 @@ function Eventos() {
   const [poster, setPoster] = useState<EventRow | null>(null);
   const posterRef = useRef<HTMLDivElement>(null);
   const [removing, setRemoving] = useState<EventRow | null>(null);
+  const [viewing, setViewing] = useState<EventRow | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function toggleArchived(e: EventRow) {
