@@ -17,6 +17,7 @@ export type EventRow = {
   custom_field_labels: string[];
   status: string;
   archived: boolean;
+  athletes_lock_at: string | null;
   created_at: string;
 };
 
