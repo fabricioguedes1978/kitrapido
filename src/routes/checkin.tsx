@@ -124,7 +124,7 @@ function Checkin() {
   );
 }
 
-function KitCard({ row }: { row: KitRow }) {
+function KitCard({ row, index, total }: { row: KitRow; index: number; total: number }) {
   const qrRef = useRef<HTMLDivElement>(null);
   const delivered = row.kit_status !== "pending" && row.kit_status !== "blocked";
   const scanUrl = athleteQrUrl(row.event_id, row.athlete_id);
