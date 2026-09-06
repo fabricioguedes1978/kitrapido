@@ -26,12 +26,13 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   KIT_STATUS,
   downloadBlob,
+  formatCPF,
+  isValidCPF,
   logAudit,
   maskCPF,
   onlyDigits,
   qrPayload,
 } from "@/lib/cronochip";
-import { formatCpf, isValidCpf } from "@/lib/cpf";
 
 export const Route = createFileRoute("/_authenticated/atletas")({
   head: () => ({

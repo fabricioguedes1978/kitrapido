@@ -9,8 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { onlyDigits } from "@/lib/cronochip";
-import { formatCpf, isValidCpf } from "@/lib/cpf";
+import { formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
 
 type LoginProfile = "admin" | "gerente" | "staff";

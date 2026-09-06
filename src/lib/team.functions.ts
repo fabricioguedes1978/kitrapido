@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isValidCpf } from "@/lib/cpf";
+import { isValidCPF } from "@/lib/cronochip";
 
 export const TEAM_EMAIL_DOMAIN = "equipe.cronochip.app";
 
