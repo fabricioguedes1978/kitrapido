@@ -31,6 +31,7 @@ import {
   onlyDigits,
   qrPayload,
 } from "@/lib/cronochip";
+import { formatCpf, isValidCpf } from "@/lib/cpf";
 
 export const Route = createFileRoute("/_authenticated/atletas")({
   head: () => ({

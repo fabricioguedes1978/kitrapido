@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { athleteQrUrl, formatDate, formatDateTime } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
+import { formatCpf, isValidCpf } from "@/lib/cpf";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
 export const Route = createFileRoute("/checkin")({
