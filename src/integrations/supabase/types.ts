@@ -601,6 +601,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_valid_cpf: { Args: { _cpf: string }; Returns: boolean }
       public_kit_lookup: {
         Args: { _doc: string; _slug: string }
         Returns: {
