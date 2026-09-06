@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent, useEventsQuery, type EventRow } from "@/hooks/useEvents";
@@ -60,6 +61,7 @@ const EMPTY = {
   modalities: "",
   status: "planning",
   athletes_lock_at: "",
+  allow_organizer_import: false,
   custom_field_labels: ["", "", "", "", ""] as string[],
 };
 
@@ -165,6 +167,7 @@ function Eventos() {
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
       athletes_lock_at: toLocalInput(e.athletes_lock_at),
+      allow_organizer_import: !!e.allow_organizer_import,
       custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
@@ -193,6 +196,7 @@ function Eventos() {
             athletes_lock_at: form.athletes_lock_at
               ? new Date(form.athletes_lock_at).toISOString()
               : null,
+            allow_organizer_import: form.allow_organizer_import,
           }
         : {}),
     };
@@ -349,6 +353,9 @@ function Eventos() {
                     })
                   : "24h antes do evento (automático)"}
               </Detail>
+              <Detail label="Gerente pode enviar planilha">
+                {viewing.allow_organizer_import ? "Sim" : "Não (somente administrador)"}
+              </Detail>
               {viewing.custom_field_labels?.some((l) => l?.trim()) && (
                 <Detail label="Campos personalizados" full>
                   {viewing.custom_field_labels.filter((l) => l?.trim()).join(", ")}
@@ -472,6 +479,21 @@ function Eventos() {
                   do início do evento. Somente o administrador pode mudar este prazo.
                 </p>
               </Field>
+            )}
+            {isAdmin && (
+              <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold">Gerente pode enviar a planilha de inscritos</p>
+                  <p className="text-muted-foreground text-xs">
+                    Quando desligado, apenas o administrador envia a planilha de inscritos deste
+                    evento. Ligue para autorizar o gerente a fazer o envio.
+                  </p>
+                </div>
+                <Switch
+                  checked={form.allow_organizer_import}
+                  onCheckedChange={(v) => setForm({ ...form, allow_organizer_import: v })}
+                />
+              </div>
             )}
             <Field label="Descrição">
               <Textarea

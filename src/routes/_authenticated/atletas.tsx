@@ -185,6 +185,7 @@ function Atletas() {
   const { profile, isAdmin } = useAuth();
   const lockAt = event?.athletes_lock_at ?? null;
   const locked = !isAdmin && !!lockAt && new Date(lockAt).getTime() <= Date.now();
+  const canImport = isAdmin || !!event?.allow_organizer_import;
   const lockLabel = lockAt
     ? new Date(lockAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
     : null;
@@ -403,6 +404,12 @@ function Atletas() {
   }
 
   function handleFile(file: File) {
+    if (!canImport) {
+      toast.error("Envio de planilha não autorizado", {
+        description: "Somente o administrador pode enviar a planilha deste evento.",
+      });
+      return;
+    }
     if (locked) {
       toast.error("Cadastro de atletas encerrado", {
         description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
@@ -598,7 +605,16 @@ function Atletas() {
         }}
       />
 
-      <Card className="mb-4">
+      {!canImport && (
+        <Card className="mb-4">
+          <CardContent className="text-muted-foreground p-4 text-sm">
+            O envio da planilha de inscritos deste evento está liberado apenas para o administrador.
+            Peça a ele a autorização na tela de Eventos para poder enviar a planilha.
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className={canImport ? "mb-4" : "mb-4 hidden"}>
         <CardContent className="p-4">
           <div
             role="button"
