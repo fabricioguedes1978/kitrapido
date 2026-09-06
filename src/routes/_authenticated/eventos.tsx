@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent, useEventsQuery, type EventRow } from "@/hooks/useEvents";
@@ -60,6 +61,7 @@ const EMPTY = {
   modalities: "",
   status: "planning",
   athletes_lock_at: "",
+  allow_organizer_import: false,
   custom_field_labels: ["", "", "", "", ""] as string[],
 };
 
