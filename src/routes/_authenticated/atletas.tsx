@@ -605,7 +605,16 @@ function Atletas() {
         }}
       />
 
-      <Card className="mb-4">
+      {!canImport && (
+        <Card className="mb-4">
+          <CardContent className="text-muted-foreground p-4 text-sm">
+            O envio da planilha de inscritos deste evento está liberado apenas para o administrador.
+            Peça a ele a autorização na tela de Eventos para poder enviar a planilha.
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className={canImport ? "mb-4" : "mb-4 hidden"}>
         <CardContent className="p-4">
           <div
             role="button"
