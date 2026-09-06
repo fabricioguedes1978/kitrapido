@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export type EventRow = {
   id: string;
@@ -62,7 +63,9 @@ function subscribe(cb: () => void) {
 
 export function useCurrentEvent() {
   const { data: all = [], isLoading } = useEventsQuery();
-  const events = all.filter((e) => !e.archived);
+  const { isAdmin, isOrganizer } = useAuth();
+  // Eventos inativos ficam visíveis apenas para administrador e gerente.
+  const events = isAdmin || isOrganizer ? all : all.filter((e) => !e.archived);
   const qc = useQueryClient();
   const eventId = useSyncExternalStore(
     subscribe,

@@ -35,7 +35,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent, useEventsQuery, type EventRow } from "@/hooks/useEvents";
-import { EVENT_STATUS, checkinUrl, formatDate, logAudit, slugify } from "@/lib/cronochip";
+import { checkinUrl, formatDate, logAudit, slugify } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/eventos")({
   head: () => ({
@@ -59,7 +59,7 @@ const EMPTY = {
   address: "",
   description: "",
   modalities: "",
-  status: "planning",
+  archived: false,
   athletes_lock_at: "",
   allow_organizer_import: false,
   custom_field_labels: ["", "", "", "", ""] as string[],
@@ -165,7 +165,7 @@ function Eventos() {
       address: e.address ?? "",
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
-      status: e.status,
+      archived: !!e.archived,
       athletes_lock_at: toLocalInput(e.athletes_lock_at),
       allow_organizer_import: !!e.allow_organizer_import,
       custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
@@ -189,7 +189,8 @@ function Eventos() {
         .split(",")
         .map((m) => m.trim())
         .filter(Boolean),
-      status: form.status as "planning",
+      status: (editing?.status ?? "planning") as "planning",
+      archived: form.archived,
       custom_field_labels: form.custom_field_labels.map((l) => l.trim()),
       ...(isAdmin
         ? {
@@ -239,8 +240,11 @@ function Eventos() {
             <CardContent className="space-y-2 py-5">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                 <h2 className="min-w-0 truncate text-lg font-bold">{e.name}</h2>
-                <Badge variant={e.archived ? "destructive" : "secondary"} className="shrink-0">
-                  {e.archived ? "Inativo" : (EVENT_STATUS[e.status] ?? e.status)}
+                <Badge
+                  variant={e.archived ? "destructive" : "secondary"}
+                  className="shrink-0 font-bold uppercase"
+                >
+                  {e.archived ? "Inativo" : "Ativo"}
                 </Badge>
               </div>
               <p className="text-muted-foreground text-sm">
@@ -310,7 +314,7 @@ function Eventos() {
               </div>
               {e.archived && (
                 <p className="text-muted-foreground pt-1 text-xs">
-                  Evento inativo: invisível para organizadores, atendentes e atletas.
+                  Evento inativo: visível apenas para administrador e gerente.
                 </p>
               )}
 
@@ -330,8 +334,8 @@ function Eventos() {
           {viewing && (
             <div className="grid gap-3 text-sm sm:grid-cols-2">
               <Detail label="Situação">
-                <Badge variant={viewing.archived ? "destructive" : "secondary"}>
-                  {viewing.archived ? "Inativo" : (EVENT_STATUS[viewing.status] ?? viewing.status)}
+                <Badge variant={viewing.archived ? "destructive" : "secondary"} className="font-bold uppercase">
+                  {viewing.archived ? "Inativo" : "Ativo"}
                 </Badge>
               </Detail>
               <Detail label="Data e horário">
@@ -453,18 +457,22 @@ function Eventos() {
               />
             </Field>
             <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+              <Select
+                value={form.archived ? "inativo" : "ativo"}
+                onValueChange={(v) => setForm({ ...form, archived: v === "inativo" })}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(EVENT_STATUS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-muted-foreground text-xs">
+                Inativo: some para atendentes e atletas; somente administrador e gerente continuam
+                acessando.
+              </p>
             </Field>
             {isAdmin && (
               <Field label="Fechar cadastro e alteração de atletas em">
