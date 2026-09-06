@@ -311,7 +311,7 @@ function Atletas() {
         });
         return out;
       })
-      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"] && r["cpf"] && r["bib_number"])
+      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"] && r["bib_number"])
       .map((r) => ({
         event_id: eventId,
         name: r["name"]!,
@@ -336,7 +336,7 @@ function Atletas() {
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
       }))
-      .filter((r) => r.birth_date && r.cpf && r.cpf.length === 11 && isValidCPF(r.cpf) && r.bib_number);
+      .filter((r) => r.birth_date && (!r.cpf || (r.cpf.length === 11 && isValidCPF(r.cpf))) && r.bib_number);
 
     const incomplete = rows.length - parsed.length;
     if (parsed.length === 0) {
@@ -438,7 +438,7 @@ function Atletas() {
     if (!form.birth_date) missing.push("data de nascimento");
     if (!form.gender) missing.push("sexo");
     if (!form.modality.trim()) missing.push("modalidade");
-    if (!form.cpf.trim()) missing.push("CPF");
+    
     if (!form.bib_number.trim()) missing.push("número");
     if (missing.length > 0) {
       toast.error("Campos obrigatórios", {
@@ -447,8 +447,8 @@ function Atletas() {
       return;
     }
     const cpfDigits = onlyDigits(form.cpf);
-    if (cpfDigits.length !== 11 || !isValidCPF(cpfDigits)) {
-      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
+    if (cpfDigits && (cpfDigits.length !== 11 || !isValidCPF(cpfDigits))) {
+      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos ou deixe em branco." });
       return;
     }
     const birthIso = parseBrDate(form.birth_date);
@@ -819,7 +819,7 @@ function Atletas() {
                 <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label>CPF *</Label>
+                <Label>CPF</Label>
                 <Input
                   inputMode="numeric"
                   placeholder="000.000.000-00"
