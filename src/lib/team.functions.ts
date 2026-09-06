@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isValidCPF } from "@/lib/cronochip";
 
 export const TEAM_EMAIL_DOMAIN = "equipe.cronochip.app";
 
@@ -19,7 +20,7 @@ export const saveEventTeamUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: Input) => {
     const cpf = input.cpf.replace(/\D/g, "");
-    if (cpf.length !== 11) throw new Error("Informe um CPF válido com 11 dígitos.");
+    if (cpf.length !== 11 || !isValidCPF(cpf)) throw new Error("Informe um CPF válido com 11 dígitos.");
     if (!input.eventId) throw new Error("Selecione um evento.");
     if (!input.password || input.password.length < 6)
       throw new Error("A senha precisa ter pelo menos 6 caracteres.");

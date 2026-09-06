@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { athleteQrUrl, formatDate, formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatCPF, formatDate, formatDateTime, isValidCPF } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
@@ -64,8 +64,13 @@ function Checkin() {
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
+    const digits = doc.replace(/\D/g, "");
+    if (digits.length !== 11 || !isValidCPF(digits)) {
+      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.rpc("public_kit_lookup_all", { _doc: doc.trim() });
+    const { data, error } = await supabase.rpc("public_kit_lookup_all", { _doc: digits });
     setLoading(false);
     if (error) {
       toast.error("Não foi possível consultar agora. Tente novamente.");
@@ -94,7 +99,7 @@ function Checkin() {
               inputMode="numeric"
               required
               value={doc}
-              onChange={(e) => setDoc(e.target.value)}
+              onChange={(e) => setDoc(formatCPF(e.target.value))}
               placeholder="000.000.000-00"
             />
           </div>

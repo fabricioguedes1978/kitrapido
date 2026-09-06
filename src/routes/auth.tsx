@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { onlyDigits } from "@/lib/cronochip";
+import { formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
 import { cpfLogin } from "@/lib/team.functions";
 
 type LoginProfile = "admin" | "gerente" | "staff";
@@ -46,7 +46,15 @@ function AuthPage() {
     setLoading(true);
     const typed = email.trim();
     const digits = onlyDigits(typed);
-    const identifier = digits.length === 11 && !typed.includes("@") ? cpfLogin(digits) : typed;
+    const isCpf = profile !== "admin" || (digits.length === 11 && !typed.includes("@"));
+    if (isCpf) {
+      if (digits.length !== 11 || !isValidCPF(digits)) {
+        setLoading(false);
+        toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
+        return;
+      }
+    }
+    const identifier = isCpf ? cpfLogin(digits) : typed;
     const { error } = await supabase.auth.signInWithPassword({ email: identifier, password });
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
@@ -126,9 +134,9 @@ function AuthPage() {
                   autoComplete="username"
                   required
                   inputMode={profile === "admin" ? "email" : "numeric"}
-                  placeholder={profile === "admin" ? "seu@email.com" : "Somente números"}
+                  placeholder={profile === "admin" ? "seu@email.com" : "000.000.000-00"}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(profile === "admin" ? e.target.value : formatCPF(e.target.value))}
                 />
               </div>
               <div className="space-y-1.5">

@@ -26,6 +26,8 @@ import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   KIT_STATUS,
   downloadBlob,
+  formatCPF,
+  isValidCPF,
   logAudit,
   maskCPF,
   onlyDigits,
@@ -334,7 +336,7 @@ function Atletas() {
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
       }))
-      .filter((r) => r.birth_date && r.cpf && r.cpf.length === 11 && r.bib_number);
+      .filter((r) => r.birth_date && r.cpf && r.cpf.length === 11 && isValidCPF(r.cpf) && r.bib_number);
 
     const incomplete = rows.length - parsed.length;
     if (parsed.length === 0) {
@@ -445,8 +447,8 @@ function Atletas() {
       return;
     }
     const cpfDigits = onlyDigits(form.cpf);
-    if (cpfDigits.length !== 11) {
-      toast.error("CPF inválido", { description: "Digite um CPF com 11 dígitos." });
+    if (cpfDigits.length !== 11 || !isValidCPF(cpfDigits)) {
+      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
       return;
     }
     const birthIso = parseBrDate(form.birth_date);
@@ -818,7 +820,12 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>CPF *</Label>
-                <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+                <Input
+                  inputMode="numeric"
+                  placeholder="000.000.000-00"
+                  value={form.cpf}
+                  onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>E-mail</Label>
