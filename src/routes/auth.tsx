@@ -48,7 +48,7 @@ function AuthPage() {
     const digits = onlyDigits(typed);
     const isCpf = profile !== "admin" || (digits.length === 11 && !typed.includes("@"));
     if (isCpf) {
-      if (digits.length !== 11 || !isValidCpf(digits)) {
+      if (digits.length !== 11 || !isValidCPF(digits)) {
         setLoading(false);
         toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
         return;
@@ -136,7 +136,7 @@ function AuthPage() {
                   inputMode={profile === "admin" ? "email" : "numeric"}
                   placeholder={profile === "admin" ? "seu@email.com" : "000.000.000-00"}
                   value={email}
-                  onChange={(e) => setEmail(profile === "admin" ? e.target.value : formatCpf(e.target.value))}
+                  onChange={(e) => setEmail(profile === "admin" ? e.target.value : formatCPF(e.target.value))}
                 />
               </div>
               <div className="space-y-1.5">

@@ -65,7 +65,7 @@ function Checkin() {
   async function search(e: React.FormEvent) {
     e.preventDefault();
     const digits = doc.replace(/\D/g, "");
-    if (digits.length !== 11 || !isValidCpf(digits)) {
+    if (digits.length !== 11 || !isValidCPF(digits)) {
       toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
       return;
     }
@@ -99,7 +99,7 @@ function Checkin() {
               inputMode="numeric"
               required
               value={doc}
-              onChange={(e) => setDoc(formatCpf(e.target.value))}
+              onChange={(e) => setDoc(formatCPF(e.target.value))}
               placeholder="000.000.000-00"
             />
           </div>
