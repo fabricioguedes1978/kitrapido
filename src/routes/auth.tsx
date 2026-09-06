@@ -47,7 +47,15 @@ function AuthPage() {
     setLoading(true);
     const typed = email.trim();
     const digits = onlyDigits(typed);
-    const identifier = digits.length === 11 && !typed.includes("@") ? cpfLogin(digits) : typed;
+    const isCpf = profile !== "admin" || (digits.length === 11 && !typed.includes("@"));
+    if (isCpf) {
+      if (digits.length !== 11 || !isValidCpf(digits)) {
+        setLoading(false);
+        toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
+        return;
+      }
+    }
+    const identifier = isCpf ? cpfLogin(digits) : typed;
     const { error } = await supabase.auth.signInWithPassword({ email: identifier, password });
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
@@ -127,9 +135,9 @@ function AuthPage() {
                   autoComplete="username"
                   required
                   inputMode={profile === "admin" ? "email" : "numeric"}
-                  placeholder={profile === "admin" ? "seu@email.com" : "Somente números"}
+                  placeholder={profile === "admin" ? "seu@email.com" : "000.000.000-00"}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(profile === "admin" ? e.target.value : formatCpf(e.target.value))}
                 />
               </div>
               <div className="space-y-1.5">
