@@ -18,6 +18,7 @@ export type EventRow = {
   status: string;
   archived: boolean;
   athletes_lock_at: string | null;
+  allow_organizer_import: boolean;
   created_at: string;
 };
 

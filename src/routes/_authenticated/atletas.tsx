@@ -185,6 +185,7 @@ function Atletas() {
   const { profile, isAdmin } = useAuth();
   const lockAt = event?.athletes_lock_at ?? null;
   const locked = !isAdmin && !!lockAt && new Date(lockAt).getTime() <= Date.now();
+  const canImport = isAdmin || !!event?.allow_organizer_import;
   const lockLabel = lockAt
     ? new Date(lockAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
     : null;
