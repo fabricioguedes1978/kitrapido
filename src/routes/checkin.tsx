@@ -65,8 +65,13 @@ function Checkin() {
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
+    const digits = doc.replace(/\D/g, "");
+    if (digits.length !== 11 || !isValidCpf(digits)) {
+      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos." });
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.rpc("public_kit_lookup_all", { _doc: doc.trim() });
+    const { data, error } = await supabase.rpc("public_kit_lookup_all", { _doc: digits });
     setLoading(false);
     if (error) {
       toast.error("Não foi possível consultar agora. Tente novamente.");
@@ -95,7 +100,7 @@ function Checkin() {
               inputMode="numeric"
               required
               value={doc}
-              onChange={(e) => setDoc(e.target.value)}
+              onChange={(e) => setDoc(formatCpf(e.target.value))}
               placeholder="000.000.000-00"
             />
           </div>
