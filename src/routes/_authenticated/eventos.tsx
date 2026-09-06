@@ -167,6 +167,7 @@ function Eventos() {
       modalities: (e.modalities ?? []).join(", "),
       status: e.status,
       athletes_lock_at: toLocalInput(e.athletes_lock_at),
+      allow_organizer_import: !!e.allow_organizer_import,
       custom_field_labels: [0, 1, 2, 3, 4].map((i) => e.custom_field_labels?.[i] ?? ""),
     });
     setOpen(true);
@@ -195,6 +196,7 @@ function Eventos() {
             athletes_lock_at: form.athletes_lock_at
               ? new Date(form.athletes_lock_at).toISOString()
               : null,
+            allow_organizer_import: form.allow_organizer_import,
           }
         : {}),
     };
