@@ -404,6 +404,12 @@ function Atletas() {
   }
 
   function handleFile(file: File) {
+    if (!canImport) {
+      toast.error("Envio de planilha não autorizado", {
+        description: "Somente o administrador pode enviar a planilha deste evento.",
+      });
+      return;
+    }
     if (locked) {
       toast.error("Cadastro de atletas encerrado", {
         description: `O prazo terminou em ${lockLabel}. Fale com o administrador.`,
