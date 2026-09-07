@@ -25,7 +25,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   KIT_STATUS,
-  SHIRT_SIZES,
   downloadBlob,
   formatCPF,
   isValidCPF,
@@ -219,7 +218,7 @@ function Atletas() {
     },
   });
 
-  /** Tamanhos vindos da planilha/cadastros deste evento. */
+  /** Tamanhos já usados neste evento (sugestões, mas livre para digitar). */
   const importedSizes = useMemo(() => {
     const set = new Set<string>();
     for (const a of athletes) {
@@ -228,11 +227,6 @@ function Atletas() {
     }
     return [...set].sort();
   }, [athletes]);
-
-  const registeredSizes = useMemo(
-    () => SHIRT_SIZES.filter((s) => !importedSizes.includes(s)),
-    [importedSizes],
-  );
 
 
   const filtered = useMemo(() => {
@@ -909,27 +903,17 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Camiseta</Label>
-                <select
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                <Input
+                  list="shirt-size-suggestions"
+                  placeholder="Digite o tamanho (ex: M, G, 42)"
                   value={form.shirt_size}
-                  onChange={(e) => setForm({ ...form, shirt_size: e.target.value })}
-                >
-                  <option value="">Sem tamanho</option>
-                  {importedSizes.length > 0 && (
-                    <optgroup label="Tamanhos da planilha">
-                      {importedSizes.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {registeredSizes.length > 0 && (
-                    <optgroup label="Tamanhos cadastrados">
-                      {registeredSizes.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
+                  onChange={(e) => setForm({ ...form, shirt_size: e.target.value.toUpperCase() })}
+                />
+                <datalist id="shirt-size-suggestions">
+                  {importedSizes.map((s) => (
+                    <option key={s} value={s} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="space-y-1.5">
