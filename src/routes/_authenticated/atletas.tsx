@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   KIT_STATUS,
+  SHIRT_SIZES,
   downloadBlob,
   formatCPF,
   isValidCPF,
