@@ -89,10 +89,10 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
 
   // Medição prévia para calcular a altura total
   const probe = document.createElement("canvas").getContext("2d")!;
-  probe.font = "bold 44px Helvetica, Arial, sans-serif";
+  probe.font = "bold 56px Helvetica, Arial, sans-serif";
   const titleLines = wrap(probe, data.eventName.toUpperCase(), inner);
   const headerLines = data.headerLines?.filter(Boolean).map((l) => l.toUpperCase()) ?? [];
-  const headerH = 40 + titleLines.length * 52 + headerLines.length * 34 + 36;
+  const headerH = 52 + titleLines.length * 64 + headerLines.length * 44 + 44;
 
   const cols = 2;
   const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
@@ -120,16 +120,16 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   ctx.fillStyle = GREEN;
   ctx.fillRect(0, 0, W, headerH);
   ctx.textAlign = "center";
-  let y = 40;
+  let y = 52;
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 44px Helvetica, Arial, sans-serif";
+  ctx.font = "bold 56px Helvetica, Arial, sans-serif";
   for (const line of titleLines) {
-    y += 46;
+    y += 58;
     ctx.fillText(line, W / 2, y);
   }
-  ctx.font = "bold 26px Helvetica, Arial, sans-serif";
+  ctx.font = "bold 32px Helvetica, Arial, sans-serif";
   for (const line of headerLines) {
-    y += 34;
+    y += 44;
     ctx.fillText(line, W / 2, y);
   }
   ctx.textAlign = "left";
