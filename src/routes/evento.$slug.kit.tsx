@@ -222,7 +222,7 @@ function MeuKit() {
                   </p>
                   <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     {pickupLines.map((l) => (
-                      <Field key={l.label} label={l.label} value={l.value} />
+                      <Field key={l.label} label={l.label} value={l.value} preserve={l.label === "Informações"} />
                     ))}
                   </dl>
                   {mapsHref && (
