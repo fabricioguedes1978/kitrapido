@@ -885,39 +885,13 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Sexo *</Label>
                 <select
-                  value={genderOther ? "__other__" : form.gender}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "__other__") {
-                      setGenderOther(true);
-                      setCustomGender("");
-                      setForm({ ...form, gender: "" });
-                    } else {
-                      setGenderOther(false);
-                      setCustomGender("");
-                      setForm({ ...form, gender: value });
-                    }
-                  }}
+                  value={form.gender}
+                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
-                  {importedGenders.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                  <option value="__other__">+ Digitar novo</option>
+                  <option value="MASCULINO">MASCULINO</option>
+                  <option value="FEMININO">FEMININO</option>
                 </select>
-                {genderOther && (
-                  <Input
-                    placeholder="Digite o sexo"
-                    value={customGender}
-                    onChange={(e) => {
-                      const upper = e.target.value.toUpperCase();
-                      setCustomGender(upper);
-                      setForm({ ...form, gender: upper });
-                    }}
-                  />
-                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
