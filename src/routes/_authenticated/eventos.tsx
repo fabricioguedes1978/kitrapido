@@ -366,17 +366,11 @@ function Eventos() {
               <Detail label="Endereço">{viewing.address || "—"}</Detail>
               <Detail label="Local de largada">{viewing.start_location || "—"}</Detail>
               <Detail label="Retirada do kit" full>
-                {[
-                  viewing.pickup_address,
-                  viewing.pickup_city,
-                  viewing.pickup_days,
-                  viewing.pickup_start_time && viewing.pickup_end_time
-                    ? `${viewing.pickup_start_time.slice(0, 5)} às ${viewing.pickup_end_time.slice(0, 5)}`
-                    : null,
-                ]
+                {[viewing.pickup_address, viewing.pickup_city, viewing.pickup_info]
                   .filter(Boolean)
                   .join(" · ") || "—"}
               </Detail>
+
               <Detail label="Modalidades">
                 {viewing.modalities?.length ? viewing.modalities.join(", ") : "—"}
               </Detail>
