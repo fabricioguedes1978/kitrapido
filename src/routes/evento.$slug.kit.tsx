@@ -101,11 +101,11 @@ function MeuKit() {
         .filter(Boolean)
         .join(" · ")
     : "";
+  const pickupInfo = result?.pickup_info || "";
   const pickupLines = result
     ? [
         { label: "Endereço", value: result.pickup_address || "" },
         { label: "Cidade", value: result.pickup_city || "" },
-        { label: "Informações", value: result.pickup_info || "" },
       ].filter((l) => l.value)
     : [];
   const mapsHref = result

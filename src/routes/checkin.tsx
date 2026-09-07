@@ -164,10 +164,10 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   const startTime = [row.event_date ? formatDate(row.event_date) : null, hm(row.event_time) ? `LARGADA ${hm(row.event_time)}` : null]
     .filter(Boolean)
     .join(" · ");
+  const pickupInfo = row.pickup_info || "";
   const pickupLines = [
     { label: "Endereço", value: row.pickup_address || "" },
     { label: "Cidade", value: row.pickup_city || "" },
-    { label: "Informações", value: row.pickup_info || "" },
   ].filter((l) => l.value);
   const mapsHref = mapsUrl(row.pickup_maps_url, row.pickup_address, row.pickup_city);
 
