@@ -301,11 +301,11 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   );
 }
 
-function Field({ label, value, strong }: { label: string; value?: string | null; strong?: boolean }) {
+function Field({ label, value, strong, preserve }: { label: string; value?: string | null; strong?: boolean; preserve?: boolean }) {
   return (
     <div className="min-w-0">
       <dt className="text-muted-foreground text-xs tracking-wide uppercase">{label}</dt>
-      <dd className={strong ? "text-lg font-bold" : "font-medium"}>{value || "—"}</dd>
+      <dd className={`${strong ? "text-lg font-bold" : "font-medium"} ${preserve ? "whitespace-pre-wrap" : ""}`}>{value || "—"}</dd>
     </div>
   );
 }
