@@ -334,12 +334,15 @@ function Atletas() {
       custom_4: a.custom_4 ?? "",
       custom_5: a.custom_5 ?? "",
     });
+    setModalityOther(!modalityKnown && !!a.modality);
+    setCategoryOther(!categoryKnown && !!a.category);
     setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
     setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
   }
+
 
 
 
