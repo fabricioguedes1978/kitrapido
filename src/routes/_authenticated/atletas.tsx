@@ -922,13 +922,15 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
                 <select
-                  value={customModality ? "__other__" : form.modality}
+                  value={modalityOther ? "__other__" : form.modality}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "__other__") {
+                      setModalityOther(true);
                       setCustomModality("");
                       setForm({ ...form, modality: "" });
                     } else {
+                      setModalityOther(false);
                       setCustomModality("");
                       setForm({ ...form, modality: value });
                     }
@@ -943,7 +945,7 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {customModality !== "" && (
+                {modalityOther && (
                   <Input
                     placeholder="Digite a modalidade"
                     value={customModality}
@@ -957,13 +959,15 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
                 <select
-                  value={customCategory ? "__other__" : form.category}
+                  value={categoryOther ? "__other__" : form.category}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "__other__") {
+                      setCategoryOther(true);
                       setCustomCategory("");
                       setForm({ ...form, category: "" });
                     } else {
+                      setCategoryOther(false);
                       setCustomCategory("");
                       setForm({ ...form, category: value });
                     }
@@ -978,7 +982,7 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {customCategory !== "" && (
+                {categoryOther && (
                   <Input
                     placeholder="Digite a categoria"
                     value={customCategory}
@@ -989,6 +993,7 @@ function Atletas() {
                   />
                 )}
               </div>
+
 
 
 
