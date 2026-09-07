@@ -200,8 +200,11 @@ function Atletas() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
+  const [modalityOther, setModalityOther] = useState(false);
+  const [categoryOther, setCategoryOther] = useState(false);
   const [customModality, setCustomModality] = useState("");
   const [customCategory, setCustomCategory] = useState("");
+
 
 
 
