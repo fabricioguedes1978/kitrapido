@@ -303,6 +303,8 @@ function Atletas() {
       });
       return;
     }
+    const modalityKnown = importedModalities.includes(a.modality ?? "");
+    const categoryKnown = importedCategories.includes(a.category ?? "");
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
@@ -314,8 +316,8 @@ function Atletas() {
       phone: a.phone ?? "",
       registration_number: a.registration_number ?? "",
       bib_number: a.bib_number ?? "",
-      modality: a.modality ?? "",
-      category: a.category ?? "",
+      modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
+      category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
       distance: a.distance ?? "",
       shirt_size: a.shirt_size ?? "",
       kit_type: a.kit_type ?? "",
@@ -326,10 +328,13 @@ function Atletas() {
       custom_4: a.custom_4 ?? "",
       custom_5: a.custom_5 ?? "",
     });
+    setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
+    setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
   }
+
 
 
 
