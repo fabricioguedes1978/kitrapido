@@ -170,15 +170,19 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
     ctx.fillText((data.pickup?.title ?? "LOCAL DA RETIRADA DO KIT").toUpperCase(), PAD + 76, cursor + 52);
 
     let py = cursor + 86;
-    for (const line of pickupLines) {
+    pickupLines.forEach((line, i) => {
       ctx.fillStyle = MUTED;
       ctx.font = "18px Helvetica, Arial, sans-serif";
       ctx.fillText(line.label.toUpperCase(), PAD + 26, py + 18);
       ctx.fillStyle = INK;
       ctx.font = "bold 24px Helvetica, Arial, sans-serif";
-      ctx.fillText((wrap(ctx, line.value, inner - 60)[0] ?? line.value).slice(0, 52), PAD + 26, py + 48);
-      py += 62;
-    }
+      const wrapped = pickupWrapped[i] ?? [line.value];
+      for (const textLine of wrapped) {
+        ctx.fillText(textLine.slice(0, 52), PAD + 26, py + 48);
+        py += 32;
+      }
+      py += 24;
+    });
     cursor += pickupH + 34;
   }
 
