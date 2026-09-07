@@ -227,7 +227,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
               <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
             </div>
           ) : (
-            <div className="border-primary/30 bg-primary/10 text-primary flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
+            <div className="border-warning/30 bg-warning/15 text-warning flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
               <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
             </div>
           )}
