@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CalendarDays, CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
