@@ -934,7 +934,7 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {customModality !== undefined && (
+                {customModality !== "" && (
                   <Input
                     placeholder="Digite a modalidade"
                     value={customModality}
@@ -969,7 +969,7 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {customCategory !== undefined && (
+                {customCategory !== "" && (
                   <Input
                     placeholder="Digite a categoria"
                     value={customCategory}
@@ -980,6 +980,7 @@ function Atletas() {
                   />
                 )}
               </div>
+
 
 
 
