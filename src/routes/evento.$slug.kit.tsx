@@ -191,9 +191,9 @@ function MeuKit() {
               )}
 
               <div className="bg-primary text-primary-foreground -mx-6 -mt-6 rounded-t-xl px-5 py-6 text-center">
-                <p className="text-xl font-extrabold tracking-wide uppercase">{result.event_name}</p>
-                {startLine && <p className="mt-1 text-sm font-bold uppercase">{startLine}</p>}
-                {startTime && <p className="mt-0.5 text-sm font-bold uppercase">{startTime}</p>}
+                <p className="text-2xl font-extrabold tracking-wide uppercase sm:text-4xl">{result.event_name}</p>
+                {startLine && <p className="mt-2 text-base font-bold uppercase sm:text-lg">{startLine}</p>}
+                {startTime && <p className="mt-1 text-base font-bold uppercase sm:text-lg">{startTime}</p>}
               </div>
 
               <div>
