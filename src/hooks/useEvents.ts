@@ -15,9 +15,8 @@ export type EventRow = {
   start_location: string | null;
   pickup_address: string | null;
   pickup_city: string | null;
-  pickup_days: string | null;
-  pickup_start_time: string | null;
-  pickup_end_time: string | null;
+  pickup_info: string | null;
+  pickup_maps_url: string | null;
   description: string | null;
   logo_url: string | null;
   modalities: string[];
