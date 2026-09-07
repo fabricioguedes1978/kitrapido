@@ -290,8 +290,11 @@ function Atletas() {
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setDupWarning(null);
+    setCustomModality("");
+    setCustomCategory("");
     setNewOpen(true);
   }
+
 
   function openEdit(a: Athlete) {
     if (locked) {
