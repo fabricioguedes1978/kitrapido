@@ -156,9 +156,9 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
     ctx.font = "19px Helvetica, Arial, sans-serif";
     ctx.fillText("NÚMERO", PAD, cursor + 30);
     ctx.fillStyle = INK;
-    ctx.font = `bold 72px Helvetica, Arial, sans-serif`;
+    ctx.font = `bold 56px Helvetica, Arial, sans-serif`;
     const bibText = wrap(ctx, bibValue, inner)[0] ?? bibValue;
-    ctx.fillText(bibText.slice(0, 14), PAD, cursor + 96);
+    ctx.fillText(bibText.slice(0, 16), PAD, cursor + 84);
     cursor += bibH;
   }
 
