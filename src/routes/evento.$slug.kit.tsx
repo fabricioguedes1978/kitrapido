@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Navigation, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { athleteQrUrl, formatDate, formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatDate, formatDateTime, mapsUrl } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
