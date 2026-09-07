@@ -51,7 +51,7 @@ const NAV: NavItem[] = [
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart, roles: ["admin", "organizer"] },
   { to: "/usuarios", label: "Usuários", icon: UserCog, roles: ["admin", "organizer"] },
   { to: "/auditoria", label: "Auditoria", icon: History, roles: ["admin", "organizer"] },
-  { to: "/alterar-senha", label: "Alterar Senha", icon: KeyRound, roles: ["admin"] },
+  { to: "/alterar-senha", label: "E-mail e Senha", icon: KeyRound, roles: ["admin"] },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
