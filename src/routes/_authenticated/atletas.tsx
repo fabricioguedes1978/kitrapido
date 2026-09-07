@@ -913,8 +913,17 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
                 <select
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                  value={customModality ? "__other__" : form.modality}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setCustomModality("");
+                      setForm({ ...form, modality: "" });
+                    } else {
+                      setCustomModality("");
+                      setForm({ ...form, modality: value });
+                    }
+                  }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
                   <option value="">Selecione</option>
@@ -925,19 +934,31 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {form.modality === "__other__" && (
+                {customModality !== undefined && (
                   <Input
                     placeholder="Digite a modalidade"
-                    value={form.modality === "__other__" ? "" : form.modality}
-                    onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                    value={customModality}
+                    onChange={(e) => {
+                      setCustomModality(e.target.value);
+                      setForm({ ...form, modality: e.target.value });
+                    }}
                   />
                 )}
               </div>
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
                 <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  value={customCategory ? "__other__" : form.category}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setCustomCategory("");
+                      setForm({ ...form, category: "" });
+                    } else {
+                      setCustomCategory("");
+                      setForm({ ...form, category: value });
+                    }
+                  }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
                   <option value="">Selecione</option>
@@ -948,14 +969,18 @@ function Atletas() {
                   ))}
                   <option value="__other__">+ Digitar novo</option>
                 </select>
-                {form.category === "__other__" && (
+                {customCategory !== undefined && (
                   <Input
                     placeholder="Digite a categoria"
-                    value={form.category === "__other__" ? "" : form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    value={customCategory}
+                    onChange={(e) => {
+                      setCustomCategory(e.target.value);
+                      setForm({ ...form, category: e.target.value });
+                    }}
                   />
                 )}
               </div>
+
 
 
               <div className="space-y-1.5">
