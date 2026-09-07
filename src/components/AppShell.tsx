@@ -20,6 +20,7 @@ import {
   ImageUp,
   Flag,
   User,
+  KeyRound,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
@@ -50,6 +51,7 @@ const NAV: NavItem[] = [
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart, roles: ["admin", "organizer"] },
   { to: "/usuarios", label: "Usuários", icon: UserCog, roles: ["admin", "organizer"] },
   { to: "/auditoria", label: "Auditoria", icon: History, roles: ["admin", "organizer"] },
+  { to: "/alterar-senha", label: "Alterar Senha", icon: KeyRound, roles: ["admin"] },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
