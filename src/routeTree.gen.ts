@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CheckinRouteImport } from './routes/checkin'
 import { Route as ConsultaRouteImport } from './routes/consulta'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAlterarSenhaRouteImport } from './routes/_authenticated/alterar-senha'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedAutorizacoesRouteImport } from './routes/_authenticated/autorizacoes'
@@ -60,6 +61,12 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAlterarSenhaRoute =
+  AuthenticatedAlterarSenhaRouteImport.update({
+    id: '/alterar-senha',
+    path: '/alterar-senha',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAtletasRoute = AuthenticatedAtletasRouteImport.update({
   id: '/atletas',
   path: '/atletas',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/autorizacoes': typeof AuthenticatedAutorizacoesRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/autorizacoes': typeof AuthenticatedAutorizacoesRoute
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/consulta'
     | '/reset-password'
+    | '/alterar-senha'
     | '/atletas'
     | '/auditoria'
     | '/autorizacoes'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/consulta'
     | '/reset-password'
+    | '/alterar-senha'
     | '/atletas'
     | '/auditoria'
     | '/autorizacoes'
@@ -259,6 +271,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/consulta'
     | '/reset-password'
+    | '/_authenticated/alterar-senha'
     | '/_authenticated/atletas'
     | '/_authenticated/auditoria'
     | '/_authenticated/autorizacoes'
@@ -329,6 +342,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/alterar-senha': {
+      id: '/_authenticated/alterar-senha'
+      path: '/alterar-senha'
+      fullPath: '/alterar-senha'
+      preLoaderRoute: typeof AuthenticatedAlterarSenhaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/atletas': {
       id: '/_authenticated/atletas'
@@ -439,6 +459,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlterarSenhaRoute: typeof AuthenticatedAlterarSenhaRoute
   AuthenticatedAtletasRoute: typeof AuthenticatedAtletasRoute
   AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedAutorizacoesRoute: typeof AuthenticatedAutorizacoesRoute
@@ -456,6 +477,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlterarSenhaRoute: AuthenticatedAlterarSenhaRoute,
   AuthenticatedAtletasRoute: AuthenticatedAtletasRoute,
   AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedAutorizacoesRoute: AuthenticatedAutorizacoesRoute,
