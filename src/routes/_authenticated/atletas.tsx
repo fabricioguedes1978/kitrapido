@@ -317,6 +317,7 @@ function Atletas() {
     }
     const modalityKnown = importedModalities.includes(a.modality ?? "");
     const categoryKnown = importedCategories.includes(a.category ?? "");
+    const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
@@ -331,7 +332,7 @@ function Atletas() {
       modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
       category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
       distance: a.distance ?? "",
-      shirt_size: a.shirt_size ?? "",
+      shirt_size: shirtKnown ? (a.shirt_size ?? "") : a.shirt_size ? "__other__" : "",
       kit_type: a.kit_type ?? "",
       payment_status: a.payment_status ?? "pago",
       custom_1: a.custom_1 ?? "",
@@ -342,12 +343,15 @@ function Atletas() {
     });
     setModalityOther(!modalityKnown && !!a.modality);
     setCategoryOther(!categoryKnown && !!a.category);
+    setShirtOther(!shirtKnown && !!a.shirt_size);
     setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
     setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
+    setCustomShirt(shirtKnown ? "" : (a.shirt_size ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
   }
+
 
 
 
