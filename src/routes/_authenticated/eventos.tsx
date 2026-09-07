@@ -199,9 +199,8 @@ function Eventos() {
       start_location: form.start_location || null,
       pickup_address: form.pickup_address || null,
       pickup_city: form.pickup_city || null,
-      pickup_days: form.pickup_days || null,
-      pickup_start_time: form.pickup_start_time || null,
-      pickup_end_time: form.pickup_end_time || null,
+      pickup_info: form.pickup_info || null,
+      pickup_maps_url: form.pickup_maps_url || null,
       description: form.description || null,
       modalities: form.modalities
         .split(",")
