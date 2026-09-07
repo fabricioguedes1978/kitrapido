@@ -61,7 +61,6 @@ type Athlete = {
   bib_number: string | null;
   modality: string | null;
   category: string | null;
-  distance: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
@@ -86,7 +85,6 @@ const EMPTY_FORM = {
   bib_number: "",
   modality: "",
   category: "",
-  distance: "",
   shirt_size: "",
   kit_type: "",
   payment_status: "pago",
@@ -122,7 +120,6 @@ const COLUMN_MAP: Record<string, string> = {
   numero: "bib_number",
   modalidade: "modality",
   categoria: "category",
-  distancia: "distance",
   camiseta: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
@@ -218,7 +215,7 @@ function Atletas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -340,7 +337,6 @@ function Atletas() {
       bib_number: a.bib_number ?? "",
       modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
       category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
-      distance: a.distance ?? "",
       shirt_size: shirtKnown ? (a.shirt_size ?? "") : a.shirt_size ? "__other__" : "",
       kit_type: a.kit_type ?? "",
       payment_status: a.payment_status ?? "pago",
@@ -396,7 +392,6 @@ function Atletas() {
         bib_number: r["bib_number"] ?? null,
         modality: r["modality"] ?? null,
         category: r["category"] ?? null,
-        distance: r["distance"] ?? null,
         shirt_size: r["shirt_size"] ? r["shirt_size"].toUpperCase() : null,
         kit_type: r["kit_type"] ?? null,
         payment_status: normPayment(r["payment_status"]),
@@ -571,7 +566,6 @@ function Atletas() {
       bib_number: bib,
       modality: form.modality.trim(),
       category: form.category.trim() || null,
-      distance: form.distance.trim() || null,
       shirt_size: form.shirt_size ? form.shirt_size.toUpperCase() : null,
       kit_type: form.kit_type.trim() || null,
       payment_status: form.payment_status,
@@ -731,13 +725,13 @@ function Atletas() {
                 e.stopPropagation();
                 const headers = [
                   "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
-                  "inscricao", "numero", "modalidade", "categoria", "distancia", "camiseta", "kit",
+                  "inscricao", "numero", "modalidade", "categoria", "camiseta", "kit",
                   "status", "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
                   "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
                   "maria@email.com", "(31) 9999-9999", "INS001", "1001", "Corrida", "Feminino Geral",
-                  "10km", "M", "Kit Padrão", "Pago", "", "", "", "", "",
+                  "M", "Kit Padrão", "Pago", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
@@ -1013,13 +1007,6 @@ function Atletas() {
 
 
 
-              <div className="space-y-1.5">
-                <Label>Distância</Label>
-                <Input
-                  value={form.distance}
-                  onChange={(e) => setForm({ ...form, distance: e.target.value })}
-                />
-              </div>
               <div className="space-y-1.5">
                 <Label>Camiseta</Label>
                 <select
