@@ -97,7 +97,9 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   const cols = 2;
   const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
   const pickupLines = data.pickup?.lines.filter((l) => l.value) ?? [];
-  const pickupH = pickupLines.length ? 36 + 46 + pickupLines.length * 62 + 28 : 0;
+  const pickupWrapped = pickupLines.map((l) => wrap(probe, l.value, inner - 60));
+  const pickupTotalLines = pickupWrapped.reduce((sum, lines) => sum + Math.max(lines.length, 1), 0);
+  const pickupH = pickupLines.length ? 36 + 46 + pickupTotalLines * 38 + pickupLines.length * 24 + 28 : 0;
 
   const H =
     headerH + 46 + 62 + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
