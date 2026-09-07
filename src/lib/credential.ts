@@ -31,19 +31,24 @@ async function svgToImage(svg: SVGElement, size: number) {
 }
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
-  const words = text.split(/\s+/).filter(Boolean);
+  const paragraphs = text.split("\n");
   const lines: string[] = [];
-  let line = "";
-  for (const w of words) {
-    const test = line ? `${line} ${w}` : w;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = w;
-    } else {
-      line = test;
+  for (const paragraph of paragraphs) {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    let line = "";
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
     }
+    if (line) lines.push(line);
+    // preserve blank lines between paragraphs
+    if (paragraph.trim() === "" && paragraphs.length > 1) lines.push("");
   }
-  if (line) lines.push(line);
   return lines;
 }
 
