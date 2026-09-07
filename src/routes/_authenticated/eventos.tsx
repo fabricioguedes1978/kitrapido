@@ -505,30 +505,26 @@ function Eventos() {
                   onChange={(e) => setForm({ ...form, pickup_city: e.target.value })}
                 />
               </Field>
-              <Field label="Dias da retirada">
-                <Input
-                  placeholder="Ex.: 12 e 13 de setembro"
-                  value={form.pickup_days}
-                  onChange={(e) => setForm({ ...form, pickup_days: e.target.value })}
+              <Field label="Dias, horários e orientações">
+                <Textarea
+                  rows={4}
+                  placeholder="Ex.: 12 e 13 de setembro, das 10h às 20h. Levar documento com foto."
+                  value={form.pickup_info}
+                  onChange={(e) => setForm({ ...form, pickup_info: e.target.value })}
                 />
               </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Início">
-                  <Input
-                    type="time"
-                    value={form.pickup_start_time}
-                    onChange={(e) => setForm({ ...form, pickup_start_time: e.target.value })}
-                  />
-                </Field>
-                <Field label="Término">
-                  <Input
-                    type="time"
-                    value={form.pickup_end_time}
-                    onChange={(e) => setForm({ ...form, pickup_end_time: e.target.value })}
-                  />
-                </Field>
-              </div>
+              <Field label="Link da localização (Google Maps)">
+                <Input
+                  placeholder="Cole aqui o link do Google Maps (opcional)"
+                  value={form.pickup_maps_url}
+                  onChange={(e) => setForm({ ...form, pickup_maps_url: e.target.value })}
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Se ficar vazio, o botão "Como chegar" usa o endereço informado acima.
+                </p>
+              </Field>
             </div>
+
             <Field label="Modalidades (separadas por vírgula)">
               <Input
                 placeholder="5km, 10km, 21km"
