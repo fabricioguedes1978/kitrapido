@@ -293,7 +293,12 @@ function Atletas() {
       });
       return;
     }
-    setForm({ ...EMPTY_FORM });
+    setForm({
+      ...EMPTY_FORM,
+      modality: importedModalities[0] ?? "",
+      category: importedCategories[0] ?? "",
+      shirt_size: importedSizes[0] ?? "",
+    });
     setEditingId(null);
     setDupWarning(null);
     setModalityOther(false);
@@ -947,7 +952,6 @@ function Atletas() {
                   }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
-                  <option value="">Selecione</option>
                   {importedModalities.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -984,7 +988,6 @@ function Atletas() {
                   }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
-                  <option value="">Selecione</option>
                   {importedCategories.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -1033,7 +1036,6 @@ function Atletas() {
                   }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
-                  <option value="">Selecione</option>
                   {importedSizes.map((s) => (
                     <option key={s} value={s}>
                       {s}
