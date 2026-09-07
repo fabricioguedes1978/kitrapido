@@ -222,7 +222,7 @@ function MeuKit() {
                   </p>
                   <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     {pickupLines.map((l) => (
-                      <Field key={l.label} label={l.label} value={l.value} />
+                      <Field key={l.label} label={l.label} value={l.value} preserve={l.label === "Informações"} />
                     ))}
                   </dl>
                   {mapsHref && (
@@ -262,11 +262,11 @@ function MeuKit() {
   );
 }
 
-function Field({ label, value, strong }: { label: string; value?: string | null; strong?: boolean }) {
+function Field({ label, value, strong, preserve }: { label: string; value?: string | null; strong?: boolean; preserve?: boolean }) {
   return (
     <div className="min-w-0">
       <dt className="text-muted-foreground text-xs tracking-wide uppercase">{label}</dt>
-      <dd className={strong ? "text-lg font-bold" : "font-medium"}>{value || "—"}</dd>
+      <dd className={`${strong ? "text-lg font-bold" : "font-medium"} ${preserve ? "whitespace-pre-wrap" : ""}`}>{value || "—"}</dd>
     </div>
   );
 }

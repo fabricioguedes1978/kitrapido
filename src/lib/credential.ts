@@ -31,19 +31,24 @@ async function svgToImage(svg: SVGElement, size: number) {
 }
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
-  const words = text.split(/\s+/).filter(Boolean);
+  const paragraphs = text.split("\n");
   const lines: string[] = [];
-  let line = "";
-  for (const w of words) {
-    const test = line ? `${line} ${w}` : w;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = w;
-    } else {
-      line = test;
+  for (const paragraph of paragraphs) {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    let line = "";
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
     }
+    if (line) lines.push(line);
+    // preserve blank lines between paragraphs
+    if (paragraph.trim() === "" && paragraphs.length > 1) lines.push("");
   }
-  if (line) lines.push(line);
   return lines;
 }
 
@@ -92,7 +97,9 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   const cols = 2;
   const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
   const pickupLines = data.pickup?.lines.filter((l) => l.value) ?? [];
-  const pickupH = pickupLines.length ? 36 + 46 + pickupLines.length * 62 + 28 : 0;
+  const pickupWrapped = pickupLines.map((l) => wrap(probe, l.value, inner - 60));
+  const pickupTotalLines = pickupWrapped.reduce((sum, lines) => sum + Math.max(lines.length, 1), 0);
+  const pickupH = pickupLines.length ? 36 + 46 + pickupTotalLines * 38 + pickupLines.length * 24 + 28 : 0;
 
   const H =
     headerH + 46 + 62 + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
@@ -163,15 +170,19 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
     ctx.fillText((data.pickup?.title ?? "LOCAL DA RETIRADA DO KIT").toUpperCase(), PAD + 76, cursor + 52);
 
     let py = cursor + 86;
-    for (const line of pickupLines) {
+    pickupLines.forEach((line, i) => {
       ctx.fillStyle = MUTED;
       ctx.font = "18px Helvetica, Arial, sans-serif";
       ctx.fillText(line.label.toUpperCase(), PAD + 26, py + 18);
       ctx.fillStyle = INK;
       ctx.font = "bold 24px Helvetica, Arial, sans-serif";
-      ctx.fillText((wrap(ctx, line.value, inner - 60)[0] ?? line.value).slice(0, 52), PAD + 26, py + 48);
-      py += 62;
-    }
+      const wrapped = pickupWrapped[i] ?? [line.value];
+      for (const textLine of wrapped) {
+        ctx.fillText(textLine.slice(0, 52), PAD + 26, py + 48);
+        py += 32;
+      }
+      py += 24;
+    });
     cursor += pickupH + 34;
   }
 
