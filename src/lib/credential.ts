@@ -161,7 +161,7 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   cursor += dataRowsH + 34;
 
   /* ----- Local da retirada do kit ----- */
-  if (pickupLines.length) {
+  if (pickupLines.length || noteTotalLines) {
     ctx.strokeStyle = "#d1d5db";
     ctx.lineWidth = 2;
     roundRect(ctx, PAD, cursor, inner, pickupH, 18);
@@ -188,6 +188,16 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
       }
       py += 24;
     });
+
+    if (noteTotalLines) {
+      ctx.fillStyle = INK;
+      ctx.font = "bold 22px Helvetica, Arial, sans-serif";
+      for (const textLine of noteWrapped) {
+        ctx.fillText(textLine.slice(0, 80), PAD + 26, py + 32);
+        py += 32;
+      }
+    }
+
     cursor += pickupH + 34;
   }
 
