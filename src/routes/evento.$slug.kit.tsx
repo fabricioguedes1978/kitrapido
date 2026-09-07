@@ -130,7 +130,7 @@ function MeuKit() {
           value: f.value,
         })),
       ],
-      pickup: pickupLines.length ? { title: "Local da retirada do kit", lines: pickupLines } : undefined,
+      pickup: pickupLines.length || pickupInfo ? { title: "Local da retirada do kit", lines: pickupLines, note: pickupInfo } : undefined,
       footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",
     };
     const base = `voucher-${result.name.toLowerCase().replace(/\s+/g, "-")}`;

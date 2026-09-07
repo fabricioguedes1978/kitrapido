@@ -192,7 +192,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
       headerLines: [startLine, startTime].filter(Boolean),
       name: row.name,
       rows: athleteRows,
-      pickup: pickupLines.length ? { title: "Local da retirada do kit", lines: pickupLines } : undefined,
+      pickup: pickupLines.length || pickupInfo ? { title: "Local da retirada do kit", lines: pickupLines, note: pickupInfo } : undefined,
       footer: delivered
         ? `KIT RETIRADO EM ${formatDateTime(row.delivered_at)}`
         : "Apresente este QR Code na retirada do kit",
