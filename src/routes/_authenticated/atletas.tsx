@@ -202,8 +202,11 @@ function Atletas() {
   const [dupWarning, setDupWarning] = useState<string | null>(null);
   const [modalityOther, setModalityOther] = useState(false);
   const [categoryOther, setCategoryOther] = useState(false);
+  const [shirtOther, setShirtOther] = useState(false);
   const [customModality, setCustomModality] = useState("");
   const [customCategory, setCustomCategory] = useState("");
+  const [customShirt, setCustomShirt] = useState("");
+
 
 
 
@@ -295,10 +298,13 @@ function Atletas() {
     setDupWarning(null);
     setModalityOther(false);
     setCategoryOther(false);
+    setShirtOther(false);
     setCustomModality("");
     setCustomCategory("");
+    setCustomShirt("");
     setNewOpen(true);
   }
+
 
 
 
@@ -311,6 +317,7 @@ function Atletas() {
     }
     const modalityKnown = importedModalities.includes(a.modality ?? "");
     const categoryKnown = importedCategories.includes(a.category ?? "");
+    const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
@@ -325,7 +332,7 @@ function Atletas() {
       modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
       category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
       distance: a.distance ?? "",
-      shirt_size: a.shirt_size ?? "",
+      shirt_size: shirtKnown ? (a.shirt_size ?? "") : a.shirt_size ? "__other__" : "",
       kit_type: a.kit_type ?? "",
       payment_status: a.payment_status ?? "pago",
       custom_1: a.custom_1 ?? "",
@@ -336,12 +343,15 @@ function Atletas() {
     });
     setModalityOther(!modalityKnown && !!a.modality);
     setCategoryOther(!categoryKnown && !!a.category);
+    setShirtOther(!shirtKnown && !!a.shirt_size);
     setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
     setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
+    setCustomShirt(shirtKnown ? "" : (a.shirt_size ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
   }
+
 
 
 
@@ -1007,18 +1017,43 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Camiseta</Label>
-                <Input
-                  list="shirt-size-suggestions"
-                  placeholder="Digite o tamanho (ex: M, G, 42)"
-                  value={form.shirt_size}
-                  onChange={(e) => setForm({ ...form, shirt_size: e.target.value.toUpperCase() })}
-                />
-                <datalist id="shirt-size-suggestions">
+                <select
+                  value={shirtOther ? "__other__" : form.shirt_size}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setShirtOther(true);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: "" });
+                    } else {
+                      setShirtOther(false);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedSizes.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {shirtOther && (
+                  <Input
+                    placeholder="Digite o tamanho (ex: M, G, 42)"
+                    value={customShirt}
+                    onChange={(e) => {
+                      const upper = e.target.value.toUpperCase();
+                      setCustomShirt(upper);
+                      setForm({ ...form, shirt_size: upper });
+                    }}
+                  />
+                )}
               </div>
+
 
               <div className="space-y-1.5">
                 <Label>Kit</Label>
