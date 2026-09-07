@@ -298,10 +298,13 @@ function Atletas() {
     setDupWarning(null);
     setModalityOther(false);
     setCategoryOther(false);
+    setShirtOther(false);
     setCustomModality("");
     setCustomCategory("");
+    setCustomShirt("");
     setNewOpen(true);
   }
+
 
 
 
