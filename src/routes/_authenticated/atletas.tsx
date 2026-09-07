@@ -218,7 +218,7 @@ function Atletas() {
     },
   });
 
-  /** Tamanhos já usados neste evento (sugestões, mas livre para digitar). */
+  /** Valores já usados neste evento (sugestões, mas livre para digitar). */
   const importedSizes = useMemo(() => {
     const set = new Set<string>();
     for (const a of athletes) {
@@ -227,6 +227,25 @@ function Atletas() {
     }
     return [...set].sort();
   }, [athletes]);
+
+  const importedModalities = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.modality ?? "").trim();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
+  const importedCategories = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.category ?? "").trim();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
 
 
   const filtered = useMemo(() => {
