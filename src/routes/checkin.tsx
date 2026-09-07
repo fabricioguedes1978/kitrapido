@@ -258,14 +258,17 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
             ))}
           </dl>
 
-          {(pickupLines.length > 0 || mapsHref) && (
+          {(pickupLines.length > 0 || pickupInfo || mapsHref) && (
             <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
               <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
                 <MapPin className="size-5" /> Local da retirada do kit
               </p>
+              {pickupInfo && (
+                <p className="whitespace-pre-wrap text-sm font-medium">{pickupInfo}</p>
+              )}
               <dl className="grid gap-2 text-sm sm:grid-cols-2">
                 {pickupLines.map((l) => (
-                  <Field key={l.label} label={l.label} value={l.value} preserve={l.label === "Informações"} />
+                  <Field key={l.label} label={l.label} value={l.value} />
                 ))}
               </dl>
               {mapsHref && (
