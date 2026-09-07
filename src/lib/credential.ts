@@ -95,7 +95,11 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   const headerH = 52 + titleLines.length * 64 + headerLines.length * 44 + 44;
 
   const cols = 2;
-  const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
+  const bibRowIndex = data.rows.findIndex((r) => r.label.toLowerCase().includes("número") || r.label.toLowerCase().includes("numero"));
+  const bibRow = bibRowIndex >= 0 ? data.rows[bibRowIndex] : undefined;
+  const otherRows = data.rows.filter((_, i) => i !== bibRowIndex);
+  const bibH = bibRow ? 110 : 0;
+  const dataRowsH = Math.ceil(otherRows.length / cols) * 74;
   const pickupLines = data.pickup?.lines.filter((l) => l.value) ?? [];
   const pickupNote = data.pickup?.note?.trim();
   const pickupWrapped = pickupLines.map((l) => wrap(probe, l.value, inner - 60));
@@ -107,7 +111,7 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
     : 0;
 
   const H =
-    headerH + 46 + 62 + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
+    headerH + 46 + 62 + bibH + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
 
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -145,8 +149,21 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   ctx.fillText(wrap(ctx, data.name.toUpperCase(), inner)[0] ?? "", PAD, cursor);
   cursor += 26;
 
+  /* ----- Número de peito em destaque ----- */
+  if (bibRow) {
+    const bibValue = (bibRow.value || "—").toUpperCase();
+    ctx.fillStyle = MUTED;
+    ctx.font = "19px Helvetica, Arial, sans-serif";
+    ctx.fillText("NÚMERO", PAD, cursor + 30);
+    ctx.fillStyle = INK;
+    ctx.font = `bold 72px Helvetica, Arial, sans-serif`;
+    const bibText = wrap(ctx, bibValue, inner)[0] ?? bibValue;
+    ctx.fillText(bibText.slice(0, 14), PAD, cursor + 96);
+    cursor += bibH;
+  }
+
   const colW = inner / cols;
-  data.rows.forEach((row, i) => {
+  otherRows.forEach((row, i) => {
     const col = i % cols;
     const idx = Math.floor(i / cols);
     const x = PAD + col * colW;
