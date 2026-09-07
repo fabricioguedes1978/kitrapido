@@ -218,7 +218,7 @@ function Atletas() {
     },
   });
 
-  /** Tamanhos já usados neste evento (sugestões, mas livre para digitar). */
+  /** Valores já usados neste evento (sugestões, mas livre para digitar). */
   const importedSizes = useMemo(() => {
     const set = new Set<string>();
     for (const a of athletes) {
@@ -227,6 +227,25 @@ function Atletas() {
     }
     return [...set].sort();
   }, [athletes]);
+
+  const importedModalities = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.modality ?? "").trim();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
+  const importedCategories = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.category ?? "").trim();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
 
 
   const filtered = useMemo(() => {
@@ -883,17 +902,32 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
                 <Input
+                  list="modality-suggestions"
+                  placeholder="Digite a modalidade (ex: Corrida, Caminhada)"
                   value={form.modality}
                   onChange={(e) => setForm({ ...form, modality: e.target.value })}
                 />
+                <datalist id="modality-suggestions">
+                  {importedModalities.map((s) => (
+                    <option key={s} value={s} />
+                  ))}
+                </datalist>
               </div>
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
                 <Input
+                  list="category-suggestions"
+                  placeholder="Digite a categoria (ex: Geral, Elite)"
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                 />
+                <datalist id="category-suggestions">
+                  {importedCategories.map((s) => (
+                    <option key={s} value={s} />
+                  ))}
+                </datalist>
               </div>
+
               <div className="space-y-1.5">
                 <Label>Distância</Label>
                 <Input
