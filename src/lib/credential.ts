@@ -9,7 +9,7 @@ export type CredentialData = {
   name: string;
   rows: CredentialRow[];
   /** Bloco separado com o local da retirada do kit. */
-  pickup?: { title?: string; lines: CredentialRow[] } | undefined;
+  pickup?: { title?: string; lines: CredentialRow[]; note?: string } | undefined;
   footer?: string;
 };
 
