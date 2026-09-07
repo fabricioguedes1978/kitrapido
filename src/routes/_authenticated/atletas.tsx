@@ -299,7 +299,7 @@ function Atletas() {
     }
     setForm({
       ...EMPTY_FORM,
-      gender: importedGenders[0] ?? "",
+      gender: "MASCULINO",
       modality: importedModalities[0] ?? "",
       category: importedCategories[0] ?? "",
       shirt_size: importedSizes[0] ?? "",
@@ -309,11 +309,9 @@ function Atletas() {
     setModalityOther(false);
     setCategoryOther(false);
     setShirtOther(false);
-    setGenderOther(false);
     setCustomModality("");
     setCustomCategory("");
     setCustomShirt("");
-    setCustomGender("");
     setNewOpen(true);
   }
 
