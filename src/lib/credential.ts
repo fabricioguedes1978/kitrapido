@@ -1,9 +1,15 @@
-/** Geração da credencial do atleta (imagem PNG ou PDF) com os dados + QR Code. */
+/** Voucher do atleta (imagem PNG ou PDF) com cabeçalho do evento, dados e QR Code. */
+
+export type CredentialRow = { label: string; value: string };
 
 export type CredentialData = {
   eventName: string;
+  /** Linhas do cabeçalho verde (local e horário de largada), em caixa alta. */
+  headerLines?: string[];
   name: string;
-  rows: { label: string; value: string }[];
+  rows: CredentialRow[];
+  /** Bloco separado com o local da retirada do kit. */
+  pickup?: { title?: string; lines: CredentialRow[] };
   footer?: string;
 };
 
@@ -24,69 +30,165 @@ async function svgToImage(svg: SVGElement, size: number) {
   return img;
 }
 
+function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let line = "";
+  for (const w of words) {
+    const test = line ? `${line} ${w}` : w;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = w;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/** Ícone de localização (pin) desenhado no canvas. */
+function pin(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+  const r = size / 2;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x + r, y + r, r, Math.PI, 0, false);
+  ctx.lineTo(x + r, y + size * 1.35);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(x + r, y + r, r * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+const GREEN = "#0f7b3f";
+const INK = "#111827";
+const MUTED = "#6b7280";
+
 export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElement) {
   const W = 900;
-  // Altura dinâmica: cresce conforme a quantidade de linhas de dados
-  const qrSize = 420;
-  const dataStart = 300;
-  const rowStep = 78;
-  const dataEnd = dataStart + data.rows.length * rowStep;
-  const H = Math.max(1280, dataEnd + 40 + qrSize + 48 + 190);
+  const PAD = 48;
+  const inner = W - PAD * 2;
+  const qrSize = 360;
+
+  // Medição prévia para calcular a altura total
+  const probe = document.createElement("canvas").getContext("2d")!;
+  probe.font = "bold 44px Helvetica, Arial, sans-serif";
+  const titleLines = wrap(probe, data.eventName.toUpperCase(), inner);
+  const headerLines = data.headerLines?.filter(Boolean).map((l) => l.toUpperCase()) ?? [];
+  const headerH = 40 + titleLines.length * 52 + headerLines.length * 34 + 36;
+
+  const cols = 2;
+  const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
+  const pickupLines = data.pickup?.lines.filter((l) => l.value) ?? [];
+  const pickupH = pickupLines.length ? 36 + 46 + pickupLines.length * 62 + 28 : 0;
+
+  const H =
+    headerH + 46 + 62 + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
+
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d")!;
-
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, W, H);
 
-  // Faixa superior verde Kit Rápido
-  ctx.fillStyle = "#0f7b3f";
-  ctx.fillRect(0, 0, W, 150);
+  /* ----- Cabeçalho verde, centralizado, caixa alta e negrito ----- */
+  ctx.fillStyle = GREEN;
+  ctx.fillRect(0, 0, W, headerH);
+  ctx.textAlign = "center";
+  let y = 40;
   ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 44px Helvetica, Arial, sans-serif";
+  for (const line of titleLines) {
+    y += 46;
+    ctx.fillText(line, W / 2, y);
+  }
+  ctx.font = "bold 26px Helvetica, Arial, sans-serif";
+  for (const line of headerLines) {
+    y += 34;
+    ctx.fillText(line, W / 2, y);
+  }
+  ctx.textAlign = "left";
+
+  /* ----- Dados do atleta ----- */
+  let cursor = headerH + 46;
+  ctx.fillStyle = GREEN;
+  ctx.font = "bold 20px Helvetica, Arial, sans-serif";
+  ctx.fillText("DADOS DO ATLETA", PAD, cursor);
+  cursor += 44;
+  ctx.fillStyle = INK;
   ctx.font = "bold 40px Helvetica, Arial, sans-serif";
-  ctx.fillText("KIT RÁPIDO", 48, 70);
-  ctx.font = "24px Helvetica, Arial, sans-serif";
-  ctx.fillText(data.eventName.slice(0, 46), 48, 110);
+  ctx.fillText(wrap(ctx, data.name.toUpperCase(), inner)[0] ?? "", PAD, cursor);
+  cursor += 26;
 
-  // Nome do atleta
-  ctx.fillStyle = "#111827";
-  ctx.font = "bold 46px Helvetica, Arial, sans-serif";
-  ctx.fillText(data.name.slice(0, 30), 48, 230);
-
-  // Dados (duas colunas quando houver muitas linhas)
-  const twoCol = data.rows.length > 6;
-  const colW = (W - 96) / 2;
+  const colW = inner / cols;
   data.rows.forEach((row, i) => {
-    const col = twoCol ? i % 2 : 0;
-    const idx = twoCol ? Math.floor(i / 2) : i;
-    const x = 48 + col * colW;
-    const yy = dataStart + idx * rowStep;
-    ctx.fillStyle = "#6b7280";
-    ctx.font = "20px Helvetica, Arial, sans-serif";
+    const col = i % cols;
+    const idx = Math.floor(i / cols);
+    const x = PAD + col * colW;
+    const yy = cursor + idx * 74 + 34;
+    ctx.fillStyle = MUTED;
+    ctx.font = "19px Helvetica, Arial, sans-serif";
     ctx.fillText(row.label.toUpperCase(), x, yy);
-    ctx.fillStyle = "#111827";
+    ctx.fillStyle = INK;
     ctx.font = "bold 26px Helvetica, Arial, sans-serif";
-    ctx.fillText(row.value.slice(0, 34), x, yy + 34);
+    ctx.fillText((wrap(ctx, row.value, colW - 16)[0] ?? row.value).slice(0, 34), x, yy + 32);
   });
+  cursor += dataRowsH + 34;
 
-  // QR Code
+  /* ----- Local da retirada do kit ----- */
+  if (pickupLines.length) {
+    ctx.strokeStyle = "#d1d5db";
+    ctx.lineWidth = 2;
+    roundRect(ctx, PAD, cursor, inner, pickupH, 18);
+    ctx.stroke();
+    ctx.fillStyle = "#f0fdf4";
+    ctx.fill();
+
+    pin(ctx, PAD + 26, cursor + 26, 30, GREEN);
+    ctx.fillStyle = GREEN;
+    ctx.font = "bold 24px Helvetica, Arial, sans-serif";
+    ctx.fillText((data.pickup?.title ?? "LOCAL DA RETIRADA DO KIT").toUpperCase(), PAD + 76, cursor + 52);
+
+    let py = cursor + 86;
+    for (const line of pickupLines) {
+      ctx.fillStyle = MUTED;
+      ctx.font = "18px Helvetica, Arial, sans-serif";
+      ctx.fillText(line.label.toUpperCase(), PAD + 26, py + 18);
+      ctx.fillStyle = INK;
+      ctx.font = "bold 24px Helvetica, Arial, sans-serif";
+      ctx.fillText((wrap(ctx, line.value, inner - 60)[0] ?? line.value).slice(0, 52), PAD + 26, py + 48);
+      py += 62;
+    }
+    cursor += pickupH + 34;
+  }
+
+  /* ----- QR Code ----- */
   const img = await svgToImage(qrSvg, qrSize);
   const qrX = (W - qrSize) / 2;
-  const qrY = H - qrSize - 170;
   ctx.strokeStyle = "#e5e7eb";
   ctx.lineWidth = 2;
-  ctx.strokeRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48);
-  ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+  roundRect(ctx, qrX - 20, cursor - 20, qrSize + 40, qrSize + 40, 16);
+  ctx.stroke();
+  ctx.drawImage(img, qrX, cursor, qrSize, qrSize);
+  cursor += qrSize + 62;
 
   ctx.fillStyle = "#374151";
-  ctx.font = "22px Helvetica, Arial, sans-serif";
+  ctx.font = "bold 22px Helvetica, Arial, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(
-    data.footer ?? "Apresente este QR Code na retirada do kit",
-    W / 2,
-    H - 100,
-  );
+  ctx.fillText(data.footer ?? "Apresente este QR Code na retirada do kit", W / 2, cursor);
   ctx.textAlign = "left";
 
   return canvas;
