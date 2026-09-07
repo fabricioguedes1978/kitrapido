@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, FileDown, Image as ImageIcon, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { athleteQrUrl, formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatDate, formatDateTime } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
@@ -41,7 +41,21 @@ type KitInfo = {
   kit_type: string | null;
   kit_status: string;
   city: string | null;
+  birth_date: string | null;
+  gender: string | null;
+  payment_status: string | null;
   event_name: string;
+  event_date: string | null;
+  event_time: string | null;
+  event_city: string | null;
+  event_state: string | null;
+  event_address: string | null;
+  start_location: string | null;
+  pickup_address: string | null;
+  pickup_city: string | null;
+  pickup_days: string | null;
+  pickup_start_time: string | null;
+  pickup_end_time: string | null;
   delivered_at: string | null;
   qr_payload: string;
   custom_labels: string[] | null;
@@ -71,14 +85,46 @@ function MeuKit() {
   const eventIdFromPayload = result?.qr_payload?.split(":")[1] ?? "";
   const scanUrl = result ? athleteQrUrl(eventIdFromPayload, result.athlete_id) : "";
 
+  const hm = (v?: string | null) => (v ? v.slice(0, 5) : "");
+  const startLine = result
+    ? [
+        result.start_location || result.event_address,
+        result.event_city ? `${result.event_city}${result.event_state ? `/${result.event_state}` : ""}` : null,
+      ]
+        .filter(Boolean)
+        .join(" — ")
+    : "";
+  const startTime = result
+    ? [
+        result.event_date ? formatDate(result.event_date) : null,
+        hm(result.event_time) ? `LARGADA ${hm(result.event_time)}` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : "";
+  const pickupHours = result
+    ? hm(result.pickup_start_time) && hm(result.pickup_end_time)
+      ? `${hm(result.pickup_start_time)} às ${hm(result.pickup_end_time)}`
+      : hm(result.pickup_start_time)
+    : "";
+  const pickupLines = result
+    ? [
+        { label: "Endereço", value: result.pickup_address || "" },
+        { label: "Cidade", value: result.pickup_city || "" },
+        { label: "Dias", value: result.pickup_days || "" },
+        { label: "Horário", value: pickupHours },
+      ].filter((l) => l.value)
+    : [];
+
   async function saveCredential(kind: "png" | "pdf") {
     const svg = qrRef.current?.querySelector("svg");
     if (!result || !svg) return;
     const data = {
       eventName: result.event_name,
+      headerLines: [startLine, startTime].filter(Boolean),
       name: result.name,
       rows: [
-        { label: "Nº de peito", value: result.bib_number || "—" },
+        { label: "Número", value: result.bib_number || "—" },
         { label: "Modalidade", value: result.modality || "—" },
         { label: "Camiseta", value: result.shirt_size || "—" },
         { label: "Kit", value: result.kit_type || "—" },
@@ -87,11 +133,10 @@ function MeuKit() {
           value: f.value,
         })),
       ],
-      footer: delivered
-        ? "Kit já retirado"
-        : "Apresente este QR Code na retirada do kit",
+      pickup: pickupLines.length ? { title: "Local da retirada do kit", lines: pickupLines } : undefined,
+      footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",
     };
-    const base = `credencial-${result.name.toLowerCase().replace(/\s+/g, "-")}`;
+    const base = `voucher-${result.name.toLowerCase().replace(/\s+/g, "-")}`;
     try {
       if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
       else await downloadCredentialPdf(data, svg, `${base}.pdf`);
@@ -148,10 +193,17 @@ function MeuKit() {
                 </div>
               )}
 
+              <div className="bg-primary text-primary-foreground -mx-6 -mt-6 rounded-t-xl px-5 py-6 text-center">
+                <p className="text-xl font-extrabold tracking-wide uppercase">{result.event_name}</p>
+                {startLine && <p className="mt-1 text-sm font-bold uppercase">{startLine}</p>}
+                {startTime && <p className="mt-0.5 text-sm font-bold uppercase">{startTime}</p>}
+              </div>
+
               <div>
-                <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
-                <p className="text-xl font-bold">{result.name}</p>
-                <p className="text-muted-foreground text-sm">{result.event_name}</p>
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Dados do atleta
+                </p>
+                <p className="text-2xl font-extrabold uppercase">{result.name}</p>
               </div>
 
               <dl className="grid grid-cols-2 gap-3 text-sm">
@@ -165,6 +217,19 @@ function MeuKit() {
                   <Field key={f.label} label={f.label} value={f.value} />
                 ))}
               </dl>
+
+              {pickupLines.length > 0 && (
+                <div className="bg-primary/5 border-primary/20 space-y-2 rounded-xl border p-4">
+                  <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
+                    <MapPin className="size-5" /> Local da retirada do kit
+                  </p>
+                  <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                    {pickupLines.map((l) => (
+                      <Field key={l.label} label={l.label} value={l.value} />
+                    ))}
+                  </dl>
+                </div>
+              )}
 
               <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
                 <div ref={qrRef}>
