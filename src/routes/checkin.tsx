@@ -45,12 +45,23 @@ type KitRow = {
   kit_type: string | null;
   kit_status: string;
   city: string | null;
+  birth_date: string | null;
+  gender: string | null;
+  payment_status: string | null;
   event_id: string;
   event_name: string;
   event_slug: string;
   event_date: string | null;
+  event_time: string | null;
   event_city: string | null;
   event_state: string | null;
+  event_address: string | null;
+  start_location: string | null;
+  pickup_address: string | null;
+  pickup_city: string | null;
+  pickup_days: string | null;
+  pickup_start_time: string | null;
+  pickup_end_time: string | null;
   delivered_at: string | null;
   qr_payload: string;
   custom_labels: string[] | null;
@@ -129,37 +140,69 @@ function Checkin() {
   );
 }
 
+function hm(v?: string | null) {
+  return v ? v.slice(0, 5) : "";
+}
+
+function genderLabel(v?: string | null) {
+  const g = (v ?? "").trim().toUpperCase();
+  if (g.startsWith("M")) return "Masculino";
+  if (g.startsWith("F")) return "Feminino";
+  return v || "—";
+}
+
 function KitCard({ row, index, total }: { row: KitRow; index: number; total: number }) {
   const qrRef = useRef<HTMLDivElement>(null);
   const delivered = row.kit_status !== "pending" && row.kit_status !== "blocked";
   const scanUrl = athleteQrUrl(row.event_id, row.athlete_id);
   const extras = customFields(row.custom_labels, row.custom_values ?? []);
 
+  const paid = (row.payment_status ?? "pago").trim().toLowerCase();
+  const isPaid = paid === "pago" || paid === "paid";
+  const startLine = [row.start_location || row.event_address, row.event_city ? `${row.event_city}${row.event_state ? `/${row.event_state}` : ""}` : null]
+    .filter(Boolean)
+    .join(" — ");
+  const startTime = [row.event_date ? formatDate(row.event_date) : null, hm(row.event_time) ? `LARGADA ${hm(row.event_time)}` : null]
+    .filter(Boolean)
+    .join(" · ");
+  const pickupHours =
+    hm(row.pickup_start_time) && hm(row.pickup_end_time)
+      ? `${hm(row.pickup_start_time)} às ${hm(row.pickup_end_time)}`
+      : hm(row.pickup_start_time) || "";
+  const pickupLines = [
+    { label: "Endereço", value: row.pickup_address || "" },
+    { label: "Cidade", value: row.pickup_city || "" },
+    { label: "Dias", value: row.pickup_days || "" },
+    { label: "Horário", value: pickupHours },
+  ].filter((l) => l.value);
+
+  const athleteRows = [
+    { label: "Número", value: row.bib_number || "—" },
+    { label: "Nascimento", value: row.birth_date ? formatDate(row.birth_date) : "—" },
+    { label: "Sexo", value: genderLabel(row.gender) },
+    { label: "Status", value: isPaid ? "PAGO" : "PENDENTE PAGAMENTO" },
+    { label: "Kit", value: row.kit_type || "—" },
+    { label: "Camiseta", value: row.shirt_size || "—" },
+    { label: "Modalidade", value: row.modality || "—" },
+    { label: "Categoria", value: row.category || "—" },
+    ...extras.map((f) => ({ label: f.label, value: f.value })),
+  ];
+
   async function saveCredential(kind: "png" | "pdf") {
     const svg = qrRef.current?.querySelector("svg");
     if (!svg) return;
     const data = {
       eventName: row.event_name,
+      headerLines: [startLine, startTime].filter(Boolean),
       name: row.name,
-      rows: [
-        { label: "Data", value: row.event_date ? formatDate(row.event_date) : "—" },
-        {
-          label: "Local",
-          value: row.event_city ? `${row.event_city}${row.event_state ? `/${row.event_state}` : ""}` : "—",
-        },
-        { label: "Status", value: delivered ? `Kit retirado ${formatDateTime(row.delivered_at)}` : "Kit disponível para retirada" },
-        { label: "Nº de peito", value: row.bib_number || "—" },
-        { label: "Kit", value: row.kit_type || "—" },
-        { label: "Camiseta", value: row.shirt_size || "—" },
-        { label: "Modalidade", value: row.modality || "—" },
-        { label: "Categoria", value: row.category || "—" },
-        { label: "Cidade", value: row.city || "—" },
-        ...extras.map((f) => ({ label: f.label, value: f.value })),
-      ],
-      footer: delivered ? "Kit já retirado" : "Apresente este QR Code na retirada do kit",
+      rows: athleteRows,
+      pickup: pickupLines.length ? { title: "Local da retirada do kit", lines: pickupLines } : undefined,
+      footer: delivered
+        ? `KIT RETIRADO EM ${formatDateTime(row.delivered_at)}`
+        : "Apresente este QR Code na retirada do kit",
     };
     const safeEvent = row.event_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const base = `credencial-${row.name.toLowerCase().replace(/\s+/g, "-")}${safeEvent ? `-${safeEvent}` : ""}${total > 1 ? `-${index + 1}` : ""}`;
+    const base = `voucher-${row.name.toLowerCase().replace(/\s+/g, "-")}${safeEvent ? `-${safeEvent}` : ""}${total > 1 ? `-${index + 1}` : ""}`;
     try {
       if (kind === "png") await downloadCredentialPng(data, svg, `${base}.png`);
       else await downloadCredentialPdf(data, svg, `${base}.pdf`);
@@ -170,57 +213,67 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
 
   return (
     <Card className="shadow-card">
-      <CardContent className="space-y-5 pt-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xl font-bold">{row.event_name}</p>
-            <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              {row.event_date && (
-                <span className="inline-flex items-center gap-1">
-                  <CalendarDays className="size-4" /> {formatDate(row.event_date)}
-                </span>
-              )}
-              {row.event_city && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="size-4" /> {row.event_city}
-                  {row.event_state ? `/${row.event_state}` : ""}
-                </span>
-              )}
-            </div>
-          </div>
+      <CardContent className="space-y-5 p-0 pb-6">
+        <div className="bg-primary text-primary-foreground relative rounded-t-xl px-5 py-6 text-center">
           {total > 1 && (
-            <span className="bg-primary/10 text-primary shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+            <span className="bg-primary-foreground/20 absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-bold">
               {index + 1}/{total}
             </span>
           )}
+          <p className="text-xl font-extrabold tracking-wide uppercase sm:text-2xl">{row.event_name}</p>
+          {startLine && <p className="mt-1 text-sm font-bold uppercase">{startLine}</p>}
+          {startTime && <p className="mt-0.5 text-sm font-bold uppercase">{startTime}</p>}
         </div>
 
-        {delivered ? (
-          <div className="border-success/30 bg-success/12 text-success flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
-            <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
-          </div>
-        ) : (
-          <div className="border-primary/30 bg-primary/10 text-primary flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
-            <Ticket className="size-5" /> Kit disponível para retirada
-          </div>
-        )}
+        <div className="space-y-5 px-5">
+          {delivered ? (
+            <div className="border-success/30 bg-success/12 text-success flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
+              <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
+            </div>
+          ) : (
+            <div className="border-primary/30 bg-primary/10 text-primary flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
+              <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
+            </div>
+          )}
 
-        <div>
-          <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
-          <p className="text-2xl font-extrabold">{row.name}</p>
-        </div>
+          <div>
+            <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Dados do atleta
+            </p>
+            <p className="text-2xl font-extrabold uppercase">{row.name}</p>
+          </div>
 
-        <dl className="grid grid-cols-2 gap-3 text-sm">
-          <Field label="Nº de peito" value={row.bib_number} strong />
-          <Field label="Kit" value={row.kit_type} strong />
-          <Field label="Camiseta" value={row.shirt_size} strong />
-          <Field label="Modalidade" value={row.modality} />
-          <Field label="Categoria" value={row.category} />
-          <Field label="Cidade" value={row.city} />
-          {extras.map((f) => (
-            <Field key={f.label} label={f.label} value={f.value} />
-          ))}
-        </dl>
+          <dl className="grid grid-cols-2 gap-3 text-sm">
+            <Field label="Número" value={row.bib_number} strong />
+            <Field label="Nascimento" value={row.birth_date ? formatDate(row.birth_date) : null} />
+            <Field label="Sexo" value={genderLabel(row.gender)} />
+            <div className="min-w-0">
+              <dt className="text-muted-foreground text-xs tracking-wide uppercase">Status</dt>
+              <dd className={`font-extrabold uppercase ${isPaid ? "text-success" : "text-destructive"}`}>
+                {isPaid ? "PAGO" : "PENDENTE PAGAMENTO"}
+              </dd>
+            </div>
+            <Field label="Kit" value={row.kit_type} strong />
+            <Field label="Camiseta" value={row.shirt_size} strong />
+            <Field label="Modalidade" value={row.modality} />
+            <Field label="Categoria" value={row.category} />
+            {extras.map((f) => (
+              <Field key={f.label} label={f.label} value={f.value} />
+            ))}
+          </dl>
+
+          {pickupLines.length > 0 && (
+            <div className="bg-primary/5 border-primary/20 space-y-2 rounded-xl border p-4">
+              <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
+                <MapPin className="size-5" /> Local da retirada do kit
+              </p>
+              <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                {pickupLines.map((l) => (
+                  <Field key={l.label} label={l.label} value={l.value} />
+                ))}
+              </dl>
+            </div>
+          )}
 
         <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
           <div ref={qrRef}>
@@ -237,6 +290,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
               <FileDown className="size-4" /> Salvar PDF
             </Button>
           </div>
+        </div>
         </div>
       </CardContent>
     </Card>
