@@ -200,6 +200,9 @@ function Atletas() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
+  const [customModality, setCustomModality] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
+
 
 
   const { data: athletes = [], isLoading } = useQuery({
