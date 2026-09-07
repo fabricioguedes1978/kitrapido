@@ -1017,18 +1017,43 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Camiseta</Label>
-                <Input
-                  list="shirt-size-suggestions"
-                  placeholder="Digite o tamanho (ex: M, G, 42)"
-                  value={form.shirt_size}
-                  onChange={(e) => setForm({ ...form, shirt_size: e.target.value.toUpperCase() })}
-                />
-                <datalist id="shirt-size-suggestions">
+                <select
+                  value={shirtOther ? "__other__" : form.shirt_size}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setShirtOther(true);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: "" });
+                    } else {
+                      setShirtOther(false);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedSizes.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {shirtOther && (
+                  <Input
+                    placeholder="Digite o tamanho (ex: M, G, 42)"
+                    value={customShirt}
+                    onChange={(e) => {
+                      const upper = e.target.value.toUpperCase();
+                      setCustomShirt(upper);
+                      setForm({ ...form, shirt_size: upper });
+                    }}
+                  />
+                )}
               </div>
+
 
               <div className="space-y-1.5">
                 <Label>Kit</Label>
