@@ -101,19 +101,17 @@ function MeuKit() {
         .filter(Boolean)
         .join(" · ")
     : "";
-  const pickupHours = result
-    ? hm(result.pickup_start_time) && hm(result.pickup_end_time)
-      ? `${hm(result.pickup_start_time)} às ${hm(result.pickup_end_time)}`
-      : hm(result.pickup_start_time)
-    : "";
   const pickupLines = result
     ? [
         { label: "Endereço", value: result.pickup_address || "" },
         { label: "Cidade", value: result.pickup_city || "" },
-        { label: "Dias", value: result.pickup_days || "" },
-        { label: "Horário", value: pickupHours },
+        { label: "Informações", value: result.pickup_info || "" },
       ].filter((l) => l.value)
     : [];
+  const mapsHref = result
+    ? mapsUrl(result.pickup_maps_url, result.pickup_address, result.pickup_city)
+    : "";
+
 
   async function saveCredential(kind: "png" | "pdf") {
     const svg = qrRef.current?.querySelector("svg");
