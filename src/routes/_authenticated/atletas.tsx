@@ -202,8 +202,11 @@ function Atletas() {
   const [dupWarning, setDupWarning] = useState<string | null>(null);
   const [modalityOther, setModalityOther] = useState(false);
   const [categoryOther, setCategoryOther] = useState(false);
+  const [shirtOther, setShirtOther] = useState(false);
   const [customModality, setCustomModality] = useState("");
   const [customCategory, setCustomCategory] = useState("");
+  const [customShirt, setCustomShirt] = useState("");
+
 
 
 
