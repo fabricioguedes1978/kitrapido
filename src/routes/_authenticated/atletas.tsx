@@ -218,7 +218,7 @@ function Atletas() {
     },
   });
 
-  /** Tamanhos vindos da planilha/cadastros deste evento. */
+  /** Tamanhos já usados neste evento (sugestões, mas livre para digitar). */
   const importedSizes = useMemo(() => {
     const set = new Set<string>();
     for (const a of athletes) {
@@ -227,11 +227,6 @@ function Atletas() {
     }
     return [...set].sort();
   }, [athletes]);
-
-  const registeredSizes = useMemo(
-    () => SHIRT_SIZES.filter((s) => !importedSizes.includes(s)),
-    [importedSizes],
-  );
 
 
   const filtered = useMemo(() => {
