@@ -293,7 +293,12 @@ function Atletas() {
       });
       return;
     }
-    setForm({ ...EMPTY_FORM });
+    setForm({
+      ...EMPTY_FORM,
+      modality: importedModalities[0] ?? "",
+      category: importedCategories[0] ?? "",
+      shirt_size: importedSizes[0] ?? "",
+    });
     setEditingId(null);
     setDupWarning(null);
     setModalityOther(false);
