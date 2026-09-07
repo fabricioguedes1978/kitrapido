@@ -158,3 +158,14 @@ export function downloadBlob(content: BlobPart, filename: string, type: string) 
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export function mapsUrl(
+  custom?: string | null,
+  address?: string | null,
+  city?: string | null,
+): string {
+  const link = (custom ?? "").trim();
+  if (link) return /^https?:\/\//i.test(link) ? link : `https://${link}`;
+  const q = [address, city].filter(Boolean).join(", ").trim();
+  return q ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}` : "";
+}

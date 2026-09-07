@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Navigation, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { athleteQrUrl, formatDate, formatDateTime } from "@/lib/cronochip";
+import { athleteQrUrl, formatDate, formatDateTime, mapsUrl } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
@@ -53,9 +53,8 @@ type KitInfo = {
   start_location: string | null;
   pickup_address: string | null;
   pickup_city: string | null;
-  pickup_days: string | null;
-  pickup_start_time: string | null;
-  pickup_end_time: string | null;
+  pickup_info: string | null;
+  pickup_maps_url: string | null;
   delivered_at: string | null;
   qr_payload: string;
   custom_labels: string[] | null;
@@ -102,19 +101,17 @@ function MeuKit() {
         .filter(Boolean)
         .join(" · ")
     : "";
-  const pickupHours = result
-    ? hm(result.pickup_start_time) && hm(result.pickup_end_time)
-      ? `${hm(result.pickup_start_time)} às ${hm(result.pickup_end_time)}`
-      : hm(result.pickup_start_time)
-    : "";
   const pickupLines = result
     ? [
         { label: "Endereço", value: result.pickup_address || "" },
         { label: "Cidade", value: result.pickup_city || "" },
-        { label: "Dias", value: result.pickup_days || "" },
-        { label: "Horário", value: pickupHours },
+        { label: "Informações", value: result.pickup_info || "" },
       ].filter((l) => l.value)
     : [];
+  const mapsHref = result
+    ? mapsUrl(result.pickup_maps_url, result.pickup_address, result.pickup_city)
+    : "";
+
 
   async function saveCredential(kind: "png" | "pdf") {
     const svg = qrRef.current?.querySelector("svg");
@@ -218,8 +215,8 @@ function MeuKit() {
                 ))}
               </dl>
 
-              {pickupLines.length > 0 && (
-                <div className="bg-primary/5 border-primary/20 space-y-2 rounded-xl border p-4">
+              {(pickupLines.length > 0 || mapsHref) && (
+                <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
                   <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
                     <MapPin className="size-5" /> Local da retirada do kit
                   </p>
@@ -228,8 +225,16 @@ function MeuKit() {
                       <Field key={l.label} label={l.label} value={l.value} />
                     ))}
                   </dl>
+                  {mapsHref && (
+                    <Button asChild className="w-full" size="lg">
+                      <a href={mapsHref} target="_blank" rel="noreferrer">
+                        <Navigation className="size-4" /> Como chegar
+                      </a>
+                    </Button>
+                  )}
                 </div>
               )}
+
 
               <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
                 <div ref={qrRef}>

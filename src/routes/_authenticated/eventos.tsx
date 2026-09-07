@@ -60,9 +60,8 @@ const EMPTY = {
   start_location: "",
   pickup_address: "",
   pickup_city: "",
-  pickup_days: "",
-  pickup_start_time: "",
-  pickup_end_time: "",
+  pickup_info: "",
+  pickup_maps_url: "",
   description: "",
   modalities: "",
   archived: false,
@@ -172,9 +171,8 @@ function Eventos() {
       start_location: e.start_location ?? "",
       pickup_address: e.pickup_address ?? "",
       pickup_city: e.pickup_city ?? "",
-      pickup_days: e.pickup_days ?? "",
-      pickup_start_time: e.pickup_start_time?.slice(0, 5) ?? "",
-      pickup_end_time: e.pickup_end_time?.slice(0, 5) ?? "",
+      pickup_info: e.pickup_info ?? "",
+      pickup_maps_url: e.pickup_maps_url ?? "",
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       archived: !!e.archived,
@@ -199,9 +197,8 @@ function Eventos() {
       start_location: form.start_location || null,
       pickup_address: form.pickup_address || null,
       pickup_city: form.pickup_city || null,
-      pickup_days: form.pickup_days || null,
-      pickup_start_time: form.pickup_start_time || null,
-      pickup_end_time: form.pickup_end_time || null,
+      pickup_info: form.pickup_info || null,
+      pickup_maps_url: form.pickup_maps_url || null,
       description: form.description || null,
       modalities: form.modalities
         .split(",")
@@ -366,17 +363,11 @@ function Eventos() {
               <Detail label="Endereço">{viewing.address || "—"}</Detail>
               <Detail label="Local de largada">{viewing.start_location || "—"}</Detail>
               <Detail label="Retirada do kit" full>
-                {[
-                  viewing.pickup_address,
-                  viewing.pickup_city,
-                  viewing.pickup_days,
-                  viewing.pickup_start_time && viewing.pickup_end_time
-                    ? `${viewing.pickup_start_time.slice(0, 5)} às ${viewing.pickup_end_time.slice(0, 5)}`
-                    : null,
-                ]
+                {[viewing.pickup_address, viewing.pickup_city, viewing.pickup_info]
                   .filter(Boolean)
                   .join(" · ") || "—"}
               </Detail>
+
               <Detail label="Modalidades">
                 {viewing.modalities?.length ? viewing.modalities.join(", ") : "—"}
               </Detail>
@@ -505,30 +496,26 @@ function Eventos() {
                   onChange={(e) => setForm({ ...form, pickup_city: e.target.value })}
                 />
               </Field>
-              <Field label="Dias da retirada">
-                <Input
-                  placeholder="Ex.: 12 e 13 de setembro"
-                  value={form.pickup_days}
-                  onChange={(e) => setForm({ ...form, pickup_days: e.target.value })}
+              <Field label="Dias, horários e orientações">
+                <Textarea
+                  rows={4}
+                  placeholder="Ex.: 12 e 13 de setembro, das 10h às 20h. Levar documento com foto."
+                  value={form.pickup_info}
+                  onChange={(e) => setForm({ ...form, pickup_info: e.target.value })}
                 />
               </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Início">
-                  <Input
-                    type="time"
-                    value={form.pickup_start_time}
-                    onChange={(e) => setForm({ ...form, pickup_start_time: e.target.value })}
-                  />
-                </Field>
-                <Field label="Término">
-                  <Input
-                    type="time"
-                    value={form.pickup_end_time}
-                    onChange={(e) => setForm({ ...form, pickup_end_time: e.target.value })}
-                  />
-                </Field>
-              </div>
+              <Field label="Link da localização (Google Maps)">
+                <Input
+                  placeholder="Cole aqui o link do Google Maps (opcional)"
+                  value={form.pickup_maps_url}
+                  onChange={(e) => setForm({ ...form, pickup_maps_url: e.target.value })}
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Se ficar vazio, o botão "Como chegar" usa o endereço informado acima.
+                </p>
+              </Field>
             </div>
+
             <Field label="Modalidades (separadas por vírgula)">
               <Input
                 placeholder="5km, 10km, 21km"

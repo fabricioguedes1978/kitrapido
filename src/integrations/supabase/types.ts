@@ -299,9 +299,8 @@ export type Database = {
           name: string
           pickup_address: string | null
           pickup_city: string | null
-          pickup_days: string | null
-          pickup_end_time: string | null
-          pickup_start_time: string | null
+          pickup_info: string | null
+          pickup_maps_url: string | null
           slug: string
           start_location: string | null
           state: string | null
@@ -325,9 +324,8 @@ export type Database = {
           name: string
           pickup_address?: string | null
           pickup_city?: string | null
-          pickup_days?: string | null
-          pickup_end_time?: string | null
-          pickup_start_time?: string | null
+          pickup_info?: string | null
+          pickup_maps_url?: string | null
           slug: string
           start_location?: string | null
           state?: string | null
@@ -351,9 +349,8 @@ export type Database = {
           name?: string
           pickup_address?: string | null
           pickup_city?: string | null
-          pickup_days?: string | null
-          pickup_end_time?: string | null
-          pickup_start_time?: string | null
+          pickup_info?: string | null
+          pickup_maps_url?: string | null
           slug?: string
           start_location?: string | null
           state?: string | null
@@ -649,9 +646,8 @@ export type Database = {
           payment_status: string
           pickup_address: string
           pickup_city: string
-          pickup_days: string
-          pickup_end_time: string
-          pickup_start_time: string
+          pickup_info: string
+          pickup_maps_url: string
           qr_payload: string
           shirt_size: string
           start_location: string
@@ -684,9 +680,8 @@ export type Database = {
           payment_status: string
           pickup_address: string
           pickup_city: string
-          pickup_days: string
-          pickup_end_time: string
-          pickup_start_time: string
+          pickup_info: string
+          pickup_maps_url: string
           qr_payload: string
           shirt_size: string
           start_location: string

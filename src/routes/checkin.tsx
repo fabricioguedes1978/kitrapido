@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Ticket } from "lucide-react";
+import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Navigation, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { athleteQrUrl, formatCPF, formatDate, formatDateTime, isValidCPF } from "@/lib/cronochip";
+import { athleteQrUrl, formatCPF, formatDate, formatDateTime, isValidCPF, mapsUrl } from "@/lib/cronochip";
 import { customFields } from "@/lib/display";
 import { downloadCredentialPdf, downloadCredentialPng } from "@/lib/credential";
 
@@ -59,9 +59,8 @@ type KitRow = {
   start_location: string | null;
   pickup_address: string | null;
   pickup_city: string | null;
-  pickup_days: string | null;
-  pickup_start_time: string | null;
-  pickup_end_time: string | null;
+  pickup_info: string | null;
+  pickup_maps_url: string | null;
   delivered_at: string | null;
   qr_payload: string;
   custom_labels: string[] | null;
@@ -165,16 +164,13 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   const startTime = [row.event_date ? formatDate(row.event_date) : null, hm(row.event_time) ? `LARGADA ${hm(row.event_time)}` : null]
     .filter(Boolean)
     .join(" · ");
-  const pickupHours =
-    hm(row.pickup_start_time) && hm(row.pickup_end_time)
-      ? `${hm(row.pickup_start_time)} às ${hm(row.pickup_end_time)}`
-      : hm(row.pickup_start_time) || "";
   const pickupLines = [
     { label: "Endereço", value: row.pickup_address || "" },
     { label: "Cidade", value: row.pickup_city || "" },
-    { label: "Dias", value: row.pickup_days || "" },
-    { label: "Horário", value: pickupHours },
+    { label: "Informações", value: row.pickup_info || "" },
   ].filter((l) => l.value);
+  const mapsHref = mapsUrl(row.pickup_maps_url, row.pickup_address, row.pickup_city);
+
 
   const athleteRows = [
     { label: "Número", value: row.bib_number || "—" },
@@ -262,8 +258,8 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
             ))}
           </dl>
 
-          {pickupLines.length > 0 && (
-            <div className="bg-primary/5 border-primary/20 space-y-2 rounded-xl border p-4">
+          {(pickupLines.length > 0 || mapsHref) && (
+            <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
               <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
                 <MapPin className="size-5" /> Local da retirada do kit
               </p>
@@ -272,8 +268,16 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
                   <Field key={l.label} label={l.label} value={l.value} />
                 ))}
               </dl>
+              {mapsHref && (
+                <Button asChild className="w-full" size="lg">
+                  <a href={mapsHref} target="_blank" rel="noreferrer">
+                    <Navigation className="size-4" /> Como chegar
+                  </a>
+                </Button>
+              )}
             </div>
           )}
+
 
         <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
           <div ref={qrRef}>
