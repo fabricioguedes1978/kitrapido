@@ -164,10 +164,10 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   const startTime = [row.event_date ? formatDate(row.event_date) : null, hm(row.event_time) ? `LARGADA ${hm(row.event_time)}` : null]
     .filter(Boolean)
     .join(" · ");
+  const pickupInfo = row.pickup_info || "";
   const pickupLines = [
     { label: "Endereço", value: row.pickup_address || "" },
     { label: "Cidade", value: row.pickup_city || "" },
-    { label: "Informações", value: row.pickup_info || "" },
   ].filter((l) => l.value);
   const mapsHref = mapsUrl(row.pickup_maps_url, row.pickup_address, row.pickup_city);
 
@@ -192,7 +192,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
       headerLines: [startLine, startTime].filter(Boolean),
       name: row.name,
       rows: athleteRows,
-      pickup: pickupLines.length ? { title: "Local da retirada do kit", lines: pickupLines } : undefined,
+      pickup: pickupLines.length || pickupInfo ? { title: "Local da retirada do kit", lines: pickupLines, note: pickupInfo } : undefined,
       footer: delivered
         ? `KIT RETIRADO EM ${formatDateTime(row.delivered_at)}`
         : "Apresente este QR Code na retirada do kit",
@@ -258,14 +258,17 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
             ))}
           </dl>
 
-          {(pickupLines.length > 0 || mapsHref) && (
+          {(pickupLines.length > 0 || pickupInfo || mapsHref) && (
             <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
               <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
                 <MapPin className="size-5" /> Local da retirada do kit
               </p>
+              {pickupInfo && (
+                <p className="whitespace-pre-wrap text-sm font-medium">{pickupInfo}</p>
+              )}
               <dl className="grid gap-2 text-sm sm:grid-cols-2">
                 {pickupLines.map((l) => (
-                  <Field key={l.label} label={l.label} value={l.value} preserve={l.label === "Informações"} />
+                  <Field key={l.label} label={l.label} value={l.value} />
                 ))}
               </dl>
               {mapsHref && (

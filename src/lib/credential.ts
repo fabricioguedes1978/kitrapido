@@ -9,7 +9,7 @@ export type CredentialData = {
   name: string;
   rows: CredentialRow[];
   /** Bloco separado com o local da retirada do kit. */
-  pickup?: { title?: string; lines: CredentialRow[] } | undefined;
+  pickup?: { title?: string; lines: CredentialRow[]; note?: string } | undefined;
   footer?: string;
 };
 
@@ -97,9 +97,14 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   const cols = 2;
   const dataRowsH = Math.ceil(data.rows.length / cols) * 74;
   const pickupLines = data.pickup?.lines.filter((l) => l.value) ?? [];
+  const pickupNote = data.pickup?.note?.trim();
   const pickupWrapped = pickupLines.map((l) => wrap(probe, l.value, inner - 60));
+  const noteWrapped = pickupNote ? wrap(probe, pickupNote, inner - 60) : [];
   const pickupTotalLines = pickupWrapped.reduce((sum, lines) => sum + Math.max(lines.length, 1), 0);
-  const pickupH = pickupLines.length ? 36 + 46 + pickupTotalLines * 38 + pickupLines.length * 24 + 28 : 0;
+  const noteTotalLines = noteWrapped.length;
+  const pickupH = (pickupLines.length || noteTotalLines)
+    ? 36 + 46 + pickupTotalLines * 38 + pickupLines.length * 24 + (noteTotalLines ? 18 + noteTotalLines * 32 : 0) + 28
+    : 0;
 
   const H =
     headerH + 46 + 62 + dataRowsH + 34 + (pickupH ? pickupH + 34 : 0) + qrSize + 130;
@@ -156,7 +161,7 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
   cursor += dataRowsH + 34;
 
   /* ----- Local da retirada do kit ----- */
-  if (pickupLines.length) {
+  if (pickupLines.length || noteTotalLines) {
     ctx.strokeStyle = "#d1d5db";
     ctx.lineWidth = 2;
     roundRect(ctx, PAD, cursor, inner, pickupH, 18);
@@ -183,6 +188,16 @@ export async function buildCredentialCanvas(data: CredentialData, qrSvg: SVGElem
       }
       py += 24;
     });
+
+    if (noteTotalLines) {
+      ctx.fillStyle = INK;
+      ctx.font = "bold 22px Helvetica, Arial, sans-serif";
+      for (const textLine of noteWrapped) {
+        ctx.fillText(textLine.slice(0, 80), PAD + 26, py + 32);
+        py += 32;
+      }
+    }
+
     cursor += pickupH + 34;
   }
 
