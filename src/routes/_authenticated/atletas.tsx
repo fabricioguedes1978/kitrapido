@@ -257,14 +257,7 @@ function Atletas() {
     return [...set].sort();
   }, [athletes]);
 
-  const importedGenders = useMemo(() => {
-    const set = new Set<string>();
-    for (const a of athletes) {
-      const s = (a.gender ?? "").trim();
-      if (s) set.add(s);
-    }
-    return [...set].sort();
-  }, [athletes]);
+  // Sexo fixo: MASCULINO / FEMININO
 
 
 
