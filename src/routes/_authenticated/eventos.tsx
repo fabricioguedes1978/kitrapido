@@ -57,6 +57,12 @@ const EMPTY = {
   city: "",
   state: "",
   address: "",
+  start_location: "",
+  pickup_address: "",
+  pickup_city: "",
+  pickup_days: "",
+  pickup_start_time: "",
+  pickup_end_time: "",
   description: "",
   modalities: "",
   archived: false,
@@ -163,6 +169,12 @@ function Eventos() {
       city: e.city ?? "",
       state: e.state ?? "",
       address: e.address ?? "",
+      start_location: e.start_location ?? "",
+      pickup_address: e.pickup_address ?? "",
+      pickup_city: e.pickup_city ?? "",
+      pickup_days: e.pickup_days ?? "",
+      pickup_start_time: e.pickup_start_time?.slice(0, 5) ?? "",
+      pickup_end_time: e.pickup_end_time?.slice(0, 5) ?? "",
       description: e.description ?? "",
       modalities: (e.modalities ?? []).join(", "),
       archived: !!e.archived,
@@ -184,6 +196,12 @@ function Eventos() {
       city: form.city || null,
       state: form.state || null,
       address: form.address || null,
+      start_location: form.start_location || null,
+      pickup_address: form.pickup_address || null,
+      pickup_city: form.pickup_city || null,
+      pickup_days: form.pickup_days || null,
+      pickup_start_time: form.pickup_start_time || null,
+      pickup_end_time: form.pickup_end_time || null,
       description: form.description || null,
       modalities: form.modalities
         .split(",")
@@ -346,6 +364,19 @@ function Eventos() {
                 {[viewing.city, viewing.state].filter(Boolean).join("/") || "—"}
               </Detail>
               <Detail label="Endereço">{viewing.address || "—"}</Detail>
+              <Detail label="Local de largada">{viewing.start_location || "—"}</Detail>
+              <Detail label="Retirada do kit" full>
+                {[
+                  viewing.pickup_address,
+                  viewing.pickup_city,
+                  viewing.pickup_days,
+                  viewing.pickup_start_time && viewing.pickup_end_time
+                    ? `${viewing.pickup_start_time.slice(0, 5)} às ${viewing.pickup_end_time.slice(0, 5)}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "—"}
+              </Detail>
               <Detail label="Modalidades">
                 {viewing.modalities?.length ? viewing.modalities.join(", ") : "—"}
               </Detail>
@@ -449,6 +480,55 @@ function Eventos() {
             <Field label="Endereço">
               <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             </Field>
+            <Field label="Local de largada">
+              <Input
+                placeholder="Ex.: Praça da Liberdade"
+                value={form.start_location}
+                onChange={(e) => setForm({ ...form, start_location: e.target.value })}
+              />
+            </Field>
+
+            <div className="space-y-3 rounded-lg border p-3">
+              <p className="text-sm font-semibold">Local da retirada do kit</p>
+              <p className="text-muted-foreground text-xs">
+                Estes dados aparecem no voucher do atleta.
+              </p>
+              <Field label="Endereço da retirada">
+                <Input
+                  value={form.pickup_address}
+                  onChange={(e) => setForm({ ...form, pickup_address: e.target.value })}
+                />
+              </Field>
+              <Field label="Cidade da retirada">
+                <Input
+                  value={form.pickup_city}
+                  onChange={(e) => setForm({ ...form, pickup_city: e.target.value })}
+                />
+              </Field>
+              <Field label="Dias da retirada">
+                <Input
+                  placeholder="Ex.: 12 e 13 de setembro"
+                  value={form.pickup_days}
+                  onChange={(e) => setForm({ ...form, pickup_days: e.target.value })}
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Início">
+                  <Input
+                    type="time"
+                    value={form.pickup_start_time}
+                    onChange={(e) => setForm({ ...form, pickup_start_time: e.target.value })}
+                  />
+                </Field>
+                <Field label="Término">
+                  <Input
+                    type="time"
+                    value={form.pickup_end_time}
+                    onChange={(e) => setForm({ ...form, pickup_end_time: e.target.value })}
+                  />
+                </Field>
+              </div>
+            </div>
             <Field label="Modalidades (separadas por vírgula)">
               <Input
                 placeholder="5km, 10km, 21km"

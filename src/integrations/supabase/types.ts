@@ -297,7 +297,13 @@ export type Database = {
           logo_url: string | null
           modalities: string[]
           name: string
+          pickup_address: string | null
+          pickup_city: string | null
+          pickup_days: string | null
+          pickup_end_time: string | null
+          pickup_start_time: string | null
           slug: string
+          start_location: string | null
           state: string | null
           status: Database["public"]["Enums"]["event_status"]
         }
@@ -317,7 +323,13 @@ export type Database = {
           logo_url?: string | null
           modalities?: string[]
           name: string
+          pickup_address?: string | null
+          pickup_city?: string | null
+          pickup_days?: string | null
+          pickup_end_time?: string | null
+          pickup_start_time?: string | null
           slug: string
+          start_location?: string | null
           state?: string | null
           status?: Database["public"]["Enums"]["event_status"]
         }
@@ -337,7 +349,13 @@ export type Database = {
           logo_url?: string | null
           modalities?: string[]
           name?: string
+          pickup_address?: string | null
+          pickup_city?: string | null
+          pickup_days?: string | null
+          pickup_end_time?: string | null
+          pickup_start_time?: string | null
           slug?: string
+          start_location?: string | null
           state?: string | null
           status?: Database["public"]["Enums"]["event_status"]
         }
@@ -611,18 +629,32 @@ export type Database = {
         Returns: {
           athlete_id: string
           bib_number: string
+          birth_date: string
           category: string
           city: string
           custom_labels: string[]
           custom_values: string[]
           delivered_at: string
+          event_address: string
+          event_city: string
+          event_date: string
           event_name: string
+          event_state: string
+          event_time: string
+          gender: string
           kit_status: Database["public"]["Enums"]["kit_status"]
           kit_type: string
           modality: string
           name: string
+          payment_status: string
+          pickup_address: string
+          pickup_city: string
+          pickup_days: string
+          pickup_end_time: string
+          pickup_start_time: string
           qr_payload: string
           shirt_size: string
+          start_location: string
         }[]
       }
       public_kit_lookup_all: {
@@ -630,23 +662,34 @@ export type Database = {
         Returns: {
           athlete_id: string
           bib_number: string
+          birth_date: string
           category: string
           city: string
           custom_labels: string[]
           custom_values: string[]
           delivered_at: string
+          event_address: string
           event_city: string
           event_date: string
           event_id: string
           event_name: string
           event_slug: string
           event_state: string
+          event_time: string
+          gender: string
           kit_status: Database["public"]["Enums"]["kit_status"]
           kit_type: string
           modality: string
           name: string
+          payment_status: string
+          pickup_address: string
+          pickup_city: string
+          pickup_days: string
+          pickup_end_time: string
+          pickup_start_time: string
           qr_payload: string
           shirt_size: string
+          start_location: string
         }[]
       }
       shares_managed_event: { Args: { _user_id: string }; Returns: boolean }
