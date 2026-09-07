@@ -901,32 +901,51 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
-                <Input
-                  list="modality-suggestions"
-                  placeholder="Digite a modalidade (ex: Corrida, Caminhada)"
+                <select
                   value={form.modality}
                   onChange={(e) => setForm({ ...form, modality: e.target.value })}
-                />
-                <datalist id="modality-suggestions">
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedModalities.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {form.modality === "__other__" && (
+                  <Input
+                    placeholder="Digite a modalidade"
+                    value={form.modality === "__other__" ? "" : form.modality}
+                    onChange={(e) => setForm({ ...form, modality: e.target.value })}
+                  />
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
-                <Input
-                  list="category-suggestions"
-                  placeholder="Digite a categoria (ex: Geral, Elite)"
+                <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-                />
-                <datalist id="category-suggestions">
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedCategories.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {form.category === "__other__" && (
+                  <Input
+                    placeholder="Digite a categoria"
+                    value={form.category === "__other__" ? "" : form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  />
+                )}
               </div>
+
 
               <div className="space-y-1.5">
                 <Label>Distância</Label>
