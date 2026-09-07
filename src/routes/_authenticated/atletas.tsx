@@ -203,9 +203,11 @@ function Atletas() {
   const [modalityOther, setModalityOther] = useState(false);
   const [categoryOther, setCategoryOther] = useState(false);
   const [shirtOther, setShirtOther] = useState(false);
+  const [genderOther, setGenderOther] = useState(false);
   const [customModality, setCustomModality] = useState("");
   const [customCategory, setCustomCategory] = useState("");
   const [customShirt, setCustomShirt] = useState("");
+  const [customGender, setCustomGender] = useState("");
 
 
 
@@ -255,6 +257,15 @@ function Atletas() {
     return [...set].sort();
   }, [athletes]);
 
+  const importedGenders = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.gender ?? "").trim();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
 
 
   const filtered = useMemo(() => {
@@ -295,6 +306,7 @@ function Atletas() {
     }
     setForm({
       ...EMPTY_FORM,
+      gender: importedGenders[0] ?? "",
       modality: importedModalities[0] ?? "",
       category: importedCategories[0] ?? "",
       shirt_size: importedSizes[0] ?? "",
@@ -304,9 +316,11 @@ function Atletas() {
     setModalityOther(false);
     setCategoryOther(false);
     setShirtOther(false);
+    setGenderOther(false);
     setCustomModality("");
     setCustomCategory("");
     setCustomShirt("");
+    setCustomGender("");
     setNewOpen(true);
   }
 
@@ -323,9 +337,10 @@ function Atletas() {
     const modalityKnown = importedModalities.includes(a.modality ?? "");
     const categoryKnown = importedCategories.includes(a.category ?? "");
     const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
+    const genderKnown = importedGenders.includes(a.gender ?? "");
     setForm({
       name: a.name ?? "",
-      gender: a.gender ?? "",
+      gender: genderKnown ? (a.gender ?? "") : a.gender ? "__other__" : "",
       birth_date: a.birth_date ? formatDate(a.birth_date) : "",
       city: a.city ?? "",
       equipe: a.equipe ?? "",
@@ -349,9 +364,11 @@ function Atletas() {
     setModalityOther(!modalityKnown && !!a.modality);
     setCategoryOther(!categoryKnown && !!a.category);
     setShirtOther(!shirtKnown && !!a.shirt_size);
+    setGenderOther(!genderKnown && !!a.gender);
     setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
     setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
     setCustomShirt(shirtKnown ? "" : (a.shirt_size ?? ""));
+    setCustomGender(genderKnown ? "" : (a.gender ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
@@ -881,15 +898,39 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Sexo *</Label>
                 <select
-                  value={form.gender}
-                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                  value={genderOther ? "__other__" : form.gender}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setGenderOther(true);
+                      setCustomGender("");
+                      setForm({ ...form, gender: "" });
+                    } else {
+                      setGenderOther(false);
+                      setCustomGender("");
+                      setForm({ ...form, gender: value });
+                    }
+                  }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                 >
-                  <option value="">Selecione</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Feminino</option>
-                  <option value="Outro">Outro</option>
+                  {importedGenders.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  <option value="__other__">+ Digitar novo</option>
                 </select>
+                {genderOther && (
+                  <Input
+                    placeholder="Digite o sexo"
+                    value={customGender}
+                    onChange={(e) => {
+                      const upper = e.target.value.toUpperCase();
+                      setCustomGender(upper);
+                      setForm({ ...form, gender: upper });
+                    }}
+                  />
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
