@@ -203,11 +203,9 @@ function Atletas() {
   const [modalityOther, setModalityOther] = useState(false);
   const [categoryOther, setCategoryOther] = useState(false);
   const [shirtOther, setShirtOther] = useState(false);
-  const [genderOther, setGenderOther] = useState(false);
   const [customModality, setCustomModality] = useState("");
   const [customCategory, setCustomCategory] = useState("");
   const [customShirt, setCustomShirt] = useState("");
-  const [customGender, setCustomGender] = useState("");
 
 
 
