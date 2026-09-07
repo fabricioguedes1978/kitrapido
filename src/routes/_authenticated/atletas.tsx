@@ -219,6 +219,22 @@ function Atletas() {
     },
   });
 
+  /** Tamanhos vindos da planilha/cadastros deste evento. */
+  const importedSizes = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of athletes) {
+      const s = (a.shirt_size ?? "").trim().toUpperCase();
+      if (s) set.add(s);
+    }
+    return [...set].sort();
+  }, [athletes]);
+
+  const registeredSizes = useMemo(
+    () => SHIRT_SIZES.filter((s) => !importedSizes.includes(s)),
+    [importedSizes],
+  );
+
+
   const filtered = useMemo(() => {
     const q = term.trim().toLowerCase();
     if (!q) return athletes.slice(0, 300);
