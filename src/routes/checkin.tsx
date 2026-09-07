@@ -164,16 +164,13 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
   const startTime = [row.event_date ? formatDate(row.event_date) : null, hm(row.event_time) ? `LARGADA ${hm(row.event_time)}` : null]
     .filter(Boolean)
     .join(" · ");
-  const pickupHours =
-    hm(row.pickup_start_time) && hm(row.pickup_end_time)
-      ? `${hm(row.pickup_start_time)} às ${hm(row.pickup_end_time)}`
-      : hm(row.pickup_start_time) || "";
   const pickupLines = [
     { label: "Endereço", value: row.pickup_address || "" },
     { label: "Cidade", value: row.pickup_city || "" },
-    { label: "Dias", value: row.pickup_days || "" },
-    { label: "Horário", value: pickupHours },
+    { label: "Informações", value: row.pickup_info || "" },
   ].filter((l) => l.value);
+  const mapsHref = mapsUrl(row.pickup_maps_url, row.pickup_address, row.pickup_city);
+
 
   const athleteRows = [
     { label: "Número", value: row.bib_number || "—" },
