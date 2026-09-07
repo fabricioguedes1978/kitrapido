@@ -41,7 +41,6 @@ type AthleteRow = {
   bib_number: string | null;
   modality: string | null;
   category: string | null;
-  distance: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   registration_status: string | null;
@@ -99,7 +98,7 @@ function Entregas() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,name,cpf,birth_date,gender,email,phone,registration_number,bib_number,modality,category,distance,shirt_size,kit_type,registration_status,payment_status,kit_status,city,equipe,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,name,cpf,birth_date,gender,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,registration_status,payment_status,kit_status,city,equipe,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -180,7 +179,6 @@ function Entregas() {
       "Numero": row.athlete.bib_number ?? "",
       Modalidade: row.athlete.modality ?? "",
       Categoria: row.athlete.category ?? "",
-      Distância: row.athlete.distance ?? "",
       Camiseta: row.athlete.shirt_size ?? "",
       Kit: row.athlete.kit_type ?? "",
       "Status inscrição": row.athlete.registration_status ?? "",
