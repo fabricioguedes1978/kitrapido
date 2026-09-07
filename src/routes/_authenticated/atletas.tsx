@@ -328,10 +328,10 @@ function Atletas() {
     const modalityKnown = importedModalities.includes(a.modality ?? "");
     const categoryKnown = importedCategories.includes(a.category ?? "");
     const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
-    const genderKnown = importedGenders.includes(a.gender ?? "");
+    const genderValue = (a.gender ?? "").trim().toUpperCase();
     setForm({
       name: a.name ?? "",
-      gender: genderKnown ? (a.gender ?? "") : a.gender ? "__other__" : "",
+      gender: genderValue === "MASCULINO" || genderValue === "FEMININO" ? genderValue : "",
       birth_date: a.birth_date ? formatDate(a.birth_date) : "",
       city: a.city ?? "",
       equipe: a.equipe ?? "",
@@ -355,11 +355,9 @@ function Atletas() {
     setModalityOther(!modalityKnown && !!a.modality);
     setCategoryOther(!categoryKnown && !!a.category);
     setShirtOther(!shirtKnown && !!a.shirt_size);
-    setGenderOther(!genderKnown && !!a.gender);
     setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
     setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
     setCustomShirt(shirtKnown ? "" : (a.shirt_size ?? ""));
-    setCustomGender(genderKnown ? "" : (a.gender ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
