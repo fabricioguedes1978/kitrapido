@@ -293,10 +293,13 @@ function Atletas() {
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setDupWarning(null);
+    setModalityOther(false);
+    setCategoryOther(false);
     setCustomModality("");
     setCustomCategory("");
     setNewOpen(true);
   }
+
 
 
   function openEdit(a: Athlete) {
