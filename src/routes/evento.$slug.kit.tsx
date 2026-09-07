@@ -215,8 +215,8 @@ function MeuKit() {
                 ))}
               </dl>
 
-              {pickupLines.length > 0 && (
-                <div className="bg-primary/5 border-primary/20 space-y-2 rounded-xl border p-4">
+              {(pickupLines.length > 0 || mapsHref) && (
+                <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
                   <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
                     <MapPin className="size-5" /> Local da retirada do kit
                   </p>
@@ -225,8 +225,16 @@ function MeuKit() {
                       <Field key={l.label} label={l.label} value={l.value} />
                     ))}
                   </dl>
+                  {mapsHref && (
+                    <Button asChild className="w-full" size="lg">
+                      <a href={mapsHref} target="_blank" rel="noreferrer">
+                        <Navigation className="size-4" /> Como chegar
+                      </a>
+                    </Button>
+                  )}
                 </div>
               )}
+
 
               <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
                 <div ref={qrRef}>
