@@ -206,7 +206,7 @@ function MeuKit() {
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div className="col-span-2 min-w-0">
                   <dt className="text-muted-foreground text-xs tracking-wide uppercase">Número</dt>
-                  <dd className="text-6xl font-extrabold tracking-tight">{result.bib_number || "—"}</dd>
+                  <dd className="text-5xl font-extrabold tracking-tight">{result.bib_number || "—"}</dd>
                 </div>
                 <Field label="Modalidade" value={result.modality} />
                 <Field label="Categoria" value={result.category} />

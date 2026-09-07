@@ -242,9 +242,9 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div className="col-span-2 min-w-0">
               <dt className="text-muted-foreground text-xs tracking-wide uppercase">Número</dt>
-              <dd className="text-6xl font-extrabold tracking-tight">{row.bib_number || "—"}</dd>
+              <dd className="text-5xl font-extrabold tracking-tight">{row.bib_number || "—"}</dd>
             </div>
-            <Field label="Nascimento" value={row.birth_date ? formatDate(row.birth_date) : null} />
+            <Field label="Nascimento" value={row.birth_date ? formatDate(row.birth_date) : null} strong />
             <Field label="Sexo" value={genderLabel(row.gender)} />
             <div className="min-w-0">
               <dt className="text-muted-foreground text-xs tracking-wide uppercase">Status</dt>
