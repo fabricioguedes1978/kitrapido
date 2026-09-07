@@ -200,6 +200,12 @@ function Atletas() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
+  const [modalityOther, setModalityOther] = useState(false);
+  const [categoryOther, setCategoryOther] = useState(false);
+  const [customModality, setCustomModality] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
+
+
 
 
   const { data: athletes = [], isLoading } = useQuery({
@@ -287,8 +293,14 @@ function Atletas() {
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setDupWarning(null);
+    setModalityOther(false);
+    setCategoryOther(false);
+    setCustomModality("");
+    setCustomCategory("");
     setNewOpen(true);
   }
+
+
 
   function openEdit(a: Athlete) {
     if (locked) {
@@ -297,6 +309,8 @@ function Atletas() {
       });
       return;
     }
+    const modalityKnown = importedModalities.includes(a.modality ?? "");
+    const categoryKnown = importedCategories.includes(a.category ?? "");
     setForm({
       name: a.name ?? "",
       gender: a.gender ?? "",
@@ -308,8 +322,8 @@ function Atletas() {
       phone: a.phone ?? "",
       registration_number: a.registration_number ?? "",
       bib_number: a.bib_number ?? "",
-      modality: a.modality ?? "",
-      category: a.category ?? "",
+      modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
+      category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
       distance: a.distance ?? "",
       shirt_size: a.shirt_size ?? "",
       kit_type: a.kit_type ?? "",
@@ -320,10 +334,16 @@ function Atletas() {
       custom_4: a.custom_4 ?? "",
       custom_5: a.custom_5 ?? "",
     });
+    setModalityOther(!modalityKnown && !!a.modality);
+    setCategoryOther(!categoryKnown && !!a.category);
+    setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
+    setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
     setNewOpen(true);
   }
+
+
 
 
 
@@ -901,32 +921,82 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
-                <Input
-                  list="modality-suggestions"
-                  placeholder="Digite a modalidade (ex: Corrida, Caminhada)"
-                  value={form.modality}
-                  onChange={(e) => setForm({ ...form, modality: e.target.value })}
-                />
-                <datalist id="modality-suggestions">
+                <select
+                  value={modalityOther ? "__other__" : form.modality}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setModalityOther(true);
+                      setCustomModality("");
+                      setForm({ ...form, modality: "" });
+                    } else {
+                      setModalityOther(false);
+                      setCustomModality("");
+                      setForm({ ...form, modality: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedModalities.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {modalityOther && (
+                  <Input
+                    placeholder="Digite a modalidade"
+                    value={customModality}
+                    onChange={(e) => {
+                      setCustomModality(e.target.value);
+                      setForm({ ...form, modality: e.target.value });
+                    }}
+                  />
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
-                <Input
-                  list="category-suggestions"
-                  placeholder="Digite a categoria (ex: Geral, Elite)"
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                />
-                <datalist id="category-suggestions">
+                <select
+                  value={categoryOther ? "__other__" : form.category}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setCategoryOther(true);
+                      setCustomCategory("");
+                      setForm({ ...form, category: "" });
+                    } else {
+                      setCategoryOther(false);
+                      setCustomCategory("");
+                      setForm({ ...form, category: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  <option value="">Selecione</option>
                   {importedCategories.map((s) => (
-                    <option key={s} value={s} />
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {categoryOther && (
+                  <Input
+                    placeholder="Digite a categoria"
+                    value={customCategory}
+                    onChange={(e) => {
+                      setCustomCategory(e.target.value);
+                      setForm({ ...form, category: e.target.value });
+                    }}
+                  />
+                )}
               </div>
+
+
+
+
 
               <div className="space-y-1.5">
                 <Label>Distância</Label>
