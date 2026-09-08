@@ -217,7 +217,7 @@ function Landing() {
               </div>
             </div>
 
-            <div className="bg-sidebar shadow-brand absolute -right-1 bottom-0 w-[22%] rotate-3 rounded-[18px] border-[5px] border-sidebar p-1 sm:-right-2 sm:w-[24%] sm:rounded-[24px] sm:border-[9px]">
+            <div className="bg-sidebar shadow-brand absolute right-1 bottom-0 w-[20%] rotate-3 rounded-[18px] border-[5px] border-sidebar p-1 sm:right-3 sm:w-[22%] sm:rounded-[24px] sm:border-[9px]">
               <div className="bg-card aspect-[0.52/1] rounded-[10px] px-1.5 py-3 text-center sm:rounded-[14px] sm:px-4 sm:py-5">
                 <Brand compact className="mx-auto justify-center scale-75 sm:scale-100" />
                 <QrCode className="mx-auto mt-2 size-10 text-foreground sm:mt-4 sm:size-24" />
