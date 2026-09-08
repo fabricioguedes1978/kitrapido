@@ -169,9 +169,9 @@ function Landing() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[260px] pb-6 sm:max-w-lg sm:pb-10 lg:max-w-xl lg:translate-x-0">
+          <div className="relative mx-auto w-full max-w-[240px] pb-6 sm:max-w-lg sm:pb-10 lg:max-w-xl lg:translate-x-0">
             <div className="bg-primary/15 absolute -inset-4 -z-10 rotate-[-7deg] rounded-[42%_16%_32%_18%] sm:-inset-6" />
-            <div className="bg-sidebar shadow-brand relative mx-auto w-[72%] overflow-hidden rounded-[20px] border-[7px] border-sidebar p-1.5 sm:w-[72%] sm:rounded-[28px] sm:border-[14px] sm:p-2">
+            <div className="bg-sidebar shadow-brand relative mx-auto w-[68%] overflow-hidden rounded-[20px] border-[7px] border-sidebar p-1.5 sm:w-[72%] sm:rounded-[28px] sm:border-[14px] sm:p-2">
               <div className="bg-card aspect-[1.48/1] overflow-hidden rounded-lg sm:rounded-xl">
                 <div className="grid h-full grid-cols-[26%_74%] sm:grid-cols-[29%_71%]">
                   <aside className="bg-sidebar px-2 py-3 text-sidebar-foreground sm:px-5 sm:py-4">
