@@ -786,7 +786,7 @@ function Atletas() {
             <TableBody>
               {isLoading && (
                 <TableRow>
-                  <TableCell colSpan={11}>Carregando…</TableCell>
+                  <TableCell colSpan={13}>Carregando…</TableCell>
                 </TableRow>
               )}
               {filtered.map((a) => (
@@ -833,7 +833,7 @@ function Atletas() {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-muted-foreground">
+                  <TableCell colSpan={13} className="text-muted-foreground">
                     Nenhum atleta encontrado. Importe a lista de inscritos em CSV ou Excel.
                   </TableCell>
                 </TableRow>
