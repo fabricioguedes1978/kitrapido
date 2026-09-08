@@ -127,7 +127,7 @@ function Landing() {
             <h1 className="mt-7 text-5xl leading-[0.98] font-extrabold sm:text-6xl lg:text-7xl">
               A RETIRADA DE KITS DA SUA CORRIDA
             </h1>
-            <p className="text-primary mt-4 max-w-2xl text-xl font-semibold leading-relaxed sm:text-2xl">
+            <p className="text-primary mt-1 max-w-2xl text-xl font-semibold leading-relaxed sm:text-2xl">
               Menos fila. Mais agilidade. Controle total da entrega.
             </p>
             <p className="text-muted-foreground mt-5 max-w-2xl text-lg leading-relaxed sm:text-xl">
