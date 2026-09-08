@@ -159,12 +159,9 @@ function Landing() {
                 </Link>
               </Button>
             </div>
-            <div className="text-muted-foreground mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm sm:mt-9 sm:grid-cols-3 sm:gap-4">
+            <div className="text-muted-foreground mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm sm:mt-9 sm:grid-cols-2 sm:gap-4">
               <span className="flex items-center gap-2 border-r-border sm:border-r">
                 <Clock className="text-primary size-5 shrink-0 sm:size-6" /> Setup em minutos
-              </span>
-              <span className="flex items-center gap-2 border-r-border sm:border-r">
-                <ShieldCheck className="text-primary size-5 shrink-0 sm:size-6" /> Suporte no dia do evento
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="text-primary size-5 shrink-0 sm:size-6" /> LGPD compliant
@@ -236,10 +233,6 @@ function Landing() {
       {/* Trust bar */}
       <section className="border-y bg-card/50 py-5 sm:py-6">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-5 px-4 text-center text-sm text-muted-foreground sm:justify-between sm:text-left">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-primary text-xl font-extrabold sm:text-2xl">3.000+</span>
-            <span>atletas já passaram pelo Kit Rápido</span>
-          </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-primary text-xl font-extrabold sm:text-2xl">100%</span>
             <span>rastreabilidade das entregas</span>
