@@ -125,13 +125,16 @@ function Landing() {
               <PackageCheck className="size-5" /> Entrega de kits sem fila
             </span>
             <h1 className="mt-7 text-5xl leading-[0.98] font-extrabold sm:text-6xl lg:text-7xl">
-              A retirada de kits da sua corrida,{" "}
-              <span className="text-primary">rápida e sob controle.</span>
+              A RETIRADA DE KITS DA SUA CORRIDA
             </h1>
-            <p className="text-muted-foreground mt-7 max-w-2xl text-lg leading-relaxed sm:text-xl">
-              O Kit Rápido é um sistema de gestão de entrega de kits em tempo real, com QR Code,
-              controle de estoque, prevenção de duplicidade e relatórios completos. Tudo no celular,
-              tablet ou computador — mesmo com internet instável.
+            <p className="text-primary mt-4 max-w-2xl text-xl font-semibold leading-relaxed sm:text-2xl">
+              Menos fila. Mais agilidade. Controle total da entrega.
+            </p>
+            <p className="text-muted-foreground mt-5 max-w-2xl text-lg leading-relaxed sm:text-xl">
+              Com o Kit Rápido, seu atleta chega, apresenta o QR Code, é identificado e retira o kit de forma rápida e segura. Enquanto sua equipe atende, você acompanha as entregas, o estoque e toda a operação em tempo real.
+            </p>
+            <p className="text-muted-foreground mt-4 max-w-2xl text-lg leading-relaxed sm:text-xl">
+              Uma solução criada para corridas que precisam entregar centenas ou milhares de kits com organização e eficiência.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-14 px-7 text-base shadow-brand">
