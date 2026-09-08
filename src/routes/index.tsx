@@ -234,10 +234,6 @@ function Landing() {
       <section className="border-y bg-card/50 py-5 sm:py-6">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-5 px-4 text-center text-sm text-muted-foreground sm:justify-between sm:text-left">
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-primary text-xl font-extrabold sm:text-2xl">3.000+</span>
-            <span>atletas já passaram pelo Kit Rápido</span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-primary text-xl font-extrabold sm:text-2xl">100%</span>
             <span>rastreabilidade das entregas</span>
           </div>
