@@ -172,8 +172,8 @@ function Landing() {
           <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[480px] lg:max-w-[560px]">
             <div className="bg-primary/15 absolute -inset-4 -z-10 rotate-[-6deg] rounded-[38%_14%_30%_16%] sm:-inset-6" />
             <img
-              src="/__l5e/assets-v1/b3bb811c-dea4-4a50-a3ac-ce8e9160b84e/mockup-devices-v2.png"
-              alt="Demonstração do painel de entrega de kits no tablet e da credencial com QR Code no celular"
+              src="/__l5e/assets-v1/cfa56338-c15e-41c8-ae76-50ee35e3e7b2/mockup-devices-v3.png"
+              alt="Demonstração do painel KITE FACIL no tablet e da credencial com QR Code no celular"
               width={1024}
               height={768}
               className="relative z-10 w-full drop-shadow-2xl"
