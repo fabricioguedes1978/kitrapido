@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ScanLine,
   ShieldCheck,
+  PackageCheck,
   Boxes,
   Gauge,
   ArrowRight,
