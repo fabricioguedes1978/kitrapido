@@ -169,9 +169,9 @@ function Landing() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl pb-6 sm:max-w-2xl sm:pb-10 lg:max-w-3xl lg:translate-x-6">
+          <div className="relative mx-auto w-full max-w-[240px] pb-6 sm:max-w-lg sm:pb-10 lg:max-w-xl lg:translate-x-0">
             <div className="bg-primary/15 absolute -inset-4 -z-10 rotate-[-7deg] rounded-[42%_16%_32%_18%] sm:-inset-6" />
-            <div className="bg-sidebar shadow-brand relative ml-auto w-[92%] overflow-hidden rounded-[20px] border-[7px] border-sidebar p-1.5 sm:w-[88%] sm:rounded-[28px] sm:border-[14px] sm:p-2">
+            <div className="bg-sidebar shadow-brand relative mx-auto w-[68%] overflow-hidden rounded-[20px] border-[7px] border-sidebar p-1.5 sm:w-[72%] sm:rounded-[28px] sm:border-[14px] sm:p-2">
               <div className="bg-card aspect-[1.48/1] overflow-hidden rounded-lg sm:rounded-xl">
                 <div className="grid h-full grid-cols-[26%_74%] sm:grid-cols-[29%_71%]">
                   <aside className="bg-sidebar px-2 py-3 text-sidebar-foreground sm:px-5 sm:py-4">
@@ -217,7 +217,7 @@ function Landing() {
               </div>
             </div>
 
-            <div className="bg-sidebar shadow-brand absolute right-0 bottom-0 w-[26%] rotate-3 rounded-[18px] border-[5px] border-sidebar p-1 sm:w-[28%] sm:rounded-[24px] sm:border-[9px]">
+            <div className="bg-sidebar shadow-brand absolute right-14 bottom-0 w-[18%] rotate-3 scale-[0.78] origin-bottom-right rounded-[18px] border-[5px] border-sidebar p-1 sm:right-3 sm:w-[22%] sm:scale-100 sm:rounded-[24px] sm:border-[9px]">
               <div className="bg-card aspect-[0.52/1] rounded-[10px] px-1.5 py-3 text-center sm:rounded-[14px] sm:px-4 sm:py-5">
                 <Brand compact className="mx-auto justify-center scale-75 sm:scale-100" />
                 <QrCode className="mx-auto mt-2 size-10 text-foreground sm:mt-4 sm:size-24" />
