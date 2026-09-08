@@ -772,11 +772,12 @@ function Atletas() {
                 <TableHead className="hidden sm:table-cell">Sexo</TableHead>
                 <TableHead className="hidden md:table-cell">Nascimento</TableHead>
                 <TableHead className="hidden md:table-cell">Cidade</TableHead>
+                <TableHead className="hidden lg:table-cell">Kit</TableHead>
+                <TableHead>Camiseta</TableHead>
                 <TableHead className="hidden lg:table-cell">Equipe</TableHead>
                 <TableHead>Nº</TableHead>
                 <TableHead className="hidden sm:table-cell">CPF</TableHead>
                 <TableHead className="hidden md:table-cell">Modalidade</TableHead>
-                <TableHead>Camiseta</TableHead>
                 <TableHead>Pagamento</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead />
@@ -807,11 +808,12 @@ function Atletas() {
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{a.kit_type ?? "—"}</TableCell>
+                  <TableCell>{a.shirt_size ?? "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell">{a.equipe ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
-                  <TableCell>{a.shirt_size ?? "—"}</TableCell>
                   <TableCell>
                     <Badge variant={a.payment_status === "pendente" ? "destructive" : "outline"}>
                       {a.payment_status === "pendente" ? "Pendente pagamento" : "Pago"}
@@ -921,6 +923,13 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
                 <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Kit</Label>
+                <Input
+                  value={form.kit_type}
+                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Camisa</Label>
@@ -1051,13 +1060,6 @@ function Atletas() {
                 <Input
                   value={form.registration_number}
                   onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Kit</Label>
-                <Input
-                  value={form.kit_type}
-                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
                 />
               </div>
               {CUSTOM_KEYS.map((key, i) => (
