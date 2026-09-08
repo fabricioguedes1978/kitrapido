@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ScanLine,
   ShieldCheck,
+  PackageCheck,
   Boxes,
   Gauge,
   ArrowRight,
-  Play,
   Zap,
   Users,
   Smartphone,
@@ -117,89 +117,102 @@ function Landing() {
       </header>
 
       {/* Hero */}
-      <section className="relative">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-accent/30" />
-        <div className="mx-auto max-w-6xl px-4 pt-10 pb-20 sm:pt-16 sm:pb-28">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div>
-              <span className="border-primary/30 bg-primary/10 text-primary inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-wide uppercase">
-                Entrega de kits sem fila
+      <section className="relative overflow-hidden border-b">
+        <div className="bg-hero-wash absolute inset-0 -z-10" />
+        <div className="mx-auto grid min-h-[680px] min-w-0 max-w-[1440px] items-center gap-12 px-5 pt-10 pb-16 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:px-10 lg:pt-12 xl:px-16">
+          <div className="relative z-10 min-w-0 max-w-3xl">
+            <span className="border-primary/25 bg-primary/8 text-primary inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold uppercase">
+              <PackageCheck className="size-5" /> Entrega de kits sem fila
+            </span>
+            <h1 className="mt-7 text-5xl leading-[0.98] font-extrabold sm:text-6xl lg:text-7xl">
+              A retirada de kits da sua corrida,{" "}
+              <span className="text-primary">rápida e sob controle.</span>
+            </h1>
+            <p className="text-muted-foreground mt-7 max-w-2xl text-lg leading-relaxed sm:text-xl">
+              O Kit Rápido é um sistema de gestão de entrega de kits em tempo real, com QR Code,
+              controle de estoque, prevenção de duplicidade e relatórios completos. Tudo no celular,
+              tablet ou computador — mesmo com internet instável.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="h-14 px-7 text-base shadow-brand">
+                <Link to="/auth">
+                  Quero usar no meu evento <ArrowRight className="size-5" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-14 border-primary/50 px-7 text-base text-primary">
+                <Link to="/checkin">
+                  <QrCode className="size-5" /> Sou atleta — check-in pelo CPF
+                </Link>
+              </Button>
+            </div>
+            <div className="text-muted-foreground mt-9 grid max-w-2xl grid-cols-1 gap-4 text-sm sm:grid-cols-3">
+              <span className="flex items-center gap-2 border-r-border sm:border-r">
+                <Clock className="text-primary size-6 shrink-0" /> Setup em minutos
               </span>
-              <h1 className="mt-5 text-4xl leading-[1.05] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                A retirada de kits da sua corrida,{" "}
-                <span className="text-primary">rápida e sob controle</span>.
-              </h1>
-              <p className="text-muted-foreground mt-5 max-w-xl text-base sm:text-lg">
-                QR Code, estoque em tempo real, bloqueio de duplicidade e relatórios completos.
-                Tudo no celular, tablet ou computador — mesmo com internet instável.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button asChild size="lg" className="shadow-brand">
-                  <Link to="/auth">
-                    Quero usar no meu evento <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link to="/checkin">Sou atleta — check-in pelo CPF</Link>
-                </Button>
-              </div>
-              <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="text-primary size-4" /> Setup em minutos
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="text-primary size-4" /> Suporte no dia do evento
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="text-primary size-4" /> LGPD compliant
-                </span>
+              <span className="flex items-center gap-2 border-r-border sm:border-r">
+                <ShieldCheck className="text-primary size-6 shrink-0" /> Suporte no dia do evento
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="text-primary size-6 shrink-0" /> LGPD compliant
+              </span>
+            </div>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-3xl pb-10 lg:translate-x-6">
+            <div className="bg-primary/15 absolute -inset-6 -z-10 rotate-[-7deg] rounded-[42%_16%_32%_18%]" />
+            <div className="bg-sidebar shadow-brand relative ml-auto w-[94%] overflow-hidden rounded-[28px] border-[10px] border-sidebar p-2 sm:w-[88%] sm:border-[14px]">
+              <div className="bg-card aspect-[1.48/1] overflow-hidden rounded-xl">
+                <div className="grid h-full grid-cols-[29%_71%]">
+                  <aside className="bg-sidebar px-3 py-4 text-sidebar-foreground sm:px-5">
+                    <Brand inverted className="scale-[0.8] origin-left sm:scale-100" />
+                    <div className="mt-7 space-y-2 text-xs sm:text-sm">
+                      {["Início", "Entregas", "Atletas", "Estoque", "Relatórios"].map((item, index) => (
+                        <div
+                          key={item}
+                          className={index === 0 ? "bg-primary text-primary-foreground rounded-md px-3 py-2 font-semibold" : "px-3 py-2 opacity-75"}
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </aside>
+                  <div className="bg-background p-3 sm:p-6">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-bold sm:text-lg">Central de Entrega</p>
+                      <span className="bg-success/10 text-success rounded-full px-2 py-1 text-[9px] font-bold sm:text-xs">● Online</span>
+                    </div>
+                    <div className="bg-card text-muted-foreground mt-4 rounded-md border px-3 py-2 text-[10px] sm:text-xs">
+                      Buscar atleta, CPF ou número...
+                    </div>
+                    <div className="bg-primary text-primary-foreground mt-3 flex items-center justify-center gap-2 rounded-md py-2.5 text-xs font-bold sm:text-sm">
+                      <ScanLine className="size-4" /> Ler QR Code
+                    </div>
+                    <div className="bg-card mt-3 rounded-lg border p-3 shadow-card sm:mt-5 sm:p-5">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 grid size-9 place-items-center rounded-full sm:size-11"><Users className="text-primary size-5" /></div>
+                        <div>
+                          <p className="text-xs font-bold sm:text-base">João da Silva</p>
+                          <p className="text-success text-[9px] font-semibold sm:text-xs">Inscrição confirmada</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-x-3 text-[9px] leading-5 sm:text-xs sm:leading-6">
+                        <div><b>Número</b> 1025<br /><b>Modalidade</b> 10 KM<br /><b>Categoria</b> M40-49</div>
+                        <div className="text-success">✓ Pagamento confirmado<br />✓ Kit disponível<br />✓ Sem duplicidade</div>
+                      </div>
+                      <div className="bg-primary text-primary-foreground mt-3 rounded-md py-2 text-center text-[10px] font-bold sm:text-xs">✓ CONFIRMAR ENTREGA</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-md lg:max-w-full">
-              <div className="bg-card shadow-card relative overflow-hidden rounded-3xl border p-6 sm:p-8">
-                <div className="bg-brand-gradient absolute top-0 right-0 left-0 h-2" />
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                      Evento ao vivo
-                    </p>
-                    <p className="text-2xl font-bold">Corrida das Nações 2026</p>
-                  </div>
-                  <span className="bg-success/10 text-success rounded-full px-2.5 py-1 text-xs font-semibold">
-                    Online
-                  </span>
-                </div>
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <div className="bg-muted rounded-xl p-4">
-                    <p className="text-muted-foreground text-xs uppercase">Entregues</p>
-                    <p className="numeric text-2xl font-extrabold text-primary">1.248</p>
-                  </div>
-                  <div className="bg-muted rounded-xl p-4">
-                    <p className="text-muted-foreground text-xs uppercase">Pendentes</p>
-                    <p className="numeric text-2xl font-extrabold">312</p>
-                  </div>
-                  <div className="bg-muted rounded-xl p-4">
-                    <p className="text-muted-foreground text-xs uppercase">Última hora</p>
-                    <p className="numeric text-2xl font-extrabold">86</p>
-                  </div>
-                  <div className="bg-muted rounded-xl p-4">
-                    <p className="text-muted-foreground text-xs uppercase">Estoque alerta</p>
-                    <p className="numeric text-2xl font-extrabold text-warning">M</p>
-                  </div>
-                </div>
-                <div className="mt-6 flex items-center gap-3 rounded-xl border border-dashed p-4">
-                  <div className="bg-primary/10 grid size-12 shrink-0 place-items-center rounded-lg">
-                    <QrCode className="text-primary size-6" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">João Silva · #4521</p>
-                    <p className="text-muted-foreground truncate text-xs">
-                      Kit entregue · 10:42 · Staff Maria
-                    </p>
-                  </div>
-                  <CheckCircle2 className="text-success ml-auto size-5 shrink-0" />
-                </div>
+            <div className="bg-sidebar shadow-brand absolute right-0 bottom-0 w-[28%] rotate-3 rounded-[24px] border-[7px] border-sidebar p-1 sm:border-[9px]">
+              <div className="bg-card aspect-[0.52/1] rounded-[14px] px-2 py-5 text-center sm:px-4">
+                <Brand compact className="mx-auto justify-center" />
+                <QrCode className="mx-auto mt-4 size-16 text-foreground sm:size-24" />
+                <p className="mt-3 text-[9px] font-extrabold sm:text-sm">JOÃO DA SILVA</p>
+                <p className="numeric text-[9px] font-bold sm:text-xs">Nº 1025</p>
+                <p className="text-[8px] sm:text-[10px]">10 KM · M40-49</p>
               </div>
             </div>
           </div>
