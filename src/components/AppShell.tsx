@@ -265,6 +265,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <EventSelector />
           </div>
           <div className="flex items-center gap-3">
+            <HelpButton />
             <OnlineIndicator className="shrink-0" />
             <UserAvatar />
           </div>
