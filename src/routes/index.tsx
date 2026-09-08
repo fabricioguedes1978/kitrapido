@@ -169,63 +169,15 @@ function Landing() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[220px] pb-8 sm:max-w-[420px] sm:pb-12 lg:max-w-[520px]">
-            <div className="bg-primary/15 absolute -inset-3 -z-10 rotate-[-6deg] rounded-[38%_14%_30%_16%] sm:-inset-5" />
-            <div className="bg-sidebar shadow-brand relative mx-auto w-[72%] overflow-hidden rounded-[18px] border-[6px] border-sidebar p-1 sm:w-[70%] sm:rounded-[26px] sm:border-[12px] sm:p-1.5">
-              <div className="bg-card aspect-[1.55/1] overflow-hidden rounded-md sm:rounded-xl">
-                <div className="grid h-full grid-cols-[24%_76%] sm:grid-cols-[26%_74%]">
-                  <aside className="bg-sidebar px-2 py-2.5 text-sidebar-foreground sm:px-4 sm:py-4">
-                    <Brand inverted className="scale-[0.6] origin-left sm:scale-90" />
-                    <div className="mt-3 space-y-0.5 text-[8px] sm:mt-6 sm:space-y-1.5 sm:text-xs">
-                      {["Início", "Entregas", "Atletas", "Estoque", "Relatórios"].map((item, index) => (
-                        <div
-                          key={item}
-                          className={index === 0 ? "bg-primary text-primary-foreground rounded-md px-1.5 py-1 font-semibold sm:px-2.5 sm:py-1.5" : "px-1.5 py-1 opacity-75 sm:px-2.5 sm:py-1.5"}
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </aside>
-                  <div className="bg-background p-1.5 sm:p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[10px] font-bold sm:text-base">Central de Entrega</p>
-                      <span className="bg-success/10 text-success rounded-full px-1 py-0.5 text-[7px] font-bold sm:px-2 sm:text-[10px]">● Online</span>
-                    </div>
-                    <div className="bg-card text-muted-foreground mt-1.5 rounded-md border px-1.5 py-1 text-[8px] sm:mt-3 sm:px-2.5 sm:py-1.5 sm:text-xs">
-                      Buscar atleta, CPF ou número...
-                    </div>
-                    <div className="bg-primary text-primary-foreground mt-1.5 flex items-center justify-center gap-1.5 rounded-md py-1 text-[9px] font-bold sm:mt-2.5 sm:py-2 sm:text-xs">
-                      <ScanLine className="size-2.5 sm:size-3.5" /> Ler QR Code
-                    </div>
-                    <div className="bg-card mt-1.5 rounded-md border p-1.5 shadow-card sm:mt-4 sm:rounded-lg sm:p-4">
-                      <div className="flex items-center gap-1.5 sm:gap-2.5">
-                        <div className="bg-primary/10 grid size-6 place-items-center rounded-full sm:size-9"><Users className="text-primary size-3 sm:size-4" /></div>
-                        <div>
-                          <p className="text-[9px] font-bold sm:text-sm">João da Silva</p>
-                          <p className="text-success text-[7px] font-semibold sm:text-[10px]">Inscrição confirmada</p>
-                        </div>
-                      </div>
-                      <div className="mt-1.5 grid grid-cols-2 gap-x-1.5 text-[7px] leading-tight sm:mt-2.5 sm:gap-x-2 sm:text-[10px] sm:leading-5">
-                        <div><b>Número</b> 1025<br /><b>Modalidade</b> 10 KM<br /><b>Categoria</b> M40-49</div>
-                        <div className="text-success">✓ Pagamento confirmado<br />✓ Kit disponível<br />✓ Sem duplicidade</div>
-                      </div>
-                      <div className="bg-primary text-primary-foreground mt-1.5 rounded-md py-1 text-center text-[8px] font-bold sm:mt-2.5 sm:py-1.5 sm:text-xs">✓ CONFIRMAR ENTREGA</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-sidebar shadow-brand absolute -right-2 bottom-0 w-[20%] rotate-3 rounded-[14px] border-[4px] border-sidebar p-1 sm:right-0 sm:w-[20%] sm:rounded-[22px] sm:border-[7px]">
-              <div className="bg-card aspect-[0.52/1] rounded-[8px] px-1 py-2 text-center sm:rounded-[12px] sm:px-3 sm:py-4">
-                <Brand compact className="mx-auto justify-center scale-65 sm:scale-85" />
-                <QrCode className="mx-auto mt-1 size-8 text-foreground sm:mt-2 sm:size-16" />
-                <p className="mt-1 text-[7px] font-extrabold sm:mt-2 sm:text-xs">JOÃO DA SILVA</p>
-                <p className="numeric text-[7px] font-bold sm:text-[10px]">Nº 1025</p>
-                <p className="text-[6px] sm:text-[9px]">10 KM · M40-49</p>
-              </div>
-            </div>
+          <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[480px] lg:max-w-[560px]">
+            <div className="bg-primary/15 absolute -inset-4 -z-10 rotate-[-6deg] rounded-[38%_14%_30%_16%] sm:-inset-6" />
+            <img
+              src="/__l5e/assets-v1/b3bb811c-dea4-4a50-a3ac-ce8e9160b84e/mockup-devices-v2.png"
+              alt="Demonstração do painel de entrega de kits no tablet e da credencial com QR Code no celular"
+              width={1024}
+              height={768}
+              className="relative z-10 w-full drop-shadow-2xl"
+            />
           </div>
         </div>
       </section>
