@@ -134,7 +134,7 @@ function Landing() {
               Com o Kit Rápido, seu atleta chega, apresenta o QR Code, é identificado e retira o kit de forma rápida e segura. Enquanto sua equipe atende, você acompanha as entregas, o estoque e toda a operação em tempo real.
             </p>
             <p className="text-muted-foreground mt-4 max-w-2xl text-lg leading-relaxed sm:text-xl">
-              Uma solução criada para corridas que precisam entregar centenas ou milhares de kits com organização e eficiência.
+              Uma solução criada para corridas que precisam entregar kits com agilidade, organização, eficiência e segurança.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-14 px-7 text-base shadow-brand">
