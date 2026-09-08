@@ -862,18 +862,37 @@ function Atletas() {
                 <span>{dupWarning ?? liveDup}</span>
               </div>
             )}
-            <div className="space-y-1.5">
-              <Label>Nome *</Label>
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Data de nascimento *</Label>
+                <Label>Número *</Label>
+                <Input
+                  value={form.bib_number}
+                  onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nome *</Label>
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>CPF</Label>
                 <Input
                   inputMode="numeric"
-                  placeholder="dd/mm/aaaa"
-                  value={form.birth_date}
-                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
+                  placeholder="000.000.000-00"
+                  value={form.cpf}
+                  onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Telefone</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>E-mail</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
@@ -888,47 +907,54 @@ function Atletas() {
                 </select>
               </div>
               <div className="space-y-1.5">
+                <Label>Data de nascimento *</Label>
+                <Input
+                  inputMode="numeric"
+                  placeholder="dd/mm/aaaa"
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1.5">
                 <Label>Cidade</Label>
                 <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label>Equipe</Label>
-                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>CPF</Label>
-                <Input
-                  inputMode="numeric"
-                  placeholder="000.000.000-00"
-                  value={form.cpf}
-                  onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>E-mail</Label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Telefone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Nº de inscrição</Label>
-                <Input
-                  value={form.registration_number}
-                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Número *</Label>
-                <Input
-                  value={form.bib_number}
-                  onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
-                />
+                <Label>Camisa</Label>
+                <select
+                  value={shirtOther ? "__other__" : form.shirt_size}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setShirtOther(true);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: "" });
+                    } else {
+                      setShirtOther(false);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  {importedSizes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {shirtOther && (
+                  <Input
+                    placeholder="Digite o tamanho (ex: M, G, 42)"
+                    value={customShirt}
+                    onChange={(e) => {
+                      const upper = e.target.value.toUpperCase();
+                      setCustomShirt(upper);
+                      setForm({ ...form, shirt_size: upper });
+                    }}
+                  />
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
@@ -1002,56 +1028,9 @@ function Atletas() {
                   />
                 )}
               </div>
-
-
-
-
-
               <div className="space-y-1.5">
-                <Label>Camiseta</Label>
-                <select
-                  value={shirtOther ? "__other__" : form.shirt_size}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "__other__") {
-                      setShirtOther(true);
-                      setCustomShirt("");
-                      setForm({ ...form, shirt_size: "" });
-                    } else {
-                      setShirtOther(false);
-                      setCustomShirt("");
-                      setForm({ ...form, shirt_size: value });
-                    }
-                  }}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
-                >
-                  {importedSizes.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                  <option value="__other__">+ Digitar novo</option>
-                </select>
-                {shirtOther && (
-                  <Input
-                    placeholder="Digite o tamanho (ex: M, G, 42)"
-                    value={customShirt}
-                    onChange={(e) => {
-                      const upper = e.target.value.toUpperCase();
-                      setCustomShirt(upper);
-                      setForm({ ...form, shirt_size: upper });
-                    }}
-                  />
-                )}
-              </div>
-
-
-              <div className="space-y-1.5">
-                <Label>Kit</Label>
-                <Input
-                  value={form.kit_type}
-                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
-                />
+                <Label>Equipe</Label>
+                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>Status</Label>
@@ -1063,6 +1042,20 @@ function Atletas() {
                   <option value="pago">Pago</option>
                   <option value="pendente">Pendente pagamento</option>
                 </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Número de inscrição</Label>
+                <Input
+                  value={form.registration_number}
+                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Kit</Label>
+                <Input
+                  value={form.kit_type}
+                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
+                />
               </div>
               {CUSTOM_KEYS.map((key, i) => (
                 <div key={key} className="space-y-1.5">
