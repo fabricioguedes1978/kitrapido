@@ -138,9 +138,9 @@ function Landing() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-14 px-7 text-base shadow-brand">
-                <Link to="/auth">
+                <a href="https://wa.me/5531998966300" target="_blank" rel="noopener noreferrer">
                   Quero usar no meu evento <ArrowRight className="size-5" />
-                </Link>
+                </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-14 border-primary/50 px-7 text-base text-primary">
                 <Link to="/checkin">
