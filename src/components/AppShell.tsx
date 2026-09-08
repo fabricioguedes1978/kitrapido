@@ -21,7 +21,9 @@ import {
   Flag,
   User,
   KeyRound,
+  HelpCircle,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
 import { Button } from "@/components/ui/button";
@@ -146,6 +148,69 @@ export function EventSelector({ className }: { className?: string }) {
   );
 }
 
+const INSTRUCTIONS: Record<AppRole, { title: string; items: string[] }> = {
+  attendant: {
+    title: "Instruções para Staff",
+    items: [
+      "Acesse a Central de Entrega pelo menu lateral.",
+      "Leia o QR Code do atleta com o botão de leitura, ou pesquise por nome, número ou CPF.",
+      "Confira os dados do atleta na tela: número, kit, camiseta e status de pagamento.",
+      "Clique em \"Entregar Kit\" para dar baixa. Se for retirada por terceiros, informe o nome de quem retirou.",
+      "Se entregar para o atleta errado, use \"Cancelar entrega\" na área de kit entregue para desfazer.",
+      "O seletor de evento no topo define em qual evento você está trabalhando.",
+    ],
+  },
+  organizer: {
+    title: "Instruções para Gerente",
+    items: [
+      "Use o seletor de evento no topo para escolher o evento que deseja gerenciar.",
+      "Em Atletas, cadastre, edite ou importe a planilha de inscritos (quando autorizado pelo administrador).",
+      "Em Central de Entrega, acompanhe e realize as entregas de kits.",
+      "Em Entregas, filtre por entregues, pendentes ou todos, e exporte para Excel.",
+      "Em Estoque, acompanhe automaticamente o total, entregues e a entregar por tamanho de camiseta.",
+      "Em Usuários, cadastre os staffs do seu evento (acesso por CPF).",
+      "Atenção: edições de atletas são bloqueadas 24h antes do evento.",
+    ],
+  },
+  admin: {
+    title: "Instruções para Administrador",
+    items: [
+      "Crie e gerencie eventos em Eventos; você pode inativar ou excluir eventos.",
+      "Use o seletor de evento no topo para alternar entre os eventos.",
+      "Cadastre gerentes em Usuários e vincule-os aos eventos (acesso por CPF e data de nascimento).",
+      "Defina em cada evento se o gerente pode importar a planilha de inscritos.",
+      "Acompanhe tudo pelo Dashboard, Relatórios e Auditoria.",
+      "Em E-mail e Senha, altere suas credenciais de acesso.",
+    ],
+  },
+};
+
+function HelpButton() {
+  const { role } = useAuth();
+  if (!role) return null;
+  const info = INSTRUCTIONS[role];
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="icon" className="shrink-0" title="Instruções de uso">
+          <HelpCircle className="size-5" />
+          <span className="sr-only">Instruções de uso</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{info.title}</DialogTitle>
+        </DialogHeader>
+        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          {info.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function UserAvatar() {
   const { profile, role } = useAuth();
   const initials = (profile?.name || profile?.email || "U")
@@ -200,6 +265,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <EventSelector />
           </div>
           <div className="flex items-center gap-3">
+            <HelpButton />
             <OnlineIndicator className="shrink-0" />
             <UserAvatar />
           </div>
