@@ -19,6 +19,7 @@ import {
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import mockupDevices from "@/assets/mockup-devices-v4.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
