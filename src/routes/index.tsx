@@ -114,9 +114,9 @@ function Landing() {
         <Brand compact className="sm:hidden" />
         <Brand className="hidden sm:flex" />
         <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="outline" className="border-primary/50 text-primary h-9 px-2 text-xs sm:h-10 sm:px-3 sm:text-sm">
-            <Link to="/checkin">
-              <QrCode className="size-4" /> <span className="hidden sm:inline">Check-in do atleta</span>
+          <Button asChild size="sm" variant="outline" className="border-primary/50 text-primary h-9 px-2 text-[11px] sm:h-10 sm:px-3 sm:text-sm">
+            <Link to="/checkin" className="whitespace-nowrap">
+              <QrCode className="size-4" /> Check-in do atleta
             </Link>
           </Button>
           <Button asChild size="sm" className="shadow-brand h-9 px-2 text-xs sm:h-10 sm:px-3 sm:text-sm">
