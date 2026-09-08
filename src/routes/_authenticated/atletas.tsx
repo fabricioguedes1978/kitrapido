@@ -121,6 +121,7 @@ const COLUMN_MAP: Record<string, string> = {
   modalidade: "modality",
   categoria: "category",
   camiseta: "shirt_size",
+  camisa: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
   status: "payment_status",
@@ -605,20 +606,22 @@ function Atletas() {
   function exportCsv() {
     const csv = Papa.unparse(
       athletes.map((a) => ({
+        Numero: a.bib_number,
         Nome: a.name,
+        CPF: a.cpf,
+        Telefone: a.phone,
+        Email: a.email,
         Sexo: a.gender,
         Nascimento: a.birth_date,
         Cidade: a.city,
-        Equipe: a.equipe,
-        CPF: a.cpf,
-        Inscricao: a.registration_number,
-        Numero: a.bib_number,
+        Camisa: a.shirt_size,
         Modalidade: a.modality,
         Categoria: a.category,
-        Camiseta: a.shirt_size,
+        Equipe: a.equipe,
+        Status: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
+        "Numero de inscricao": a.registration_number,
         Kit: a.kit_type,
-        Pagamento: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
-        Status: KIT_STATUS[a.kit_status] ?? a.kit_status,
+        "Status do kit": KIT_STATUS[a.kit_status] ?? a.kit_status,
       })),
     );
     downloadBlob("\uFEFF" + csv, `atletas-${event?.slug ?? "evento"}.csv`, "text/csv;charset=utf-8");
@@ -708,9 +711,9 @@ function Atletas() {
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
-              cpf, e-mail, telefone, inscrição, numero, modalidade, categoria, distância, camiseta, kit,
-              status (Pago ou Pendente pagamento)
+              Aceita CSV, XLSX e XLS. Colunas na ordem: numero, nome, cpf, telefone, email, sexo,
+              nascimento, cidade, camisa, modalidade, categoria, equipe, status (Pago ou Pendente
+              pagamento), numero de inscricao, kit
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -724,14 +727,14 @@ function Atletas() {
               onClick={(e) => {
                 e.stopPropagation();
                 const headers = [
-                  "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
-                  "inscricao", "numero", "modalidade", "categoria", "camiseta", "kit",
-                  "status", "extra1", "extra2", "extra3", "extra4", "extra5",
+                  "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
+                  "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
+                  "kit", "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
-                  "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
-                  "maria@email.com", "(31) 9999-9999", "INS001", "1001", "Corrida", "Feminino Geral",
-                  "M", "Kit Padrão", "Pago", "", "", "", "", "",
+                  "1001", "Maria Silva", "123.456.789-09", "(31) 9999-9999", "maria@email.com",
+                  "FEMININO", "15/05/1990", "São Paulo", "M", "Corrida", "Feminino Geral",
+                  "Equipe Exemplo", "Pago", "INS001", "Kit Padrão", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
@@ -862,18 +865,37 @@ function Atletas() {
                 <span>{dupWarning ?? liveDup}</span>
               </div>
             )}
-            <div className="space-y-1.5">
-              <Label>Nome *</Label>
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Data de nascimento *</Label>
+                <Label>Número *</Label>
+                <Input
+                  value={form.bib_number}
+                  onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nome *</Label>
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>CPF</Label>
                 <Input
                   inputMode="numeric"
-                  placeholder="dd/mm/aaaa"
-                  value={form.birth_date}
-                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
+                  placeholder="000.000.000-00"
+                  value={form.cpf}
+                  onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Telefone</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>E-mail</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
@@ -888,47 +910,54 @@ function Atletas() {
                 </select>
               </div>
               <div className="space-y-1.5">
+                <Label>Data de nascimento *</Label>
+                <Input
+                  inputMode="numeric"
+                  placeholder="dd/mm/aaaa"
+                  value={form.birth_date}
+                  onChange={(e) => setForm({ ...form, birth_date: maskBrDate(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1.5">
                 <Label>Cidade</Label>
                 <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label>Equipe</Label>
-                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>CPF</Label>
-                <Input
-                  inputMode="numeric"
-                  placeholder="000.000.000-00"
-                  value={form.cpf}
-                  onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>E-mail</Label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Telefone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Nº de inscrição</Label>
-                <Input
-                  value={form.registration_number}
-                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Número *</Label>
-                <Input
-                  value={form.bib_number}
-                  onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
-                />
+                <Label>Camisa</Label>
+                <select
+                  value={shirtOther ? "__other__" : form.shirt_size}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "__other__") {
+                      setShirtOther(true);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: "" });
+                    } else {
+                      setShirtOther(false);
+                      setCustomShirt("");
+                      setForm({ ...form, shirt_size: value });
+                    }
+                  }}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  {importedSizes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  <option value="__other__">+ Digitar novo</option>
+                </select>
+                {shirtOther && (
+                  <Input
+                    placeholder="Digite o tamanho (ex: M, G, 42)"
+                    value={customShirt}
+                    onChange={(e) => {
+                      const upper = e.target.value.toUpperCase();
+                      setCustomShirt(upper);
+                      setForm({ ...form, shirt_size: upper });
+                    }}
+                  />
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
@@ -1002,56 +1031,9 @@ function Atletas() {
                   />
                 )}
               </div>
-
-
-
-
-
               <div className="space-y-1.5">
-                <Label>Camiseta</Label>
-                <select
-                  value={shirtOther ? "__other__" : form.shirt_size}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "__other__") {
-                      setShirtOther(true);
-                      setCustomShirt("");
-                      setForm({ ...form, shirt_size: "" });
-                    } else {
-                      setShirtOther(false);
-                      setCustomShirt("");
-                      setForm({ ...form, shirt_size: value });
-                    }
-                  }}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
-                >
-                  {importedSizes.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                  <option value="__other__">+ Digitar novo</option>
-                </select>
-                {shirtOther && (
-                  <Input
-                    placeholder="Digite o tamanho (ex: M, G, 42)"
-                    value={customShirt}
-                    onChange={(e) => {
-                      const upper = e.target.value.toUpperCase();
-                      setCustomShirt(upper);
-                      setForm({ ...form, shirt_size: upper });
-                    }}
-                  />
-                )}
-              </div>
-
-
-              <div className="space-y-1.5">
-                <Label>Kit</Label>
-                <Input
-                  value={form.kit_type}
-                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
-                />
+                <Label>Equipe</Label>
+                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <Label>Status</Label>
@@ -1063,6 +1045,20 @@ function Atletas() {
                   <option value="pago">Pago</option>
                   <option value="pendente">Pendente pagamento</option>
                 </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Número de inscrição</Label>
+                <Input
+                  value={form.registration_number}
+                  onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Kit</Label>
+                <Input
+                  value={form.kit_type}
+                  onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
+                />
               </div>
               {CUSTOM_KEYS.map((key, i) => (
                 <div key={key} className="space-y-1.5">
