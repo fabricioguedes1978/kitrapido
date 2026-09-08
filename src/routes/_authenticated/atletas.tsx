@@ -605,20 +605,22 @@ function Atletas() {
   function exportCsv() {
     const csv = Papa.unparse(
       athletes.map((a) => ({
+        Numero: a.bib_number,
         Nome: a.name,
+        CPF: a.cpf,
+        Telefone: a.phone,
+        Email: a.email,
         Sexo: a.gender,
         Nascimento: a.birth_date,
         Cidade: a.city,
-        Equipe: a.equipe,
-        CPF: a.cpf,
-        Inscricao: a.registration_number,
-        Numero: a.bib_number,
+        Camisa: a.shirt_size,
         Modalidade: a.modality,
         Categoria: a.category,
-        Camiseta: a.shirt_size,
+        Equipe: a.equipe,
+        Status: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
+        "Numero de inscricao": a.registration_number,
         Kit: a.kit_type,
-        Pagamento: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
-        Status: KIT_STATUS[a.kit_status] ?? a.kit_status,
+        "Status do kit": KIT_STATUS[a.kit_status] ?? a.kit_status,
       })),
     );
     downloadBlob("\uFEFF" + csv, `atletas-${event?.slug ?? "evento"}.csv`, "text/csv;charset=utf-8");
