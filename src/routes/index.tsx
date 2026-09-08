@@ -130,7 +130,7 @@ function Landing() {
         <div className="mx-auto grid min-h-[auto] min-w-0 max-w-[1440px] items-center gap-8 px-4 pt-6 pb-10 sm:px-5 sm:pt-10 sm:pb-16 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:min-h-[680px] lg:gap-12 lg:px-10 lg:pt-12 xl:px-16">
           <div className="relative z-10 min-w-0 max-w-3xl">
             <span className="border-primary/25 bg-primary/8 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase sm:px-4 sm:py-2 sm:text-sm">
-              <PackageCheck className="size-4 sm:size-5" /> Entrega de kits sem fila
+              <QrCode className="size-4 sm:size-5" /> Atleta, faça seu check-in
             </span>
             <h1 className="mt-4 text-3xl leading-[1.05] font-extrabold sm:mt-7 sm:text-5xl sm:leading-[0.98] lg:text-7xl">
               A RETIRADA DE KITS DA SUA CORRIDA
