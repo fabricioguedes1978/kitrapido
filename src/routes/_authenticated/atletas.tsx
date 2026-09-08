@@ -121,6 +121,7 @@ const COLUMN_MAP: Record<string, string> = {
   modalidade: "modality",
   categoria: "category",
   camiseta: "shirt_size",
+  camisa: "shirt_size",
   tamanho: "shirt_size",
   kit: "kit_type",
   status: "payment_status",
