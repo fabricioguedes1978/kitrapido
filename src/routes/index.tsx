@@ -111,9 +111,16 @@ function Landing() {
       {/* Header */}
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
         <Brand />
-        <Button asChild size="sm" className="shadow-brand">
-          <Link to="/auth">Entrar no sistema</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="outline" className="border-primary/50 text-primary">
+            <Link to="/checkin">
+              <QrCode className="size-4" /> Check-in do atleta
+            </Link>
+          </Button>
+          <Button asChild size="sm" className="shadow-brand">
+            <Link to="/auth">Entrar no sistema</Link>
+          </Button>
+        </div>
       </header>
 
       {/* Hero */}
