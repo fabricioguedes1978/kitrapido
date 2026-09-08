@@ -711,9 +711,9 @@ function Atletas() {
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              Aceita CSV, XLSX e XLS. Colunas reconhecidas: nome, sexo, data de nascimento, cidade,
-              cpf, e-mail, telefone, inscrição, numero, modalidade, categoria, distância, camiseta, kit,
-              status (Pago ou Pendente pagamento)
+              Aceita CSV, XLSX e XLS. Colunas na ordem: numero, nome, cpf, telefone, email, sexo,
+              nascimento, cidade, camisa, modalidade, categoria, equipe, status (Pago ou Pendente
+              pagamento), numero de inscricao, kit
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -727,14 +727,14 @@ function Atletas() {
               onClick={(e) => {
                 e.stopPropagation();
                 const headers = [
-                  "nome", "sexo", "nascimento", "cidade", "equipe", "cpf", "email", "telefone",
-                  "inscricao", "numero", "modalidade", "categoria", "camiseta", "kit",
-                  "status", "extra1", "extra2", "extra3", "extra4", "extra5",
+                  "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
+                  "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
+                  "kit", "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
-                  "Maria Silva", "F", "15/05/1990", "São Paulo", "Equipe Exemplo", "123.456.789-09",
-                  "maria@email.com", "(31) 9999-9999", "INS001", "1001", "Corrida", "Feminino Geral",
-                  "M", "Kit Padrão", "Pago", "", "", "", "", "",
+                  "1001", "Maria Silva", "123.456.789-09", "(31) 9999-9999", "maria@email.com",
+                  "FEMININO", "15/05/1990", "São Paulo", "M", "Corrida", "Feminino Geral",
+                  "Equipe Exemplo", "Pago", "INS001", "Kit Padrão", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
