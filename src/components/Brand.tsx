@@ -15,7 +15,7 @@ export function Brand({
       <span
         className={cn(
           "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-sm",
-          compact ? "size-9" : "h-10 w-auto min-w-[5.5rem]",
+          compact ? "size-10" : "h-12 w-auto min-w-[6.5rem]",
         )}
       >
         <img
@@ -28,7 +28,7 @@ export function Brand({
         <span className="min-w-0 leading-none">
           <span
             className={cn(
-              "font-display block truncate text-lg font-bold tracking-tight",
+              "font-display block truncate text-xl font-extrabold tracking-tight sm:text-2xl",
               inverted ? "text-sidebar-foreground" : "text-foreground",
             )}
           >
@@ -36,7 +36,7 @@ export function Brand({
           </span>
           <span
             className={cn(
-              "block truncate text-[10px] font-medium tracking-[0.18em] uppercase",
+              "block truncate text-[11px] font-medium tracking-[0.18em] uppercase sm:text-xs",
               inverted ? "text-sidebar-foreground/60" : "text-muted-foreground",
             )}
           >
