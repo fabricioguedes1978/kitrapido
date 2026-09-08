@@ -156,39 +156,161 @@ export function EventSelector({ className }: { className?: string }) {
   );
 }
 
-const INSTRUCTIONS: Record<AppRole, { title: string; items: string[] }> = {
+type ManualSection = { icon: typeof ScanLine; title: string; steps: string[] };
+
+const MANUAL: Record<AppRole, { title: string; sections: ManualSection[]; tips: string[]; faq: { q: string; a: string }[] }> = {
   attendant: {
-    title: "Instruções para Staff",
-    items: [
-      "Acesse a Central de Entrega pelo menu lateral.",
-      "Leia o QR Code do atleta com o botão de leitura, ou pesquise por nome, número ou CPF.",
-      "Confira os dados do atleta na tela: número, kit, camiseta e status de pagamento.",
-      "Clique em \"Entregar Kit\" para dar baixa. Se for retirada por terceiros, informe o nome de quem retirou.",
-      "Se entregar para o atleta errado, use \"Cancelar entrega\" na área de kit entregue para desfazer.",
-      "O seletor de evento no topo define em qual evento você está trabalhando.",
+    title: "Manual do Staff (Entrega de Kits)",
+    sections: [
+      {
+        icon: ScanLine,
+        title: "1. Abrindo a Central de Entrega",
+        steps: [
+          "No menu lateral, clique em Central de Entrega.",
+          "Confirma no topo qual evento está selecionado.",
+          "Se estiver offline, o sistema guarda a entrega e sincroniza quando voltar a internet.",
+        ],
+      },
+      {
+        icon: Users,
+        title: "2. Localizando o atleta",
+        steps: [
+          "Clique em Ler QR Code e aponte a câmera para o voucher do atleta.",
+          "Ou digite o nome, número de peito ou CPF no campo de busca.",
+          "Verifique se o atleta exibido é realmente quem está na frente de você.",
+        ],
+      },
+      {
+        icon: Package,
+        title: "3. Entregando o kit",
+        steps: [
+          "Confira o número, kit, camiseta e status de pagamento (verde = pago, vermelho = pendente).",
+          "Se a retirada for feita por outra pessoa, preencha Quem retirou.",
+          "Clique em Entregar Kit para registrar a entrega.",
+        ],
+      },
+      {
+        icon: AlertCircle,
+        title: "4. Corrigindo um erro",
+        steps: [
+          "Se entregar para o atleta errado, vá na aba Kit entregue.",
+          "Encontre o atleta e clique em Cancelar entrega.",
+          "O estoque é restaurado automaticamente e tudo fica registrado na auditoria.",
+        ],
+      },
+    ],
+    tips: [
+      "Sempre confira o nome e o número antes de clicar em Entregar Kit.",
+      "Em caso de dúvida, chame o gerente ou administrador do evento.",
+      "O celular do atleta não precisa estar com internet — o QR Code funciona offline.",
+    ],
+    faq: [
+      { q: "Posso entregar kit de atleta com pagamento pendente?", a: "O sistema mostra o aviso em vermelho, mas a entrega pode ser registrada se a organização permitir. Siga a orientação do seu gerente." },
+      { q: "E se o QR Code não ler?", a: "Use a busca por nome, número ou CPF. O QR Code é só uma forma mais rápida." },
+      { q: "O que acontece se eu cancelar uma entrega?", a: "A entrega é desfeita, o estoque volta e fica registrado quem cancelou." },
     ],
   },
   organizer: {
-    title: "Instruções para Gerente",
-    items: [
-      "Use o seletor de evento no topo para escolher o evento que deseja gerenciar.",
-      "Em Atletas, cadastre, edite ou importe a planilha de inscritos (quando autorizado pelo administrador).",
-      "Em Central de Entrega, acompanhe e realize as entregas de kits.",
-      "Em Entregas, filtre por entregues, pendentes ou todos, e exporte para Excel.",
-      "Em Estoque, acompanhe automaticamente o total, entregues e a entregar por tamanho de camiseta.",
-      "Em Usuários, cadastre os staffs do seu evento (acesso por CPF).",
-      "Atenção: edições de atletas são bloqueadas 24h antes do evento.",
+    title: "Manual do Gerente de Evento",
+    sections: [
+      {
+        icon: CalendarDays,
+        title: "1. Escolhendo e configurando o evento",
+        steps: [
+          "Use o seletor de evento no topo para alternar entre seus eventos.",
+          "Em Eventos, complete local, data/horário de largada e informações de retirada de kit.",
+          "Adicione o endereço de entrega e o link do Google Maps para os atletas.",
+        ],
+      },
+      {
+        icon: Users,
+        title: "2. Cadastrando e importando atletas",
+        steps: [
+          "Em Atletas, cadastre individualmente ou importe a planilha de inscritos.",
+          "A importação só funciona se o administrador autorizou no evento.",
+          "Número, sexo, data de nascimento e modalidade são obrigatórios.",
+          "CPF é opcional, mas, se preenchido, precisa ser válido.",
+        ],
+      },
+      {
+        icon: UserCog,
+        title: "3. Cadastrando staffs",
+        steps: [
+          "Em Usuários, adicione staffs informando CPF e nome.",
+          "O staff faz login com o CPF e a senha definida por você ou pelo administrador.",
+          "Staffs só enxergam a Central de Entrega do evento vinculado.",
+        ],
+      },
+      {
+        icon: Boxes,
+        title: "4. Acompanhando estoque e entregas",
+        steps: [
+          "Em Estoque, veja o total, entregues e a entregar por tamanho de camiseta.",
+          "Em Entregas, filtre por entregue, pendente ou todos e exporte para Excel.",
+          "Use a Tela do Atleta para projetar a conferência em um monitor.",
+        ],
+      },
+    ],
+    tips: [
+      "Atualize os dados dos atletas com antecedência: 24h antes do evento o cadastro trava.",
+      "Padronize os tamanhos de camiseta, modalidade e categoria para facilitar o estoque.",
+      "Teste a leitura do QR Code com um atleta antes do dia da entrega.",
+    ],
+    faq: [
+      { q: "Por que não consigo importar planilha?", a: "Verifique se o administrador habilitou a permissão no evento (Permitir importação pelo gerente)." },
+      { q: "Posso editar atleta perto do evento?", a: "Não. 24h antes da data do evento, apenas o administrador pode alterar dados." },
+      { q: "Como adiciono um staff?", a: "Vá em Usuários → Novo usuário, escolha o perfil Staff e vincule ao evento." },
     ],
   },
   admin: {
-    title: "Instruções para Administrador",
-    items: [
-      "Crie e gerencie eventos em Eventos; você pode inativar ou excluir eventos.",
-      "Use o seletor de evento no topo para alternar entre os eventos.",
-      "Cadastre gerentes em Usuários e vincule-os aos eventos (acesso por CPF e data de nascimento).",
-      "Defina em cada evento se o gerente pode importar a planilha de inscritos.",
-      "Acompanhe tudo pelo Dashboard, Relatórios e Auditoria.",
-      "Em E-mail e Senha, altere suas credenciais de acesso.",
+    title: "Manual do Administrador",
+    sections: [
+      {
+        icon: CalendarDays,
+        title: "1. Criando e gerenciando eventos",
+        steps: [
+          "Em Eventos, crie o evento com nome, data, local e informações de retirada.",
+          "Defina o evento como Ativo (visível a todos) ou Inativo (somente ADM/gerente).",
+          "Inative ou exclua eventos antigos sem perder o histórico.",
+        ],
+      },
+      {
+        icon: UserCog,
+        title: "2. Cadastrando gerentes e staffs",
+        steps: [
+          "Em Usuários, cadastre gerentes (acesso por CPF e data de nascimento).",
+          "Vincule o gerente ao evento para que ele apareça no seletor dele.",
+          "Gerentes podem criar eventos próprios e gerenciar atletas deles.",
+        ],
+      },
+      {
+        icon: ShieldCheck,
+        title: "3. Permissões e segurança",
+        steps: [
+          "Em cada evento, marque se o gerente pode importar planilha de atletas.",
+          "Configure a data/hora de bloqueio de edição (padrão: 24h antes do evento).",
+          "Acompanhe todas as ações em Auditoria.",
+        ],
+      },
+      {
+        icon: FileBarChart,
+        title: "4. Relatórios e monitoramento",
+        steps: [
+          "Use Dashboard para visão geral em tempo real.",
+          "Em Relatórios, exporte listas filtradas por evento, status e perfil.",
+          "Em E-mail e Senha, altere suas credenciais de administrador.",
+        ],
+      },
+    ],
+    tips: [
+      "Sempre crie o evento antes de cadastrar gerentes e atletas.",
+      "Faça backup periódico das listas de atletas usando a exportação Excel.",
+      "Mantenha o evento inativo até que todos os dados estejam validados.",
+    ],
+    faq: [
+      { q: "Posso recuperar um evento excluído?", a: "Não. A exclusão é definitiva, mas os dados permanecem na auditoria. Prefira inativar." },
+      { q: "Como limito o que o gerente faz?", a: "Use as flags do evento: importação pelo gerente e data de bloqueio de edição." },
+      { q: "Onde vejo quem entregou kits?", a: "Em Auditoria e na tela Entregas, com filtros por data e usuário." },
     ],
   },
 };
@@ -196,24 +318,88 @@ const INSTRUCTIONS: Record<AppRole, { title: string; items: string[] }> = {
 function HelpButton() {
   const { role } = useAuth();
   if (!role) return null;
-  const info = INSTRUCTIONS[role];
+  const info = MANUAL[role];
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="shrink-0" title="Instruções de uso">
-          <HelpCircle className="size-5" />
-          <span className="sr-only">Instruções de uso</span>
+        <Button variant="outline" size="sm" className="hidden shrink-0 gap-2 sm:inline-flex" title="Manual de instruções">
+          <BookOpen className="size-4" />
+          <span>Manual</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{info.title}</DialogTitle>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="icon" className="shrink-0 sm:hidden" title="Manual de instruções">
+          <BookOpen className="size-5" />
+          <span className="sr-only">Manual</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl p-0">
+        <DialogHeader className="px-6 pt-6">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <BookOpen className="text-primary size-5" />
+            {info.title}
+          </DialogTitle>
         </DialogHeader>
-        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-          {info.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
+        <Tabs defaultValue="passo" className="w-full">
+          <TabsList className="mx-6 grid w-auto grid-cols-3">
+            <TabsTrigger value="passo">Passo a passo</TabsTrigger>
+            <TabsTrigger value="dicas">Dicas</TabsTrigger>
+            <TabsTrigger value="faq">Dúvidas</TabsTrigger>
+          </TabsList>
+          <ScrollArea className="max-h-[60vh]">
+            <TabsContent value="passo" className="px-6 pb-6 pt-2">
+              <Accordion type="single" collapsible defaultValue="section-0" className="w-full">
+                {info.sections.map((section, idx) => (
+                  <AccordionItem key={section.title} value={`section-${idx}`}>
+                    <AccordionTrigger className="text-left text-sm hover:no-underline">
+                      <span className="flex items-center gap-2">
+                        <section.icon className="text-primary size-4 shrink-0" />
+                        {section.title}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ol className="space-y-2 pl-6 text-sm text-muted-foreground">
+                        {section.steps.map((step, sIdx) => (
+                          <li key={sIdx} className="flex items-start gap-2">
+                            <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </TabsContent>
+            <TabsContent value="dicas" className="px-6 pb-6 pt-2">
+              <ul className="space-y-3">
+                {info.tips.map((tip, idx) => (
+                  <li key={idx} className="flex items-start gap-3 rounded-lg border p-3 text-sm">
+                    <Lightbulb className="mt-0.5 size-4 shrink-0 text-amber-500" />
+                    <span className="text-muted-foreground">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </TabsContent>
+            <TabsContent value="faq" className="px-6 pb-6 pt-2">
+              <Accordion type="single" collapsible className="w-full">
+                {info.faq.map((item, idx) => (
+                  <AccordionItem key={idx} value={`faq-${idx}`}>
+                    <AccordionTrigger className="text-left text-sm hover:no-underline">
+                      <span className="flex items-center gap-2">
+                        <MessageCircleQuestion className="text-primary size-4 shrink-0" />
+                        {item.q}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="pl-6 text-sm text-muted-foreground">{item.a}</p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
