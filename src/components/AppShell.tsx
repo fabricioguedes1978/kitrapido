@@ -43,7 +43,6 @@ const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
   { to: "/atletas", label: "Atletas", icon: Users, roles: ["admin", "organizer"] },
-  { to: "/kits", label: "Kits", icon: Package, roles: ["admin", "organizer"] },
   { to: "/estoque", label: "Estoque", icon: Boxes, roles: ["admin", "organizer"] },
   { to: "/entregas", label: "Entregas", icon: ClipboardList, roles: ["admin", "organizer"] },
   { to: "/locais", label: "Locais de Retirada", icon: MapPin, roles: ["admin", "organizer"] },
