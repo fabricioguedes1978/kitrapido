@@ -119,8 +119,8 @@ function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden border-b">
         <div className="bg-hero-wash absolute inset-0 -z-10" />
-        <div className="mx-auto grid min-h-[680px] max-w-[1440px] items-center gap-12 px-5 pt-10 pb-16 lg:grid-cols-[0.94fr_1.06fr] lg:px-10 lg:pt-12 xl:px-16">
-          <div className="relative z-10 max-w-3xl">
+        <div className="mx-auto grid min-h-[680px] min-w-0 max-w-[1440px] items-center gap-12 px-5 pt-10 pb-16 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:px-10 lg:pt-12 xl:px-16">
+          <div className="relative z-10 min-w-0 max-w-3xl">
             <span className="border-primary/25 bg-primary/8 text-primary inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold uppercase">
               <PackageCheck className="size-5" /> Entrega de kits sem fila
             </span>
