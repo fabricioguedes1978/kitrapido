@@ -15,7 +15,7 @@ export function Brand({
       <span
         className={cn(
           "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-sm",
-          compact ? "size-11" : "h-12 w-auto min-w-[6.5rem]",
+          compact ? "size-9" : "h-10 w-auto min-w-[5.5rem]",
         )}
       >
         <img
