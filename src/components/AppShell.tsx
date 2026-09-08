@@ -22,8 +22,16 @@ import {
   User,
   KeyRound,
   HelpCircle,
+  BookOpen,
+  ChevronRight,
+  AlertCircle,
+  Lightbulb,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Brand } from "@/components/Brand";
 import { OnlineIndicator } from "@/components/OnlineIndicator";
 import { Button } from "@/components/ui/button";
