@@ -443,7 +443,7 @@ function Atletas() {
     });
 
     let inserted = 0;
-    const duplicates = dupCpfCount + dupBibCount;
+    const duplicates = dupCpfCount + dupBibCount + dupRegCount;
     for (let i = 0; i < unique.length; i += 200) {
       const chunk = unique.slice(i, i + 200);
       const { error, count } = await supabase
