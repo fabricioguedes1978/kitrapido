@@ -16,14 +16,14 @@ export function Brand({
     <div className={cn("flex min-w-0 items-center gap-2.5", className)}>
       <span
         className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-sm",
-          compact ? "h-12 w-auto min-w-[4.5rem]" : "h-14 w-auto min-w-[7rem] sm:h-16",
+          "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-sm",
+          compact ? "h-12 w-auto" : "h-14 w-auto sm:h-16",
         )}
       >
         <img
           src={logoAsset.url}
           alt="Kit Rápido"
-          className={cn("h-full w-auto object-contain", compact && "max-h-full max-w-full")}
+          className="h-full w-auto max-w-full object-contain"
         />
       </span>
       {showText && !compact && (
