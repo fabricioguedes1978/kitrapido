@@ -130,11 +130,9 @@ function Autorizacoes() {
         title="Autorizações de terceiros"
         subtitle={event?.name ?? ""}
         action={
-          canManage ? (
-            <Button onClick={() => setOpen(true)}>
-              <Plus className="size-4" /> Nova autorização
-            </Button>
-          ) : undefined
+          <Button onClick={() => { setEditing(null); setForm({ name: "", cpf: "", phone: "" }); setAthleteId(""); setSearch(""); setOpen(true); }}>
+            <Plus className="size-4" /> Nova autorização
+          </Button>
         }
       />
 
