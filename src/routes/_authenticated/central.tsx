@@ -501,10 +501,23 @@ function Central() {
                 ref={inputRef}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="Nome, CPF, inscrição, nº de peito ou equipe"
+                placeholder={teamOnly ? "Digite o nome da equipe" : "Nome, CPF, inscrição ou nº de peito"}
                 className="h-14 pl-11 text-base"
                 autoComplete="off"
               />
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <Checkbox
+                id="team-only"
+                checked={teamOnly}
+                onCheckedChange={(checked) => {
+                  setTeamOnly(checked === true);
+                  setTerm("");
+                }}
+              />
+              <Label htmlFor="team-only" className="cursor-pointer text-sm font-medium">
+                Pesquisar somente por equipe
+              </Label>
             </div>
 
             {results.length > 0 && (
