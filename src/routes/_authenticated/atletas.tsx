@@ -1074,7 +1074,7 @@ function Atletas() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void saveAthlete()}>Salvar</Button>
+            <Button onClick={() => void saveAthlete()} disabled={!!liveDup}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
