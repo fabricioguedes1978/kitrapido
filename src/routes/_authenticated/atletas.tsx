@@ -765,7 +765,7 @@ function Atletas() {
 
 
       <Input
-        placeholder="Buscar por nome, CPF, inscrição ou nº de peito"
+        placeholder="Buscar por nome, CPF, inscrição, nº de peito ou equipe"
         value={term}
         onChange={(e) => setTerm(e.target.value)}
         className="mb-4 h-12"
