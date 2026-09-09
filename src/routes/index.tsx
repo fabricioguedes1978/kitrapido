@@ -111,8 +111,8 @@ function Landing() {
     <div className="bg-background min-h-screen overflow-x-hidden">
       {/* Header */}
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:py-5">
-        <Brand compact className="sm:hidden" />
-        <Brand className="hidden sm:flex" />
+        <Brand compact showText={false} className="sm:hidden" />
+        <Brand showText={false} className="hidden sm:flex" />
         <div className="flex items-center gap-2">
           <Button asChild size="sm" variant="outline" className="border-primary/50 text-primary h-9 px-2 text-[11px] sm:h-10 sm:px-3 sm:text-sm">
             <Link to="/checkin" className="whitespace-nowrap">

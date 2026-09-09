@@ -5,26 +5,28 @@ export function Brand({
   className,
   compact = false,
   inverted = false,
+  showText = true,
 }: {
   className?: string;
   compact?: boolean;
   inverted?: boolean;
+  showText?: boolean;
 }) {
   return (
     <div className={cn("flex min-w-0 items-center gap-2.5", className)}>
       <span
         className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-sm",
-          compact ? "size-10" : "h-12 w-auto min-w-[6.5rem]",
+          "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-sm",
+          compact ? "h-12 w-auto" : "h-14 w-auto sm:h-16",
         )}
       >
         <img
           src={logoAsset.url}
           alt="Kit Rápido"
-          className={cn("h-full w-auto object-contain", compact && "max-h-full max-w-full")}
+          className="h-full w-auto max-w-full object-contain"
         />
       </span>
-      {!compact && (
+      {showText && !compact && (
         <span className="min-w-0 leading-none">
           <span
             className={cn(
