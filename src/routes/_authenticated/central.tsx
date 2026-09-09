@@ -795,6 +795,73 @@ function Central() {
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
 
+        <Dialog
+          open={thirdOpen}
+          onOpenChange={(v) => {
+            if (!v) {
+              setThirdOpen(false);
+              if (!manualThird) {
+                setThirdName("");
+                setThirdCpf("");
+              }
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Retirado por terceiros</DialogTitle>
+              <DialogDescription>
+                Informe quem está retirando o kit de <strong>{selected?.name}</strong>. O nome fica
+                registrado no relatório de retirada.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="third-name">Nome de quem retirou</Label>
+                <Input
+                  id="third-name"
+                  value={thirdName}
+                  onChange={(e) => setThirdName(e.target.value)}
+                  placeholder="Nome completo"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="third-cpf">CPF (opcional)</Label>
+                <Input
+                  id="third-cpf"
+                  inputMode="numeric"
+                  value={thirdCpf}
+                  onChange={(e) => setThirdCpf(onlyDigits(e.target.value).slice(0, 11))}
+                  placeholder="Somente números"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setThirdOpen(false);
+                  if (!manualThird) {
+                    setThirdName("");
+                    setThirdCpf("");
+                  }
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disabled={thirdName.trim().length < 3}
+                onClick={() => {
+                  setManualThird({ name: thirdName.trim(), cpf: thirdCpf });
+                  setThirdOpen(false);
+                }}
+              >
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={cancelOpen} onOpenChange={(v) => !v && setCancelOpen(false)}>
           <DialogContent>
             <DialogHeader>
