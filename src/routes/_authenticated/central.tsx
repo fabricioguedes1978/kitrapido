@@ -134,6 +134,7 @@ function Central() {
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
+  const [teamOnly, setTeamOnly] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const [selected, setSelected] = useState<Athlete | null>(null);
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
