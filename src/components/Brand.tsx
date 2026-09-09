@@ -4,11 +4,13 @@ import { cn } from "@/lib/utils";
 export function Brand({
   className,
   compact = false,
+  large = false,
   inverted = false,
   showText = true,
 }: {
   className?: string;
   compact?: boolean;
+  large?: boolean;
   inverted?: boolean;
   showText?: boolean;
 }) {
@@ -17,7 +19,13 @@ export function Brand({
       <span
         className={cn(
           "flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-sm",
-          compact ? "h-12 w-auto" : "h-14 w-auto sm:h-16",
+          compact
+            ? large
+              ? "h-16 w-auto sm:h-20"
+              : "h-12 w-auto"
+            : large
+              ? "h-16 w-auto sm:h-20"
+              : "h-14 w-auto sm:h-16",
         )}
       >
         <img
