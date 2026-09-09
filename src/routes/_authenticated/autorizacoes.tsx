@@ -247,6 +247,7 @@ function Autorizacoes() {
                 </div>
               )}
             </div>
+            )}
             <div className="space-y-1.5">
               <Label>Nome do autorizado</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
