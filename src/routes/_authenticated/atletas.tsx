@@ -425,15 +425,20 @@ function Atletas() {
 
     const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
     const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
+    const seenReg = new Set(athletes.map((a) => a.registration_number ?? "").filter(Boolean));
     let dupCpfCount = 0;
     let dupBibCount = 0;
+    let dupRegCount = 0;
     const unique = parsed.filter((row) => {
       const cpf = row.cpf ?? "";
       const bib = row.bib_number ?? "";
+      const reg = row.registration_number ?? "";
       if (cpf && seenCpf.has(cpf)) { dupCpfCount++; return false; }
       if (bib && seenBib.has(bib)) { dupBibCount++; return false; }
+      if (reg && seenReg.has(reg)) { dupRegCount++; return false; }
       if (cpf) seenCpf.add(cpf);
       if (bib) seenBib.add(bib);
+      if (reg) seenReg.add(reg);
       return true;
     });
 
