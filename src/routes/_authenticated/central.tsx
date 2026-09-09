@@ -405,6 +405,9 @@ function Central() {
     setSelected(null);
     setTerm("");
     setAsThirdParty(false);
+    setManualThird(null);
+    setThirdName("");
+    setThirdCpf("");
     setMethod("busca");
     setTimeout(() => {
       setSuccess(null);
