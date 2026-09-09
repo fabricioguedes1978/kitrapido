@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
+import { useAuth } from "@/hooks/useAuth";
 import { isValidCPF, maskCPF, onlyDigits } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/autorizacoes")({
@@ -42,6 +43,8 @@ type Auth = {
 
 function Autorizacoes() {
   const { event, eventId } = useCurrentEvent();
+  const { isAdmin, isOrganizer } = useAuth();
+  const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [qr, setQr] = useState<Auth | null>(null);
@@ -119,9 +122,11 @@ function Autorizacoes() {
         title="Autorizações de terceiros"
         subtitle={event?.name ?? ""}
         action={
-          <Button onClick={() => setOpen(true)}>
-            <Plus className="size-4" /> Nova autorização
-          </Button>
+          canManage ? (
+            <Button onClick={() => setOpen(true)}>
+              <Plus className="size-4" /> Nova autorização
+            </Button>
+          ) : undefined
         }
       />
 
@@ -154,7 +159,7 @@ function Autorizacoes() {
                     <Button variant="ghost" size="icon" onClick={() => setQr(a)}>
                       <QrCode className="size-4" />
                     </Button>
-                    {a.status === "active" && (
+                    {canManage && a.status === "active" && (
                       <Button variant="ghost" size="sm" onClick={() => void cancel(a.id)}>
                         Cancelar
                       </Button>
