@@ -870,10 +870,26 @@ function Atletas() {
             <DialogTitle>{editingId ? "Editar atleta" : "Novo atleta"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            {(dupWarning || liveDup) && (
-              <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
-                <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-                <span>{dupWarning ?? liveDup}</span>
+            {(dupWarning || cpfWarning || bibWarning) && (
+              <div className="space-y-2">
+                {dupWarning && (
+                  <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{dupWarning}</span>
+                  </div>
+                )}
+                {cpfWarning && (
+                  <div className="border-warning/40 bg-warning/10 text-warning flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{cpfWarning}</span>
+                  </div>
+                )}
+                {bibWarning && (
+                  <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{bibWarning}</span>
+                  </div>
+                )}
               </div>
             )}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
