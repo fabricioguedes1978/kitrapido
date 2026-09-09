@@ -712,48 +712,56 @@ function Central() {
                 </div>
               )}
 
+              {!activeDelivery && !queuedOffline && (
+                <div className="border-t px-5 py-4 sm:px-6">
+                  <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-3">
+                    <Checkbox
+                      id="terceiros"
+                      className="mt-0.5 size-5"
+                      checked={!!manualThird}
+                      onCheckedChange={(v) => {
+                        if (v) {
+                          setThirdName(manualThird?.name ?? "");
+                          setThirdCpf(manualThird?.cpf ?? "");
+                          setThirdOpen(true);
+                        } else {
+                          setManualThird(null);
+                        }
+                      }}
+                    />
+                    <div className="space-y-1">
+                      <Label htmlFor="terceiros" className="font-bold uppercase">
+                        Retirado por terceiros
+                      </Label>
+                      {manualThird && (
+                        <p className="text-muted-foreground text-sm">
+                          {manualThird.name}
+                          {manualThird.cpf ? ` · CPF ${maskCPF(manualThird.cpf)}` : ""}{" "}
+                          <button
+                            type="button"
+                            className="text-primary underline"
+                            onClick={() => {
+                              setThirdName(manualThird.name);
+                              setThirdCpf(manualThird.cpf);
+                              setThirdOpen(true);
+                            }}
+                          >
+                            alterar
+                          </button>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="border-t px-5 py-4 sm:px-6">
                 {confirming ? (
                   <div className="bg-muted space-y-3 rounded-xl p-4">
-                    <p className="text-center font-semibold">Confirme a entrega do kit para este atleta.</p>
-
-                    <div className="bg-background flex items-start gap-3 rounded-lg border p-3">
-                      <Checkbox
-                        id="terceiros"
-                        checked={!!manualThird}
-                        onCheckedChange={(v) => {
-                          if (v) {
-                            setThirdName(manualThird?.name ?? "");
-                            setThirdCpf(manualThird?.cpf ?? "");
-                            setThirdOpen(true);
-                          } else {
-                            setManualThird(null);
-                          }
-                        }}
-                      />
-                      <div className="space-y-1">
-                        <Label htmlFor="terceiros" className="font-bold uppercase">
-                          Retirado por terceiros
-                        </Label>
-                        {manualThird && (
-                          <p className="text-muted-foreground text-sm">
-                            {manualThird.name}
-                            {manualThird.cpf ? ` · CPF ${maskCPF(manualThird.cpf)}` : ""}{" "}
-                            <button
-                              type="button"
-                              className="text-primary underline"
-                              onClick={() => {
-                                setThirdName(manualThird.name);
-                                setThirdCpf(manualThird.cpf);
-                                setThirdOpen(true);
-                              }}
-                            >
-                              alterar
-                            </button>
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    <p className="text-center font-semibold">
+                      Confirme a entrega do kit para este atleta.
+                      {manualThird ? ` Retirada por terceiros: ${manualThird.name}.` : ""}
+                    </p>
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Button size="lg" className="h-14" onClick={() => void confirmDelivery()}>
