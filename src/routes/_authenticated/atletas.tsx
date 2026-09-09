@@ -542,24 +542,17 @@ function Atletas() {
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
-    if (cpf || bib) {
-      const filters: string[] = [];
-      if (cpf) filters.push(`cpf.eq.${cpf}`);
-      if (bib) filters.push(`bib_number.eq.${bib}`);
+    if (bib) {
       const { data: dups } = await supabase
         .from("athletes")
-        .select("id,name,cpf,bib_number")
+        .select("id,name,bib_number")
         .eq("event_id", eventId)
-        .or(filters.join(","));
-      const others = (dups ?? []).filter((d) => d.id !== editingId);
-      const dupCpf = cpf ? others.find((d) => onlyDigits(d.cpf) === cpf) : null;
-      const dupBib = bib ? others.find((d) => d.bib_number === bib) : null;
-      if (dupCpf || dupBib) {
-        const msg = dupCpf
-          ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
-          : `O nº de peito ${bib} já está em uso neste evento (${dupBib!.name}).`;
+        .eq("bib_number", bib);
+      const dupBib = (dups ?? []).find((d) => d.id !== editingId);
+      if (dupBib) {
+        const msg = `O nº ${bib} já está em uso neste evento (${dupBib.name}).`;
         setDupWarning(msg);
-        toast.error("Dado duplicado", { description: msg });
+        toast.error("Número duplicado", { description: msg });
         return;
       }
     }
