@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,6 +91,8 @@ function Entregas() {
   const [term, setTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("delivered");
   const [cancelling, setCancelling] = useState<DeliveryRow | null>(null);
+  const [editing, setEditing] = useState<DeliveryRow | null>(null);
+  const [editName, setEditName] = useState("");
 
   const { data: athletes = [] } = useQuery({
     queryKey: ["deliveries-athletes", eventId],
@@ -240,6 +243,34 @@ function Entregas() {
     toast.success("Entrega cancelada. O atleta voltou para pendente.");
   }
 
+  async function saveThirdParty() {
+    if (!editing) return;
+    const name = editName.trim();
+    const { error } = await supabase
+      .from("deliveries")
+      .update({
+        delivery_type: name ? "third_party" : "athlete",
+        third_party_name: name || null,
+      })
+      .eq("id", editing.id);
+    if (error) {
+      toast.error("Não foi possível salvar", { description: error.message });
+      return;
+    }
+    await logAudit({
+      eventId: eventId!,
+      userName: profile?.name ?? null,
+      action: name
+        ? `Registrou retirada por terceiro (${name}) para ${editing.athletes?.name ?? "atleta"}`
+        : `Removeu retirada por terceiro de ${editing.athletes?.name ?? "atleta"}`,
+      entity: "deliveries",
+      entityId: editing.id,
+    });
+    await qc.invalidateQueries({ queryKey: ["deliveries-full", eventId] });
+    setEditing(null);
+    toast.success("Dados de quem retirou atualizados.");
+  }
+
   return (
     <AppShell>
       <PageHeader title="Entregas" subtitle={event?.name ?? ""} />
@@ -282,7 +313,7 @@ function Entregas() {
                 <TableHead className="hidden md:table-cell">Atendente</TableHead>
                 <TableHead className="hidden sm:table-cell">Tipo</TableHead>
                 <TableHead>Status</TableHead>
-                {canManage && <TableHead />}
+                <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -311,15 +342,25 @@ function Entregas() {
                       {row.status === "delivered" ? "Kit entregue" : row.status === "blocked" ? "Bloqueado" : "Kit pendente"}
                     </Badge>
                   </TableCell>
-                  {canManage && (
-                    <TableCell>
-                      {row.delivery && (
-                        <Button variant="ghost" size="sm" onClick={() => setCancelling(row.delivery)}>
-                          Cancelar
-                        </Button>
-                      )}
-                    </TableCell>
-                  )}
+                  <TableCell className="flex gap-1">
+                    {row.delivery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditing(row.delivery);
+                          setEditName(row.delivery?.third_party_name ?? "");
+                        }}
+                      >
+                        Quem retirou
+                      </Button>
+                    )}
+                    {canManage && row.delivery && (
+                      <Button variant="ghost" size="sm" onClick={() => setCancelling(row.delivery)}>
+                        Cancelar
+                      </Button>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
               {filtered.length === 0 && (
@@ -344,6 +385,28 @@ function Entregas() {
             <Button variant="destructive" onClick={() => void cancel()}>
               Confirmar cancelamento
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editing} onOpenChange={(v) => !v && setEditing(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Quem retirou o kit</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="tp-name">Nome de quem retirou (deixe vazio se foi o próprio atleta)</Label>
+            <Input
+              id="tp-name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value.toUpperCase())}
+              placeholder="NOME COMPLETO"
+              className="h-12"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Voltar</Button>
+            <Button onClick={() => void saveThirdParty()}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
