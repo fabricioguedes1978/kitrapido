@@ -139,6 +139,10 @@ function Central() {
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
   const [confirming, setConfirming] = useState(false);
   const [asThirdParty, setAsThirdParty] = useState(false);
+  const [manualThird, setManualThird] = useState<{ name: string; cpf: string } | null>(null);
+  const [thirdOpen, setThirdOpen] = useState(false);
+  const [thirdName, setThirdName] = useState("");
+  const [thirdCpf, setThirdCpf] = useState("");
   const [success, setSuccess] = useState<{ name: string; bib: string | null; at: string } | null>(null);
   const [locationId, setLocationId] = useState<string>("");
   const [cancelOpen, setCancelOpen] = useState(false);
