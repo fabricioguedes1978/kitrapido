@@ -83,6 +83,7 @@ type Athlete = {
   modality: string | null;
   category: string | null;
   city: string | null;
+  equipe: string | null;
   shirt_size: string | null;
   kit_type: string | null;
   kit_status: string;
@@ -156,7 +157,7 @@ function Central() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
@@ -238,6 +239,7 @@ function Central() {
           a.name.toLowerCase().includes(q) ||
           (a.bib_number ?? "").toLowerCase().includes(q) ||
           (a.registration_number ?? "").toLowerCase().includes(q) ||
+          (a.equipe ?? "").toLowerCase().includes(q) ||
           (digits.length >= 3 && onlyDigits(a.cpf).includes(digits)) ||
           (digits.length >= 4 && onlyDigits(a.phone).includes(digits))
         );
@@ -498,7 +500,7 @@ function Central() {
                 ref={inputRef}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="Nome, CPF, inscrição, nº de peito ou telefone"
+                placeholder="Nome, CPF, inscrição, nº de peito, telefone ou equipe"
                 className="h-14 pl-11 text-base"
                 autoComplete="off"
               />
