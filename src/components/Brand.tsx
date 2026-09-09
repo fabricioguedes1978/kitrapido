@@ -24,7 +24,7 @@ export function Brand({
               ? "h-16 w-auto sm:h-20"
               : "h-12 w-auto"
             : large
-              ? "h-18 w-auto sm:h-22"
+              ? "h-16 w-auto sm:h-20"
               : "h-14 w-auto sm:h-16",
         )}
       >
