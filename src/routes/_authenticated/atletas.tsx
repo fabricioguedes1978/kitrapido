@@ -286,6 +286,12 @@ function Atletas() {
     return null;
   }, [athletes, form.cpf, form.bib_number, editingId]);
 
+  const bibDuplicate = useMemo(() => {
+    const bib = form.bib_number.trim();
+    if (!bib) return false;
+    return athletes.some((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+  }, [athletes, form.bib_number, editingId]);
+
   function openNew() {
     if (locked) {
       toast.error("Cadastro de atletas encerrado", {
