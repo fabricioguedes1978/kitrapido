@@ -719,8 +719,8 @@ function Atletas() {
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas na ordem: numero, nome, cpf, telefone, email, sexo,
-              nascimento, cidade, kit, camisa, modalidade, categoria, equipe, status (Pago ou Pendente
-              pagamento), numero de inscricao
+              nascimento, cidade, kit, camisa, modalidade, categoria, equipe, status (Pago ou Pendente),
+              numero de inscricao
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
