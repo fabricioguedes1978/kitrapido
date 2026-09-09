@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS public.athletes_event_cpf_uidx;

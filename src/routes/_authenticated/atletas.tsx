@@ -272,24 +272,27 @@ function Atletas() {
       .slice(0, 300);
   }, [athletes, term]);
 
-  const liveDup = useMemo(() => {
+  const cpfWarning = useMemo(() => {
     const cpf = onlyDigits(form.cpf);
-    const bib = form.bib_number.trim();
     if (cpf.length === 11) {
       const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf && a.id !== editingId);
       if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
     }
-    if (bib) {
-      const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
-      if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
-    }
     return null;
-  }, [athletes, form.cpf, form.bib_number, editingId]);
+  }, [athletes, form.cpf, editingId]);
 
   const bibDuplicate = useMemo(() => {
     const bib = form.bib_number.trim();
     if (!bib) return false;
     return athletes.some((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+  }, [athletes, form.bib_number, editingId]);
+
+  const bibWarning = useMemo(() => {
+    const bib = form.bib_number.trim();
+    if (!bib) return null;
+    const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+    if (hit) return `O nº ${bib} já está em uso neste evento (${hit.name}).`;
+    return null;
   }, [athletes, form.bib_number, editingId]);
 
   function openNew() {
@@ -422,25 +425,30 @@ function Atletas() {
 
     const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
     const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
+    const seenReg = new Set(athletes.map((a) => a.registration_number ?? "").filter(Boolean));
     let dupCpfCount = 0;
     let dupBibCount = 0;
+    let dupRegCount = 0;
     const unique = parsed.filter((row) => {
       const cpf = row.cpf ?? "";
       const bib = row.bib_number ?? "";
+      const reg = row.registration_number ?? "";
       if (cpf && seenCpf.has(cpf)) { dupCpfCount++; return false; }
       if (bib && seenBib.has(bib)) { dupBibCount++; return false; }
+      if (reg && seenReg.has(reg)) { dupRegCount++; return false; }
       if (cpf) seenCpf.add(cpf);
       if (bib) seenBib.add(bib);
+      if (reg) seenReg.add(reg);
       return true;
     });
 
     let inserted = 0;
-    const duplicates = dupCpfCount + dupBibCount;
+    const duplicates = dupCpfCount + dupBibCount + dupRegCount;
     for (let i = 0; i < unique.length; i += 200) {
       const chunk = unique.slice(i, i + 200);
       const { error, count } = await supabase
         .from("athletes")
-        .upsert(chunk, { onConflict: "event_id,cpf", ignoreDuplicates: true, count: "exact" });
+        .upsert(chunk, { onConflict: "event_id,bib_number", ignoreDuplicates: true, count: "exact" });
       if (error) {
         toast.error("Erro na importação", {
           description:
@@ -463,10 +471,10 @@ function Atletas() {
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
       description: [
         duplicates > 0
-          ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
+          ? `${dupCpfCount} com CPF repetido, ${dupBibCount} com nº repetido e ${dupRegCount} com inscrição repetida.`
           : null,
         incomplete > 0
-          ? `${incomplete} linha(s) ignoradas por falta de nome, CPF, número, nascimento, sexo ou modalidade.`
+          ? `${incomplete} linha(s) ignoradas por falta de nome, número, nascimento, sexo ou modalidade.`
           : null,
       ]
         .filter(Boolean)
@@ -539,24 +547,17 @@ function Atletas() {
     setDupWarning(null);
     const cpf = form.cpf ? onlyDigits(form.cpf) : null;
     const bib = form.bib_number.trim() || null;
-    if (cpf || bib) {
-      const filters: string[] = [];
-      if (cpf) filters.push(`cpf.eq.${cpf}`);
-      if (bib) filters.push(`bib_number.eq.${bib}`);
+    if (bib) {
       const { data: dups } = await supabase
         .from("athletes")
-        .select("id,name,cpf,bib_number")
+        .select("id,name,bib_number")
         .eq("event_id", eventId)
-        .or(filters.join(","));
-      const others = (dups ?? []).filter((d) => d.id !== editingId);
-      const dupCpf = cpf ? others.find((d) => onlyDigits(d.cpf) === cpf) : null;
-      const dupBib = bib ? others.find((d) => d.bib_number === bib) : null;
-      if (dupCpf || dupBib) {
-        const msg = dupCpf
-          ? `Este CPF já está cadastrado neste evento (${dupCpf.name}).`
-          : `O nº de peito ${bib} já está em uso neste evento (${dupBib!.name}).`;
+        .eq("bib_number", bib);
+      const dupBib = (dups ?? []).find((d) => d.id !== editingId);
+      if (dupBib) {
+        const msg = `O nº ${bib} já está em uso neste evento (${dupBib.name}).`;
         setDupWarning(msg);
-        toast.error("Dado duplicado", { description: msg });
+        toast.error("Número duplicado", { description: msg });
         return;
       }
     }
@@ -867,10 +868,26 @@ function Atletas() {
             <DialogTitle>{editingId ? "Editar atleta" : "Novo atleta"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            {(dupWarning || liveDup) && (
-              <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
-                <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-                <span>{dupWarning ?? liveDup}</span>
+            {(dupWarning || cpfWarning || bibWarning) && (
+              <div className="space-y-2">
+                {dupWarning && (
+                  <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{dupWarning}</span>
+                  </div>
+                )}
+                {cpfWarning && (
+                  <div className="border-warning/40 bg-warning/10 text-warning flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{cpfWarning}</span>
+                  </div>
+                )}
+                {bibWarning && (
+                  <div className="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    <span>{bibWarning}</span>
+                  </div>
+                )}
               </div>
             )}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1116,7 +1133,7 @@ function Atletas() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void saveAthlete()} disabled={!!liveDup}>Salvar</Button>
+            <Button onClick={() => void saveAthlete()} disabled={bibDuplicate}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
