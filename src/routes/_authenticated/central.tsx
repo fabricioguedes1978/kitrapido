@@ -239,8 +239,7 @@ function Central() {
           (a.bib_number ?? "").toLowerCase().includes(q) ||
           (a.registration_number ?? "").toLowerCase().includes(q) ||
           (a.equipe ?? "").toLowerCase().includes(q) ||
-          (digits.length >= 3 && onlyDigits(a.cpf).includes(digits)) ||
-          (digits.length >= 4 && onlyDigits(a.phone).includes(digits))
+          (digits.length >= 3 && onlyDigits(a.cpf).includes(digits))
         );
       })
       .slice(0, 25);
