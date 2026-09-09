@@ -50,6 +50,7 @@ function Autorizacoes() {
   const [qr, setQr] = useState<Auth | null>(null);
   const [search, setSearch] = useState("");
   const [athleteId, setAthleteId] = useState("");
+  const [editing, setEditing] = useState<Auth | null>(null);
   const [form, setForm] = useState({ name: "", cpf: "", phone: "" });
 
   const { data: list = [] } = useQuery({
