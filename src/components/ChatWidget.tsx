@@ -6,7 +6,7 @@ import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 
-const WHATSAPP_URL = "https://wa.me/5531998966300";
+
 
 const SUGGESTIONS = [
   "Como faço meu check-in?",
@@ -156,14 +156,9 @@ export function ChatWidget() {
                 <Send className="size-4" />
               </Button>
             </form>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary mt-2 flex items-center justify-center gap-1.5 text-xs font-medium transition-colors"
-            >
-              <Phone className="size-3.5" /> Prefere falar com uma pessoa? Chame no WhatsApp
-            </a>
+            <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5 text-xs font-medium">
+              <Phone className="size-3.5" /> Dúvidas específicas? Verifique o regulamento do evento ou fale com a organização.
+            </p>
           </div>
         </div>
       )}
