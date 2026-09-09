@@ -471,10 +471,10 @@ function Atletas() {
     toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
       description: [
         duplicates > 0
-          ? `${dupCpfCount} com CPF repetido e ${dupBibCount} com nº de peito repetido.`
+          ? `${dupCpfCount} com CPF repetido, ${dupBibCount} com nº repetido e ${dupRegCount} com inscrição repetida.`
           : null,
         incomplete > 0
-          ? `${incomplete} linha(s) ignoradas por falta de nome, CPF, número, nascimento, sexo ou modalidade.`
+          ? `${incomplete} linha(s) ignoradas por falta de nome, número, nascimento, sexo ou modalidade.`
           : null,
       ]
         .filter(Boolean)
