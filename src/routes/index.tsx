@@ -17,6 +17,8 @@ import {
   WifiOff,
 } from "lucide-react";
 import { Brand } from "@/components/Brand";
+import { ChatWidget } from "@/components/ChatWidget";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import mockupDevices from "@/assets/mockup-devices-v4.png.asset.json";
@@ -310,13 +312,11 @@ function Landing() {
 
       {/* Footer */}
       <footer className="border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:py-8 sm:text-left">
-          <Brand compact large />
-          <p className="text-muted-foreground text-xs">
-            © {new Date().getFullYear()} Kit Rápido — dados pessoais tratados conforme a LGPD.
-          </p>
-        </div>
+...
       </footer>
+
+      <ChatWidget />
+
     </div>
   );
 }

@@ -30,6 +30,7 @@ import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
 import { Route as AuthenticatedTelaAtletaRouteImport } from './routes/_authenticated/tela-atleta'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -139,6 +140,11 @@ const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
   id: '/evento/$slug/kit',
   path: '/evento/$slug/kit',
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/api/chat': typeof ApiChatRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesByTo {
@@ -189,6 +196,7 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/api/chat': typeof ApiChatRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesById {
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
+  '/api/chat': typeof ApiChatRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRouteTypes {
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/tela-atleta'
     | '/usuarios'
+    | '/api/chat'
     | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/tela-atleta'
     | '/usuarios'
+    | '/api/chat'
     | '/evento/$slug/kit'
   id:
     | '__root__'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/_authenticated/relatorios'
     | '/_authenticated/tela-atleta'
     | '/_authenticated/usuarios'
+    | '/api/chat'
     | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
 }
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   CheckinRoute: typeof CheckinRoute
   ConsultaRoute: typeof ConsultaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiChatRoute: typeof ApiChatRoute
   EventoSlugKitRoute: typeof EventoSlugKitRoute
 }
 
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/evento/$slug/kit': {
       id: '/evento/$slug/kit'
       path: '/evento/$slug/kit'
@@ -504,6 +524,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckinRoute: CheckinRoute,
   ConsultaRoute: ConsultaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiChatRoute: ApiChatRoute,
   EventoSlugKitRoute: EventoSlugKitRoute,
 }
 export const routeTree = rootRouteImport
