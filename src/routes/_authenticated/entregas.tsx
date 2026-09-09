@@ -259,7 +259,6 @@ function Entregas() {
     }
     await logAudit({
       eventId: eventId!,
-      userId: profile?.id ?? null,
       userName: profile?.name ?? null,
       action: name
         ? `Registrou retirada por terceiro (${name}) para ${editing.athletes?.name ?? "atleta"}`
