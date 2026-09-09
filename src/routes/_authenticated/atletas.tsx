@@ -340,9 +340,7 @@ function Atletas() {
       .replace(/[\u0300-\u036f]/g, "");
     const genderValue = normalizedGender.startsWith("F")
       ? "FEMININO"
-      : normalizedGender.startsWith("M")
-        ? "MASCULINO"
-        : "";
+      : "MASCULINO";
     setForm({
       name: a.name ?? "",
       gender: genderValue,
