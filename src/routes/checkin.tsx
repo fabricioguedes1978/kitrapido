@@ -4,6 +4,8 @@ import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle2, FileDown, Image as ImageIcon, MapPin, Navigation, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Brand } from "@/components/Brand";
+import { ChatWidget } from "@/components/ChatWidget";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -135,7 +137,9 @@ function Checkin() {
           {rows?.map((row, idx) => <KitCard key={row.athlete_id} row={row} index={idx} total={rows.length} />)}
         </div>
       </main>
+      <ChatWidget />
     </div>
+
   );
 }
 
