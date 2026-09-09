@@ -739,7 +739,7 @@ function Central() {
                           {manualThird.cpf ? ` · CPF ${maskCPF(manualThird.cpf)}` : ""}{" "}
                           <button
                             type="button"
-                            className="text-primary underline"
+                            className="text-primary underline cursor-pointer"
                             onClick={() => {
                               setThirdName(manualThird.name);
                               setThirdCpf(manualThird.cpf);
