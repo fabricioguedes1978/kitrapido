@@ -180,7 +180,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
     { label: "Número", value: row.bib_number || "—" },
     { label: "Nascimento", value: row.birth_date ? formatDate(row.birth_date) : "—" },
     { label: "Sexo", value: genderLabel(row.gender) },
-    { label: "Status", value: isPaid ? "PAGO" : "PENDENTE PAGAMENTO" },
+    { label: "Status", value: isPaid ? "PAGO" : "PENDENTE" },
     { label: "Kit", value: row.kit_type || "—" },
     { label: "Camiseta", value: row.shirt_size || "—" },
     { label: "Modalidade", value: row.modality || "—" },
@@ -253,7 +253,7 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
             <div className="min-w-0">
               <dt className="text-muted-foreground text-xs tracking-wide uppercase">Status</dt>
               <dd className={`font-extrabold uppercase ${isPaid ? "text-success" : "text-destructive"}`}>
-                {isPaid ? "PAGO" : "PENDENTE PAGAMENTO"}
+                {isPaid ? "PAGO" : "PENDENTE"}
               </dd>
             </div>
             <Field label="Kit" value={row.kit_type} strong />

@@ -626,7 +626,7 @@ function Atletas() {
         Modalidade: a.modality,
         Categoria: a.category,
         Equipe: a.equipe,
-        Status: a.payment_status === "pendente" ? "Pendente pagamento" : "Pago",
+        Status: a.payment_status === "pendente" ? "Pendente" : "Pago",
         "Numero de inscricao": a.registration_number,
         "Status do kit": KIT_STATUS[a.kit_status] ?? a.kit_status,
       })),
@@ -823,7 +823,7 @@ function Atletas() {
                   <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
                   <TableCell>
                     <Badge variant={a.payment_status === "pendente" ? "destructive" : "outline"}>
-                      {a.payment_status === "pendente" ? "Pendente pagamento" : "Pago"}
+                      {a.payment_status === "pendente" ? "Pendente" : "Pago"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -1109,7 +1109,7 @@ function Atletas() {
                   onChange={(e) => setForm({ ...form, payment_status: e.target.value })}
                 >
                   <option value="pago">Pago</option>
-                  <option value="pendente">Pendente pagamento</option>
+                  <option value="pendente">Pendente</option>
                 </select>
               </div>
               <div className="space-y-1.5">
