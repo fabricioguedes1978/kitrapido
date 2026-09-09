@@ -21,6 +21,8 @@ import { QrScanDialog } from "@/components/QrScanDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -137,6 +139,10 @@ function Central() {
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
   const [confirming, setConfirming] = useState(false);
   const [asThirdParty, setAsThirdParty] = useState(false);
+  const [manualThird, setManualThird] = useState<{ name: string; cpf: string } | null>(null);
+  const [thirdOpen, setThirdOpen] = useState(false);
+  const [thirdName, setThirdName] = useState("");
+  const [thirdCpf, setThirdCpf] = useState("");
   const [success, setSuccess] = useState<{ name: string; bib: string | null; at: string } | null>(null);
   const [locationId, setLocationId] = useState<string>("");
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -311,9 +317,9 @@ function Central() {
       location_id: locationId || null,
       delivered_by: user?.id ?? null,
       delivered_by_name: profile?.name || profile?.email || null,
-      delivery_type: (asThirdParty ? "third_party" : "athlete") as "third_party" | "athlete",
-      third_party_name: asThirdParty ? (authorization?.name ?? null) : null,
-      third_party_cpf: asThirdParty ? (authorization?.cpf ?? null) : null,
+      delivery_type: (asThirdParty || manualThird ? "third_party" : "athlete") as "third_party" | "athlete",
+      third_party_name: manualThird ? manualThird.name : asThirdParty ? (authorization?.name ?? null) : null,
+      third_party_cpf: manualThird ? (manualThird.cpf || null) : asThirdParty ? (authorization?.cpf ?? null) : null,
       identification_method: method,
     };
 
@@ -399,6 +405,9 @@ function Central() {
     setSelected(null);
     setTerm("");
     setAsThirdParty(false);
+    setManualThird(null);
+    setThirdName("");
+    setThirdCpf("");
     setMethod("busca");
     setTimeout(() => {
       setSuccess(null);
@@ -707,6 +716,45 @@ function Central() {
                 {confirming ? (
                   <div className="bg-muted space-y-3 rounded-xl p-4">
                     <p className="text-center font-semibold">Confirme a entrega do kit para este atleta.</p>
+
+                    <div className="bg-background flex items-start gap-3 rounded-lg border p-3">
+                      <Checkbox
+                        id="terceiros"
+                        checked={!!manualThird}
+                        onCheckedChange={(v) => {
+                          if (v) {
+                            setThirdName(manualThird?.name ?? "");
+                            setThirdCpf(manualThird?.cpf ?? "");
+                            setThirdOpen(true);
+                          } else {
+                            setManualThird(null);
+                          }
+                        }}
+                      />
+                      <div className="space-y-1">
+                        <Label htmlFor="terceiros" className="font-bold uppercase">
+                          Retirado por terceiros
+                        </Label>
+                        {manualThird && (
+                          <p className="text-muted-foreground text-sm">
+                            {manualThird.name}
+                            {manualThird.cpf ? ` · CPF ${maskCPF(manualThird.cpf)}` : ""}{" "}
+                            <button
+                              type="button"
+                              className="text-primary underline"
+                              onClick={() => {
+                                setThirdName(manualThird.name);
+                                setThirdCpf(manualThird.cpf);
+                                setThirdOpen(true);
+                              }}
+                            >
+                              alterar
+                            </button>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Button size="lg" className="h-14" onClick={() => void confirmDelivery()}>
                         CONFIRMAR ENTREGA
@@ -746,6 +794,73 @@ function Central() {
         )}
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
+
+        <Dialog
+          open={thirdOpen}
+          onOpenChange={(v) => {
+            if (!v) {
+              setThirdOpen(false);
+              if (!manualThird) {
+                setThirdName("");
+                setThirdCpf("");
+              }
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Retirado por terceiros</DialogTitle>
+              <DialogDescription>
+                Informe quem está retirando o kit de <strong>{selected?.name}</strong>. O nome fica
+                registrado no relatório de retirada.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="third-name">Nome de quem retirou</Label>
+                <Input
+                  id="third-name"
+                  value={thirdName}
+                  onChange={(e) => setThirdName(e.target.value)}
+                  placeholder="Nome completo"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="third-cpf">CPF (opcional)</Label>
+                <Input
+                  id="third-cpf"
+                  inputMode="numeric"
+                  value={thirdCpf}
+                  onChange={(e) => setThirdCpf(onlyDigits(e.target.value).slice(0, 11))}
+                  placeholder="Somente números"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setThirdOpen(false);
+                  if (!manualThird) {
+                    setThirdName("");
+                    setThirdCpf("");
+                  }
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disabled={thirdName.trim().length < 3}
+                onClick={() => {
+                  setManualThird({ name: thirdName.trim(), cpf: thirdCpf });
+                  setThirdOpen(false);
+                }}
+              >
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={cancelOpen} onOpenChange={(v) => !v && setCancelOpen(false)}>
           <DialogContent>
