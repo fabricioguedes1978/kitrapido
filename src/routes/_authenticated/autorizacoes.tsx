@@ -87,24 +87,31 @@ function Autorizacoes() {
   }, [athletes, search]);
 
   async function save() {
-    if (!eventId || !athleteId) { toast.error("Selecione o atleta."); return; }
+    if (!eventId) return;
+    if (!editing && !athleteId) { toast.error("Selecione o atleta."); return; }
     if (!form.name.trim()) { toast.error("Informe o nome do autorizado."); return; }
     if (!isValidCPF(form.cpf)) { toast.error("CPF do autorizado inválido."); return; }
-    const { error } = await supabase.from("third_party_authorizations").insert({
-      event_id: eventId,
-      athlete_id: athleteId,
+    const payload = {
       name: form.name.trim(),
       cpf: onlyDigits(form.cpf),
       phone: form.phone || null,
-    });
+    };
+    const { error } = editing
+      ? await supabase.from("third_party_authorizations").update(payload).eq("id", editing.id)
+      : await supabase.from("third_party_authorizations").insert({
+          ...payload,
+          event_id: eventId,
+          athlete_id: athleteId,
+        });
     if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["tpa-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["tpa", eventId] });
     setOpen(false);
+    setEditing(null);
     setForm({ name: "", cpf: "", phone: "" });
     setAthleteId("");
     setSearch("");
-    toast.success("Autorização criada.");
+    toast.success(editing ? "Autorização atualizada." : "Autorização criada.");
   }
 
   async function cancel(id: string) {
