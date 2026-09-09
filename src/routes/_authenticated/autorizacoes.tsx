@@ -213,12 +213,13 @@ function Autorizacoes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Nova autorização</DialogTitle>
+            <DialogTitle>{editing ? "Editar autorizado" : "Nova autorização"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
+            {!editing && (
             <div className="space-y-1.5">
               <Label>Atleta</Label>
               <Input
