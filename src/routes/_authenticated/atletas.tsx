@@ -272,24 +272,27 @@ function Atletas() {
       .slice(0, 300);
   }, [athletes, term]);
 
-  const liveDup = useMemo(() => {
+  const cpfWarning = useMemo(() => {
     const cpf = onlyDigits(form.cpf);
-    const bib = form.bib_number.trim();
     if (cpf.length === 11) {
       const hit = athletes.find((a) => onlyDigits(a.cpf) === cpf && a.id !== editingId);
       if (hit) return `Este CPF já está cadastrado neste evento (${hit.name}).`;
     }
-    if (bib) {
-      const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
-      if (hit) return `O nº de peito ${bib} já está em uso neste evento (${hit.name}).`;
-    }
     return null;
-  }, [athletes, form.cpf, form.bib_number, editingId]);
+  }, [athletes, form.cpf, editingId]);
 
   const bibDuplicate = useMemo(() => {
     const bib = form.bib_number.trim();
     if (!bib) return false;
     return athletes.some((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+  }, [athletes, form.bib_number, editingId]);
+
+  const bibWarning = useMemo(() => {
+    const bib = form.bib_number.trim();
+    if (!bib) return null;
+    const hit = athletes.find((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+    if (hit) return `O nº ${bib} já está em uso neste evento (${hit.name}).`;
+    return null;
   }, [athletes, form.bib_number, editingId]);
 
   function openNew() {
