@@ -334,10 +334,19 @@ function Atletas() {
     const modalityKnown = importedModalities.includes(a.modality ?? "");
     const categoryKnown = importedCategories.includes(a.category ?? "");
     const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
-    const genderValue = (a.gender ?? "").trim().toUpperCase();
+    const rawGender = (a.gender ?? "").trim().toUpperCase();
+    const normalizedGender = rawGender
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    const genderValue = normalizedGender.startsWith("F")
+      ? "FEMININO"
+      : normalizedGender.startsWith("M")
+        ? "MASCULINO"
+        : "";
     setForm({
       name: a.name ?? "",
-      gender: genderValue === "MASCULINO" || genderValue === "FEMININO" ? genderValue : "",
+      gender: genderValue,
+
       birth_date: a.birth_date ? formatDate(a.birth_date) : "",
       city: a.city ?? "",
       equipe: a.equipe ?? "",
