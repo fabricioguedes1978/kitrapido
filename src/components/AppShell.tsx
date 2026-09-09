@@ -48,18 +48,18 @@ type NavItem = { to: string; label: string; icon: typeof Users; roles: AppRole[]
 
 const NAV: NavItem[] = [
   { to: "/central", label: "Central de Entrega", icon: ScanLine, roles: ["admin", "organizer", "attendant"] },
+  { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
+  { to: "/atletas", label: "Atletas", icon: Users, roles: ["admin", "organizer"] },
+  { to: "/usuarios", label: "Usuários", icon: UserCog, roles: ["admin", "organizer"] },
+  { to: "/entregas", label: "Entrega", icon: ClipboardList, roles: ["admin", "organizer"] },
+  { to: "/estoque", label: "Estoque", icon: Boxes, roles: ["admin", "organizer"] },
+  { to: "/relatorios", label: "Relatório", icon: FileBarChart, roles: ["admin", "organizer"] },
+  { to: "/auditoria", label: "Auditoria", icon: History, roles: ["admin", "organizer"] },
   { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer"] },
   { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
-  { to: "/eventos", label: "Eventos", icon: CalendarDays, roles: ["admin", "organizer"] },
-  { to: "/atletas", label: "Atletas", icon: Users, roles: ["admin", "organizer"] },
-  { to: "/estoque", label: "Estoque", icon: Boxes, roles: ["admin", "organizer"] },
-  { to: "/entregas", label: "Entregas", icon: ClipboardList, roles: ["admin", "organizer"] },
   { to: "/locais", label: "Locais de Retirada", icon: MapPin, roles: ["admin", "organizer"] },
   { to: "/autorizacoes", label: "Autorizações", icon: ShieldCheck, roles: ["admin", "organizer"] },
-  { to: "/relatorios", label: "Relatórios", icon: FileBarChart, roles: ["admin", "organizer"] },
-  { to: "/usuarios", label: "Usuários", icon: UserCog, roles: ["admin", "organizer"] },
-  { to: "/auditoria", label: "Auditoria", icon: History, roles: ["admin", "organizer"] },
   { to: "/alterar-senha", label: "E-mail e Senha", icon: KeyRound, roles: ["admin"] },
 ];
 
