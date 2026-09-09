@@ -264,7 +264,7 @@ function Autorizacoes() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void save()}>Gerar autorização</Button>
+            <Button onClick={() => void save()}>{editing ? "Salvar alterações" : "Gerar autorização"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
