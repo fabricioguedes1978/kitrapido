@@ -286,6 +286,12 @@ function Atletas() {
     return null;
   }, [athletes, form.cpf, form.bib_number, editingId]);
 
+  const bibDuplicate = useMemo(() => {
+    const bib = form.bib_number.trim();
+    if (!bib) return false;
+    return athletes.some((a) => (a.bib_number ?? "") === bib && a.id !== editingId);
+  }, [athletes, form.bib_number, editingId]);
+
   function openNew() {
     if (locked) {
       toast.error("Cadastro de atletas encerrado", {
@@ -875,13 +881,24 @@ function Atletas() {
                   onChange={(e) => setForm({ ...form, bib_number: e.target.value })}
                 />
               </div>
+            </div>
+            <div
+              className={`grid grid-cols-1 gap-3 rounded-md sm:grid-cols-2 ${
+                bibDuplicate ? "pointer-events-none opacity-60" : ""
+              }`}
+            >
               <div className="space-y-1.5">
                 <Label>Nome *</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <Input
+                  disabled={bibDuplicate}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>CPF</Label>
                 <Input
+                  disabled={bibDuplicate}
                   inputMode="numeric"
                   placeholder="000.000.000-00"
                   value={form.cpf}
@@ -890,11 +907,16 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Telefone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                <Input
+                  disabled={bibDuplicate}
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>E-mail</Label>
                 <Input
+                  disabled={bibDuplicate}
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -903,9 +925,10 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Sexo *</Label>
                 <select
+                  disabled={bibDuplicate}
                   value={form.gender}
                   onChange={(e) => setForm({ ...form, gender: e.target.value })}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="MASCULINO">MASCULINO</option>
                   <option value="FEMININO">FEMININO</option>
@@ -914,6 +937,7 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Data de nascimento *</Label>
                 <Input
+                  disabled={bibDuplicate}
                   inputMode="numeric"
                   placeholder="dd/mm/aaaa"
                   value={form.birth_date}
@@ -922,11 +946,16 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Cidade</Label>
-                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                <Input
+                  disabled={bibDuplicate}
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Kit</Label>
                 <Input
+                  disabled={bibDuplicate}
                   value={form.kit_type}
                   onChange={(e) => setForm({ ...form, kit_type: e.target.value })}
                 />
@@ -934,6 +963,7 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Camisa</Label>
                 <select
+                  disabled={bibDuplicate}
                   value={shirtOther ? "__other__" : form.shirt_size}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -947,7 +977,7 @@ function Atletas() {
                       setForm({ ...form, shirt_size: value });
                     }
                   }}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {importedSizes.map((s) => (
                     <option key={s} value={s}>
@@ -958,6 +988,7 @@ function Atletas() {
                 </select>
                 {shirtOther && (
                   <Input
+                    disabled={bibDuplicate}
                     placeholder="Digite o tamanho (ex: M, G, 42)"
                     value={customShirt}
                     onChange={(e) => {
@@ -971,6 +1002,7 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Modalidade *</Label>
                 <select
+                  disabled={bibDuplicate}
                   value={modalityOther ? "__other__" : form.modality}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -984,7 +1016,7 @@ function Atletas() {
                       setForm({ ...form, modality: value });
                     }
                   }}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {importedModalities.map((s) => (
                     <option key={s} value={s}>
@@ -995,6 +1027,7 @@ function Atletas() {
                 </select>
                 {modalityOther && (
                   <Input
+                    disabled={bibDuplicate}
                     placeholder="Digite a modalidade"
                     value={customModality}
                     onChange={(e) => {
@@ -1007,6 +1040,7 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
                 <select
+                  disabled={bibDuplicate}
                   value={categoryOther ? "__other__" : form.category}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -1020,7 +1054,7 @@ function Atletas() {
                       setForm({ ...form, category: value });
                     }
                   }}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {importedCategories.map((s) => (
                     <option key={s} value={s}>
@@ -1031,6 +1065,7 @@ function Atletas() {
                 </select>
                 {categoryOther && (
                   <Input
+                    disabled={bibDuplicate}
                     placeholder="Digite a categoria"
                     value={customCategory}
                     onChange={(e) => {
@@ -1042,12 +1077,17 @@ function Atletas() {
               </div>
               <div className="space-y-1.5">
                 <Label>Equipe</Label>
-                <Input value={form.equipe} onChange={(e) => setForm({ ...form, equipe: e.target.value })} />
+                <Input
+                  disabled={bibDuplicate}
+                  value={form.equipe}
+                  onChange={(e) => setForm({ ...form, equipe: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Status</Label>
                 <select
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  disabled={bibDuplicate}
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   value={form.payment_status}
                   onChange={(e) => setForm({ ...form, payment_status: e.target.value })}
                 >
@@ -1058,6 +1098,7 @@ function Atletas() {
               <div className="space-y-1.5">
                 <Label>Número de inscrição</Label>
                 <Input
+                  disabled={bibDuplicate}
                   value={form.registration_number}
                   onChange={(e) => setForm({ ...form, registration_number: e.target.value })}
                 />
@@ -1066,6 +1107,7 @@ function Atletas() {
                 <div key={key} className="space-y-1.5">
                   <Label>{event?.custom_field_labels?.[i]?.trim() || `Campo extra ${i + 1}`}</Label>
                   <Input
+                    disabled={bibDuplicate}
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   />
