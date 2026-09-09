@@ -119,7 +119,7 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
         big ? "text-base" : "text-xs",
       )}
     >
-      {paid ? "PAGO" : "PENDENTE PAGAMENTO"}
+      {paid ? "PAGO" : "PENDENTE"}
     </Badge>
   );
 }
