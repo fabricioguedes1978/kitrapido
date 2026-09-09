@@ -317,9 +317,9 @@ function Central() {
       location_id: locationId || null,
       delivered_by: user?.id ?? null,
       delivered_by_name: profile?.name || profile?.email || null,
-      delivery_type: (asThirdParty ? "third_party" : "athlete") as "third_party" | "athlete",
-      third_party_name: asThirdParty ? (authorization?.name ?? null) : null,
-      third_party_cpf: asThirdParty ? (authorization?.cpf ?? null) : null,
+      delivery_type: (asThirdParty || manualThird ? "third_party" : "athlete") as "third_party" | "athlete",
+      third_party_name: manualThird ? manualThird.name : asThirdParty ? (authorization?.name ?? null) : null,
+      third_party_cpf: manualThird ? (manualThird.cpf || null) : asThirdParty ? (authorization?.cpf ?? null) : null,
       identification_method: method,
     };
 
