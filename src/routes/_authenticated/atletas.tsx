@@ -267,6 +267,7 @@ function Atletas() {
           a.name.toLowerCase().includes(q) ||
           (a.bib_number ?? "").includes(q) ||
           (a.registration_number ?? "").toLowerCase().includes(q) ||
+          (a.equipe ?? "").toLowerCase().includes(q) ||
           (digits.length >= 3 && onlyDigits(a.cpf).includes(digits)),
       )
       .slice(0, 300);
@@ -764,7 +765,7 @@ function Atletas() {
 
 
       <Input
-        placeholder="Buscar por nome, CPF, inscrição ou nº de peito"
+        placeholder="Buscar por nome, CPF, inscrição, nº de peito ou equipe"
         value={term}
         onChange={(e) => setTerm(e.target.value)}
         className="mb-4 h-12"
