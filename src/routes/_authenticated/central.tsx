@@ -134,6 +134,7 @@ function Central() {
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
+  const [teamOnly, setTeamOnly] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const [selected, setSelected] = useState<Athlete | null>(null);
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
@@ -234,16 +235,18 @@ function Central() {
     const digits = onlyDigits(q);
     return roster
       .filter((a) => {
+        if (teamOnly) {
+          return (a.equipe ?? "").toLowerCase().includes(q);
+        }
         return (
           a.name.toLowerCase().includes(q) ||
           (a.bib_number ?? "").toLowerCase().includes(q) ||
           (a.registration_number ?? "").toLowerCase().includes(q) ||
-          (a.equipe ?? "").toLowerCase().includes(q) ||
           (digits.length >= 3 && onlyDigits(a.cpf).includes(digits))
         );
       })
       .slice(0, 25);
-  }, [term, roster]);
+  }, [term, roster, teamOnly]);
 
   const activeDelivery = selected
     ? (deliveries.find((d) => d.athlete_id === selected.id && d.status === "active") ?? null)
@@ -498,10 +501,23 @@ function Central() {
                 ref={inputRef}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="Nome, CPF, inscrição, nº de peito ou equipe"
+                placeholder={teamOnly ? "Digite o nome da equipe" : "Nome, CPF, inscrição ou nº de peito"}
                 className="h-14 pl-11 text-base"
                 autoComplete="off"
               />
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <Checkbox
+                id="team-only"
+                checked={teamOnly}
+                onCheckedChange={(checked) => {
+                  setTeamOnly(checked === true);
+                  setTerm("");
+                }}
+              />
+              <Label htmlFor="team-only" className="cursor-pointer text-sm font-medium">
+                Pesquisar somente por equipe
+              </Label>
             </div>
 
             {results.length > 0 && (
