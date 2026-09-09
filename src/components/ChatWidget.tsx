@@ -1,7 +1,8 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { MessageCircle, X, Send, Phone } from "lucide-react";
+import { MessageCircle, X, Send, Phone, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,8 @@ const SUGGESTIONS = [
   "Posso retirar o kit de um amigo?",
   "O que preciso levar no dia?",
 ];
+
+const CHECKIN_URL = "/checkin";
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -72,6 +75,18 @@ export function ChatWidget() {
                 <p className="text-muted-foreground">
                   Olá! 👋 Sou a Ana. Posso te ajudar com check-in, retirada do kit e dúvidas sobre o
                   evento.
+                </p>
+                <Link
+                  to={CHECKIN_URL}
+                  onClick={() => setOpen(false)}
+                  className="bg-primary/10 text-primary hover:bg-primary/20 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors"
+                >
+                  <ExternalLink className="size-3.5" />
+                  Quero fazer meu check-in
+                </Link>
+                <p className="text-muted-foreground text-xs">
+                  No dia da retirada, leve um documento com foto (RG, CNH ou passaporte) — ele pode ser
+                  solicitado pela equipe.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s) => (
