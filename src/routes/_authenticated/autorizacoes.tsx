@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { Plus, QrCode } from "lucide-react";
+import { Pencil, Plus, QrCode } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,6 +50,7 @@ function Autorizacoes() {
   const [qr, setQr] = useState<Auth | null>(null);
   const [search, setSearch] = useState("");
   const [athleteId, setAthleteId] = useState("");
+  const [editing, setEditing] = useState<Auth | null>(null);
   const [form, setForm] = useState({ name: "", cpf: "", phone: "" });
 
   const { data: list = [] } = useQuery({
@@ -86,24 +87,31 @@ function Autorizacoes() {
   }, [athletes, search]);
 
   async function save() {
-    if (!eventId || !athleteId) { toast.error("Selecione o atleta."); return; }
+    if (!eventId) return;
+    if (!editing && !athleteId) { toast.error("Selecione o atleta."); return; }
     if (!form.name.trim()) { toast.error("Informe o nome do autorizado."); return; }
     if (!isValidCPF(form.cpf)) { toast.error("CPF do autorizado inválido."); return; }
-    const { error } = await supabase.from("third_party_authorizations").insert({
-      event_id: eventId,
-      athlete_id: athleteId,
+    const payload = {
       name: form.name.trim(),
       cpf: onlyDigits(form.cpf),
       phone: form.phone || null,
-    });
+    };
+    const { error } = editing
+      ? await supabase.from("third_party_authorizations").update(payload).eq("id", editing.id)
+      : await supabase.from("third_party_authorizations").insert({
+          ...payload,
+          event_id: eventId,
+          athlete_id: athleteId,
+        });
     if (error) { toast.error("Não foi possível salvar", { description: error.message }); return; }
     await qc.invalidateQueries({ queryKey: ["tpa-full", eventId] });
     await qc.invalidateQueries({ queryKey: ["tpa", eventId] });
     setOpen(false);
+    setEditing(null);
     setForm({ name: "", cpf: "", phone: "" });
     setAthleteId("");
     setSearch("");
-    toast.success("Autorização criada.");
+    toast.success(editing ? "Autorização atualizada." : "Autorização criada.");
   }
 
   async function cancel(id: string) {
@@ -122,11 +130,9 @@ function Autorizacoes() {
         title="Autorizações de terceiros"
         subtitle={event?.name ?? ""}
         action={
-          canManage ? (
-            <Button onClick={() => setOpen(true)}>
-              <Plus className="size-4" /> Nova autorização
-            </Button>
-          ) : undefined
+          <Button onClick={() => { setEditing(null); setForm({ name: "", cpf: "", phone: "" }); setAthleteId(""); setSearch(""); setOpen(true); }}>
+            <Plus className="size-4" /> Nova autorização
+          </Button>
         }
       />
 
@@ -159,6 +165,20 @@ function Autorizacoes() {
                     <Button variant="ghost" size="icon" onClick={() => setQr(a)}>
                       <QrCode className="size-4" />
                     </Button>
+                    {a.status === "active" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Editar autorizado"
+                        onClick={() => {
+                          setEditing(a);
+                          setForm({ name: a.name, cpf: maskCPF(a.cpf), phone: a.phone ?? "" });
+                          setOpen(true);
+                        }}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    )}
                     {canManage && a.status === "active" && (
                       <Button variant="ghost" size="sm" onClick={() => void cancel(a.id)}>
                         Cancelar
@@ -193,12 +213,13 @@ function Autorizacoes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Nova autorização</DialogTitle>
+            <DialogTitle>{editing ? "Editar autorizado" : "Nova autorização"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
+            {!editing && (
             <div className="space-y-1.5">
               <Label>Atleta</Label>
               <Input
@@ -226,6 +247,7 @@ function Autorizacoes() {
                 </div>
               )}
             </div>
+            )}
             <div className="space-y-1.5">
               <Label>Nome do autorizado</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -242,7 +264,7 @@ function Autorizacoes() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => void save()}>Gerar autorização</Button>
+            <Button onClick={() => void save()}>{editing ? "Salvar alterações" : "Gerar autorização"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
