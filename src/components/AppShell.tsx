@@ -59,7 +59,6 @@ const NAV: NavItem[] = [
   { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/locais", label: "Locais de Retirada", icon: MapPin, roles: ["admin", "organizer"] },
-  { to: "/autorizacoes", label: "Autorizações", icon: ShieldCheck, roles: ["admin", "organizer"] },
   { to: "/alterar-senha", label: "E-mail e Senha", icon: KeyRound, roles: ["admin"] },
 ];
 
