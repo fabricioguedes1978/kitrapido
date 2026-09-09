@@ -57,7 +57,7 @@ const NAV: NavItem[] = [
   { to: "/auditoria", label: "Auditoria", icon: History, roles: ["admin", "organizer"] },
   { to: "/conferencia", label: "Tela do Atleta", icon: MonitorSmartphone, roles: ["admin", "organizer"] },
   { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
-  { to: "/dashboard", label: "GESTÃO", icon: LayoutDashboard, roles: ["admin", "organizer"] },
+  { to: "/dashboard", label: "Gestão", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/locais", label: "Locais de Retirada", icon: MapPin, roles: ["admin", "organizer"] },
   { to: "/alterar-senha", label: "E-mail e Senha", icon: KeyRound, roles: ["admin"] },
 ];
