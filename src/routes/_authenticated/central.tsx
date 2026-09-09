@@ -499,7 +499,7 @@ function Central() {
                 ref={inputRef}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="Nome, CPF, inscrição, nº de peito ou telefone"
+                placeholder="Nome, CPF, inscrição, nº de peito, telefone ou equipe"
                 className="h-14 pl-11 text-base"
                 autoComplete="off"
               />
