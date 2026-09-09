@@ -156,7 +156,7 @@ function Central() {
       const { data, error } = await supabase
         .from("athletes")
         .select(
-          "id,event_id,name,cpf,phone,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          "id,event_id,name,cpf,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
         )
         .eq("event_id", eventId!)
         .order("name");
