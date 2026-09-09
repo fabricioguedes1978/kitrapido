@@ -165,6 +165,20 @@ function Autorizacoes() {
                     <Button variant="ghost" size="icon" onClick={() => setQr(a)}>
                       <QrCode className="size-4" />
                     </Button>
+                    {a.status === "active" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Editar autorizado"
+                        onClick={() => {
+                          setEditing(a);
+                          setForm({ name: a.name, cpf: maskCPF(a.cpf), phone: a.phone ?? "" });
+                          setOpen(true);
+                        }}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    )}
                     {canManage && a.status === "active" && (
                       <Button variant="ghost" size="sm" onClick={() => void cancel(a.id)}>
                         Cancelar
