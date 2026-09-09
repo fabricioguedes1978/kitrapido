@@ -311,7 +311,7 @@ function Landing() {
       {/* Footer */}
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:py-8 sm:text-left">
-          <Brand compact className="scale-90 sm:scale-100" />
+          <Brand compact large />
           <p className="text-muted-foreground text-xs">
             © {new Date().getFullYear()} Kit Rápido — dados pessoais tratados conforme a LGPD.
           </p>
