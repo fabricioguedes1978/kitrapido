@@ -435,9 +435,10 @@ function Atletas() {
       return;
     }
 
-    const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
-    const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
-    const seenReg = new Set(athletes.map((a) => a.registration_number ?? "").filter(Boolean));
+    const base = fresh ? [] : athletes;
+    const seenCpf = new Set(base.map((a) => onlyDigits(a.cpf)).filter(Boolean));
+    const seenBib = new Set(base.map((a) => a.bib_number ?? "").filter(Boolean));
+    const seenReg = new Set(base.map((a) => a.registration_number ?? "").filter(Boolean));
     let dupCpfCount = 0;
     let dupBibCount = 0;
     let dupRegCount = 0;
