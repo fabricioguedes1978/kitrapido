@@ -21,7 +21,7 @@ import { ChatWidget } from "@/components/ChatWidget";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import mockupDevices from "@/assets/mockup-devices-v4.png.asset.json";
+const mockupDevices = { url: "/mockup-devices-v4.png" };
 
 export const Route = createFileRoute("/")({
   head: () => ({

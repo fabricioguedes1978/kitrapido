@@ -22,7 +22,7 @@ export function ChatWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
+  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/public/chat" }), []);
   const { messages, sendMessage, status, error } = useChat({ transport });
 
   const busy = status === "submitted" || status === "streaming";
