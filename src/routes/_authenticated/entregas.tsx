@@ -15,7 +15,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
-import { downloadBlob, formatCPF, formatDate, formatDateTime, logAudit } from "@/lib/cronochip";
+import { downloadBlob, formatCPF, formatDate, formatDateTime, logAudit } from "@/lib/fetch-all";
+import { fetchAllRows } from "@/lib/x-placeholder";cronochip";
 
 export const Route = createFileRoute("/_authenticated/entregas")({
   head: () => ({

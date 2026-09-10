@@ -32,7 +32,8 @@ import {
   maskCPF,
   onlyDigits,
   qrPayload,
-} from "@/lib/cronochip";
+} from "@/lib/fetch-all";
+import { fetchAllRows } from "@/lib/x-placeholder";cronochip";
 
 export const Route = createFileRoute("/_authenticated/atletas")({
   head: () => ({

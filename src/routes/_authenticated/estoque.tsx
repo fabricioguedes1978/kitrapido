@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
-import { SHIRT_SIZES } from "@/lib/cronochip";
+import { SHIRT_SIZES } from "@/lib/fetch-all";
+import { fetchAllRows } from "@/lib/x-placeholder";cronochip";
 
 export const Route = createFileRoute("/_authenticated/estoque")({
   head: () => ({
