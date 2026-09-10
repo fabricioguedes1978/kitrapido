@@ -35,7 +35,15 @@ function Relatorios() {
     enabled: !!eventId,
     queryFn: async () => {
       const [athletesRes, deliveriesRows, inventory] = await Promise.all([
-        fetchAllRows<Record<string, unknown>>(() =>
+        fetchAllRows<{
+          id: string;
+          name: string;
+          cpf: string | null;
+          bib_number: string | null;
+          modality: string | null;
+          shirt_size: string | null;
+          kit_status: string;
+        }>(() =>
           supabase
             .from("athletes")
             .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
