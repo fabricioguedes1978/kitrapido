@@ -79,6 +79,8 @@ type Athlete = {
   event_id: string;
   name: string;
   cpf: string | null;
+  birth_date: string | null;
+  gender: string | null;
   registration_number: string | null;
   bib_number: string | null;
   modality: string | null;
