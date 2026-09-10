@@ -519,16 +519,28 @@ function Atletas() {
   }
 
 
+  function decodeCsv(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    try {
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      return text.replace(/^\uFEFF/, "");
+    } catch {
+      return new TextDecoder("windows-1252").decode(bytes);
+    }
+  }
+
   function parseFile(file: File, fresh: boolean) {
     const ext = file.name.split(".").pop()?.toLowerCase();
     setLastFile(file.name);
     setImporting(true);
     if (ext === "csv") {
-      Papa.parse<Record<string, unknown>>(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (res) => void importRows(res.data, fresh),
-      });
+      const csvReader = new FileReader();
+      csvReader.onload = () => {
+        const text = decodeCsv(csvReader.result as ArrayBuffer);
+        const res = Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true });
+        void importRows(res.data, fresh);
+      };
+      csvReader.readAsArrayBuffer(file);
       return;
     }
     const reader = new FileReader();
@@ -539,6 +551,7 @@ function Atletas() {
     };
     reader.readAsArrayBuffer(file);
   }
+
 
   function handleFile(file: File) {
     if (!canImport) {
