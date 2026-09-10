@@ -711,6 +711,16 @@ function Atletas() {
             <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
+            {canImport && (
+              <Button
+                variant="destructive"
+                disabled={locked || athletes.length === 0}
+                title="Excluir todos os atletas deste evento"
+                onClick={() => setDeleteAllOpen(true)}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            )}
             <Button disabled={locked} onClick={openNew}>
               <Plus className="size-4" />
             </Button>
