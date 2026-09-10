@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { AlertTriangle, Download, Pencil, Plus, QrCode, Trash2, Upload } from "lucide-react";
+import { AlertTriangle, Download, Loader2, Pencil, Plus, QrCode, Trash2, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -195,6 +195,7 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
+  const [importIssues, setImportIssues] = useState<{ line: number; name: string; problem: string }[] | null>(null);
   const [importMode, setImportMode] = useState<"add" | "replace">("add");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
@@ -390,28 +391,85 @@ function Atletas() {
     (event?.custom_field_labels ?? []).forEach((label, i) => {
       if (label?.trim()) map[normalizeKey(label)] = CUSTOM_KEYS[i]!;
     });
-    const parsed = rows
-      .map((row) => {
-        const out: Record<string, string | null> = {};
-        Object.entries(row).forEach(([key, value]) => {
-          const mapped = map[normalizeKey(key)];
-          if (mapped) out[mapped] = value == null || value === "" ? null : String(value).trim();
-        });
-        return out;
-      })
-      .filter((r) => r["name"] && r["birth_date"] && r["gender"] && r["modality"] && r["bib_number"])
-      .map((r) => ({
+    const mapped = rows.map((row) => {
+      const out: Record<string, string | null> = {};
+      Object.entries(row).forEach(([key, value]) => {
+        const mappedKey = map[normalizeKey(key)];
+        if (mappedKey) out[mappedKey] = value == null || value === "" ? null : String(value).trim();
+      });
+      return out;
+    });
+
+    const base = fresh ? [] : athletes;
+    const existingBib = new Set(base.map((a) => a.bib_number ?? "").filter(Boolean));
+    const existingReg = new Set(base.map((a) => a.registration_number ?? "").filter(Boolean));
+    const sheetBib = new Map<string, number>();
+    const sheetReg = new Map<string, number>();
+    const issues: { line: number; name: string; problem: string }[] = [];
+    const records: {
+      event_id: string;
+      name: string;
+      gender: string | null;
+      birth_date: string | null;
+      city: string | null;
+      equipe: string | null;
+      cpf: string | null;
+      email: string | null;
+      phone: string | null;
+      registration_number: string | null;
+      bib_number: string;
+      modality: string | null;
+      category: string | null;
+      shirt_size: string | null;
+      kit_type: string | null;
+      payment_status: string;
+      custom_1: string | null;
+      custom_2: string | null;
+      custom_3: string | null;
+      custom_4: string | null;
+      custom_5: string | null;
+    }[] = [];
+
+    mapped.forEach((r, index) => {
+      const line = index + 2;
+      const isEmpty = Object.values(r).every((v) => !v);
+      if (isEmpty) return;
+      const problems: string[] = [];
+      if (!r["name"]) problems.push("nome em branco");
+      if (!r["gender"]) problems.push("sexo em branco");
+      if (!r["modality"]) problems.push("modalidade em branco");
+      const birth = r["birth_date"] ? parseBrDate(r["birth_date"]) : null;
+      if (!r["birth_date"]) problems.push("data de nascimento em branco");
+      else if (!birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
+      const cpf = r["cpf"] ? onlyDigits(r["cpf"]) : null;
+      if (cpf && (cpf.length !== 11 || !isValidCPF(cpf))) problems.push(`CPF inválido (${r["cpf"]})`);
+      const bib = r["bib_number"] ?? "";
+      if (!bib) problems.push("número em branco");
+      else if (existingBib.has(bib)) problems.push(`número ${bib} já cadastrado neste evento`);
+      else if (sheetBib.has(bib)) problems.push(`número ${bib} repetido na planilha (linha ${sheetBib.get(bib)})`);
+      const reg = r["registration_number"] ?? "";
+      if (reg && existingReg.has(reg)) problems.push(`inscrição ${reg} já cadastrada neste evento`);
+      else if (reg && sheetReg.has(reg))
+        problems.push(`inscrição ${reg} repetida na planilha (linha ${sheetReg.get(reg)})`);
+
+      if (problems.length > 0) {
+        issues.push({ line, name: r["name"] ?? "", problem: problems.join("; ") });
+        return;
+      }
+      if (bib) sheetBib.set(bib, line);
+      if (reg) sheetReg.set(reg, line);
+      records.push({
         event_id: eventId,
         name: r["name"]!,
         gender: r["gender"] ?? null,
-        birth_date: r["birth_date"] ? parseBrDate(r["birth_date"]) : null,
+        birth_date: birth,
         city: r["city"] ?? null,
         equipe: r["equipe"] ?? null,
-        cpf: r["cpf"] ? onlyDigits(r["cpf"]) : null,
+        cpf,
         email: r["email"] ?? null,
         phone: r["phone"] ?? null,
-        registration_number: r["registration_number"] ?? null,
-        bib_number: r["bib_number"] ?? null,
+        registration_number: reg || null,
+        bib_number: bib,
         modality: r["modality"] ?? null,
         category: r["category"] ?? null,
         shirt_size: r["shirt_size"] ? r["shirt_size"].toUpperCase() : null,
@@ -422,54 +480,30 @@ function Atletas() {
         custom_3: r["custom_3"] ?? null,
         custom_4: r["custom_4"] ?? null,
         custom_5: r["custom_5"] ?? null,
-      }))
-      .filter((r) => r.birth_date && (!r.cpf || (r.cpf.length === 11 && isValidCPF(r.cpf))) && r.bib_number);
-
-    const incomplete = rows.length - parsed.length;
-    if (parsed.length === 0) {
-      setImporting(false);
-      toast.error("Nenhuma linha válida encontrada.", {
-        description:
-          "Nome, CPF, número, data de nascimento, sexo e modalidade são obrigatórios em todas as linhas.",
       });
+    });
+
+    if (issues.length > 0) {
+      setImporting(false);
+      setImportIssues(issues);
+      toast.error(`A planilha tem ${issues.length} linha(s) com problema. Nada foi importado.`);
       return;
     }
 
-    const base = fresh ? [] : athletes;
-    const seenCpf = new Set(base.map((a) => onlyDigits(a.cpf)).filter(Boolean));
-    const seenBib = new Set(base.map((a) => a.bib_number ?? "").filter(Boolean));
-    const seenReg = new Set(base.map((a) => a.registration_number ?? "").filter(Boolean));
-    let dupCpfCount = 0;
-    let dupBibCount = 0;
-    let dupRegCount = 0;
-    const unique = parsed.filter((row) => {
-      const cpf = row.cpf ?? "";
-      const bib = row.bib_number ?? "";
-      const reg = row.registration_number ?? "";
-      if (cpf && seenCpf.has(cpf)) { dupCpfCount++; return false; }
-      if (bib && seenBib.has(bib)) { dupBibCount++; return false; }
-      if (reg && seenReg.has(reg)) { dupRegCount++; return false; }
-      if (cpf) seenCpf.add(cpf);
-      if (bib) seenBib.add(bib);
-      if (reg) seenReg.add(reg);
-      return true;
-    });
+    if (records.length === 0) {
+      setImporting(false);
+      toast.error("Nenhuma linha válida encontrada na planilha.");
+      return;
+    }
 
     let inserted = 0;
-    const duplicates = dupCpfCount + dupBibCount + dupRegCount;
-    for (let i = 0; i < unique.length; i += 200) {
-      const chunk = unique.slice(i, i + 200);
-      const { error, count } = await supabase
-        .from("athletes")
-        .insert(chunk, { count: "exact" });
+    for (let i = 0; i < records.length; i += 200) {
+      const chunk = records.slice(i, i + 200);
+      const { error, count } = await supabase.from("athletes").insert(chunk, { count: "exact" });
       if (error) {
-        toast.error("Erro na importação", {
-          description:
-            error.code === "23505"
-              ? "Existem CPFs ou números de peito repetidos na planilha ou já cadastrados."
-              : error.message,
-        });
-        break;
+        setImporting(false);
+        toast.error("Erro na importação", { description: error.message });
+        return;
       }
       inserted += count ?? chunk.length;
     }
@@ -481,19 +515,9 @@ function Atletas() {
     });
     await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
     setImporting(false);
-    toast.success(`Importação concluída: ${inserted} inseridos, ${duplicates} duplicados ignorados.`, {
-      description: [
-        duplicates > 0
-          ? `${dupCpfCount} com CPF repetido, ${dupBibCount} com nº repetido e ${dupRegCount} com inscrição repetida.`
-          : null,
-        incomplete > 0
-          ? `${incomplete} linha(s) ignoradas por falta de nome, número, nascimento, sexo ou modalidade.`
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" ") || undefined,
-    });
+    toast.success(`Importação concluída: ${inserted} atletas cadastrados.`);
   }
+
 
   function parseFile(file: File, fresh: boolean) {
     const ext = file.name.split(".").pop()?.toLowerCase();
@@ -808,10 +832,14 @@ function Atletas() {
               dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"
             }`}
           >
-            <Upload className="text-primary size-8" />
+            {importing ? (
+              <Loader2 className="text-primary size-8 animate-spin" />
+            ) : (
+              <Upload className="text-primary size-8" />
+            )}
             <p className="mt-3 text-sm font-semibold">
               {importing
-                ? "Importando arquivo…"
+                ? "Conferindo e importando a planilha…"
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
@@ -1271,6 +1299,36 @@ function Atletas() {
             <Button variant="destructive" disabled={deleting} onClick={() => void confirmReplaceImport()}>
               {deleting ? "Substituindo…" : "Substituir tudo"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!importIssues} onOpenChange={(o) => !o && setImportIssues(null)}>
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="text-destructive size-5" />
+              A planilha precisa de correção
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            Nada foi importado. Corrija as linhas abaixo na planilha e envie novamente.
+          </p>
+          <ul className="space-y-2 text-sm">
+            {(importIssues ?? []).slice(0, 100).map((issue) => (
+              <li key={`${issue.line}-${issue.problem}`} className="rounded-md border p-2">
+                <span className="font-semibold">Linha {issue.line}</span>
+                {issue.name ? ` — ${issue.name}` : ""}: {issue.problem}
+              </li>
+            ))}
+          </ul>
+          {(importIssues?.length ?? 0) > 100 && (
+            <p className="text-muted-foreground text-xs">
+              Mostrando as 100 primeiras de {importIssues?.length} linhas com problema.
+            </p>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setImportIssues(null)}>Entendi</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
