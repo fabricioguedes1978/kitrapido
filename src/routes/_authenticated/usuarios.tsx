@@ -51,7 +51,7 @@ function Usuarios() {
   const [role, setRole] = useState<"organizer" | "attendant">("attendant");
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
-  const [form, setForm] = useState({ name: "", cpf: "", birth: "", password: "" });
+  const [form, setForm] = useState({ name: "", cpf: "", password: "" });
   const [saving, setSaving] = useState(false);
 
   const { data: members = [] } = useQuery({
@@ -81,7 +81,7 @@ function Usuarios() {
   );
 
   function openNew(kind: "organizer" | "attendant") {
-    setForm({ name: "", cpf: "", birth: "", password: "" });
+    setForm({ name: "", cpf: "", password: "" });
     setNewOpen(kind);
   }
 
@@ -89,14 +89,9 @@ function Usuarios() {
     if (!eventId || !newOpen) return;
     const cpf = onlyDigits(form.cpf);
     if (!isValidCPF(cpf)) { toast.error("Informe um CPF válido."); return; }
-    const password =
-      newOpen === "organizer" ? onlyDigits(form.birth.split("-").reverse().join("")) : form.password;
-    if (newOpen === "organizer" && password.length !== 8) {
-      toast.error("Informe a data de nascimento do gerente.");
-      return;
-    }
-    if (newOpen === "attendant" && password.trim().length < 6) {
-      toast.error("Crie uma senha com pelo menos 6 caracteres para o staff.");
+    const password = form.password;
+    if (password.length < 6) {
+      toast.error(`Crie uma senha com pelo menos 6 caracteres para o ${newOpen === "organizer" ? "gerente" : "staff"}.`);
       return;
     }
     setSaving(true);
@@ -163,9 +158,9 @@ function Usuarios() {
       <Card className="mb-4">
         <CardContent className="text-muted-foreground space-y-1 py-4 text-sm">
           <p>
-            <strong className="text-foreground">Gerente:</strong> entra com o CPF e a data de
-            nascimento (só números, ex.: 15031990). Pode cadastrar atletas, editar dados e criar os
-            staffs deste evento.
+            <strong className="text-foreground">Gerente:</strong> entra com o CPF e a senha criada
+            pelo administrador. A senha pode conter letras, números e caracteres especiais. Pode
+            cadastrar atletas, editar dados e criar os staffs deste evento.
           </p>
           <p>
             <strong className="text-foreground">Staff:</strong> entra com o CPF e a senha criada pelo
@@ -206,7 +201,6 @@ function Usuarios() {
                           setForm({
                             name: m.profiles?.name ?? "",
                             cpf: m.profiles?.cpf ?? "",
-                            birth: "",
                             password: "",
                           });
                           setNewOpen(m.role === "organizer" ? "organizer" : "attendant");
@@ -258,25 +252,19 @@ function Usuarios() {
                 placeholder="000.000.000-00"
               />
             </div>
-            {newOpen === "organizer" ? (
-              <div className="space-y-1.5">
-                <Label>Data de nascimento (será a senha)</Label>
-                <Input
-                  type="date"
-                  value={form.birth}
-                  onChange={(e) => setForm({ ...form, birth: e.target.value })}
-                />
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <Label>Senha do staff</Label>
-                <Input
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="mínimo 6 caracteres"
-                />
-              </div>
-            )}
+            <div className="space-y-1.5">
+              <Label>{newOpen === "organizer" ? "Senha do gerente" : "Senha do staff"}</Label>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="mínimo 6 caracteres"
+              />
+              <p className="text-muted-foreground text-xs">
+                Pode usar letras, números e caracteres especiais.
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button disabled={saving} onClick={() => void saveNew()}>
