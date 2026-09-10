@@ -384,7 +384,7 @@ function Atletas() {
 
 
 
-  async function importRows(rows: Record<string, unknown>[]) {
+  async function importRows(rows: Record<string, unknown>[], fresh = false) {
     if (!eventId) return;
     const map: Record<string, string> = { ...COLUMN_MAP };
     (event?.custom_field_labels ?? []).forEach((label, i) => {
