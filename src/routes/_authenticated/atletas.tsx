@@ -195,6 +195,7 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
+  const [importIssues, setImportIssues] = useState<{ line: number; name: string; problem: string }[] | null>(null);
   const [importMode, setImportMode] = useState<"add" | "replace">("add");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
