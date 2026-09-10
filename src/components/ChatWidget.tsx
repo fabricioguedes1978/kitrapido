@@ -1,31 +1,96 @@
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { MessageCircle, X, Send, Phone, ExternalLink } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { MessageCircle, X, Send, ExternalLink } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 
-
-
-const SUGGESTIONS = [
-  "Como faço meu check-in?",
-  "Posso retirar o kit de um amigo?",
-  "O que preciso levar no dia?",
-];
-
 const CHECKIN_URL = "/checkin";
+
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+}
+
+const FAQ: { question: string; answer: string }[] = [
+  {
+    question: "Como faço meu check-in?",
+    answer:
+      "Você pode fazer o check-in clicando no botão \"Check-in do atleta\" no topo do site ou acessando diretamente /checkin. Digite seu CPF, escolha o evento e gere sua credencial com QR Code.",
+  },
+  {
+    question: "O que preciso levar no dia da retirada?",
+    answer:
+      "Leve um documento com foto válido (RG, CNH ou passaporte). Ele pode ser solicitado pela equipe no local de retirada.",
+  },
+  {
+    question: "Posso retirar o kit de um amigo?",
+    answer:
+      "Sim, desde que a pessoa esteja autorizada. No ato da entrega, o staff pode marcar \"Retirado por terceiros\" e anotar o nome de quem retirou.",
+  },
+  {
+    question: "Meu pagamento está PENDENTE. Posso retirar o kit?",
+    answer:
+      "Na hora da retirada, apresente o comprovante de pagamento e um documento com foto. A equipe poderá verificar o pagamento junto ao site de inscrições, na área do atleta, usando o CPF.",
+  },
+  {
+    question: "Meus dados estão errados. Como corrijo?",
+    answer:
+      "O atendimento virtual não altera dados. Você deve informar ao atendente no local de retirada qual dado está incorreto e solicitar a correção.",
+  },
+  {
+    question: "Onde fica o local de retirada de kit?",
+    answer:
+      "O endereço, cidade e orientações de retirada estão na sua credencial e no voucher. Na tela de check-in, clique em \"Como chegar\" para abrir o GPS.",
+  },
+  {
+    question: "Perdi o QR Code. E agora?",
+    answer:
+      "Você pode gerar a credencial novamente acessando o check-in com seu CPF. A credencial pode ser salva como imagem ou PDF.",
+  },
+  {
+    question: "Quais são os horários de retirada do kit?",
+    answer:
+      "Os horários e dias de retirada são definidos pela organização do evento e estão informados na sua credencial/voucher.",
+  },
+  {
+    question: "É obrigatório documento com foto para retirar o kit?",
+    answer:
+      "Sim, a equipe pode solicitar RG, CNH ou passaporte para confirmar sua identidade na retirada.",
+  },
+  {
+    question: "Posso retirar o kit por terceiros?",
+    answer:
+      "Sim. Quem retirar deve apresentar documento com foto e o staff anotará o nome da pessoa que retirou.",
+  },
+  {
+    question: "Posso vender ou transferir minha inscrição/kit?",
+    answer:
+      "A venda ou transferência depende do regulamento do evento. Consulte o regulamento do evento ou a organização.",
+  },
+  {
+    question: "Comprei uma inscrição de outra pessoa. Posso retirar o kit?",
+    answer:
+      "Se a transferência for autorizada, a inscrição deve estar no seu nome ou ser informada à organização. Consulte o regulamento do evento ou a organização antes da retirada.",
+  },
+  {
+    question: "Como faço para transferir a titularidade da minha inscrição?",
+    answer:
+      "O KIT RÁPIDO não realiza transferências. O processo deve ser feito diretamente com a organização, pelo site de inscrições ou canais oficiais.",
+  },
+  {
+    question: "Posso trocar o tamanho da camisa?",
+    answer:
+      "A troca de tamanho depende da disponibilidade de estoque no local de retirada.",
+  },
+];
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-
-  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/public/chat" }), []);
-  const { messages, sendMessage, status, error } = useChat({ transport });
-
-  const busy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -33,14 +98,31 @@ export function ChatWidget() {
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, status]);
+  }, [messages]);
 
-  function send(text: string) {
-    const value = text.trim();
-    if (!value || busy) return;
-    void sendMessage({ text: value });
+  function addMessage(role: ChatMessage["role"], text: string) {
+    setMessages((prev) => [...prev, { id: `${Date.now()}-${Math.random()}`, role, text }]);
+  }
+
+  function handleQuestion(question: string, answer: string) {
+    addMessage("user", question);
+    setTimeout(() => addMessage("assistant", answer), 150);
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const value = input.trim();
+    if (!value) return;
+    addMessage("user", value);
     setInput("");
-    inputRef.current?.focus();
+    setTimeout(
+      () =>
+        addMessage(
+          "assistant",
+          "Para dúvidas específicas, verifique o regulamento do evento ou fale com a organização no local de retirada."
+        ),
+      150
+    );
   }
 
   return (
@@ -62,7 +144,7 @@ export function ChatWidget() {
           <div className="bg-primary text-primary-foreground flex items-center justify-between gap-2 px-4 py-3">
             <div>
               <p className="text-sm font-bold">Atendimento KIT RÁPIDO</p>
-              <p className="text-xs opacity-90">Ana, assistente virtual · responde na hora</p>
+              <p className="text-xs opacity-90">Dúvidas frequentes</p>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Fechar atendimento">
               <X className="size-5" />
@@ -73,8 +155,7 @@ export function ChatWidget() {
             {messages.length === 0 && (
               <div className="space-y-3">
                 <p className="text-muted-foreground">
-                  Olá! 👋 Sou a Ana. Posso te ajudar com check-in, retirada do kit e dúvidas sobre o
-                  evento.
+                  Olá! 👋 Escolha uma pergunta abaixo ou digite sua dúvida.
                 </p>
                 <Link
                   to={CHECKIN_URL}
@@ -88,64 +169,48 @@ export function ChatWidget() {
                   No dia da retirada, leve um documento com foto (RG, CNH ou passaporte) — ele pode ser
                   solicitado pela equipe.
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => send(s)}
-                      className="border-primary/30 text-primary hover:bg-primary/10 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
               </div>
             )}
 
-            {messages.map((m) => {
-              const text = m.parts
-                .map((p) => (p.type === "text" ? p.text : ""))
-                .join("")
-                .trim();
-              if (!text) return null;
-              return (
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+              >
                 <div
-                  key={m.id}
-                  className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+                  className={
+                    m.role === "user"
+                      ? "bg-primary text-primary-foreground max-w-[85%] rounded-2xl rounded-br-sm px-3 py-2"
+                      : "text-foreground max-w-[95%] whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-muted px-3 py-2"
+                  }
                 >
-                  <div
-                    className={
-                      m.role === "user"
-                        ? "bg-primary text-primary-foreground max-w-[85%] rounded-2xl rounded-br-sm px-3 py-2"
-                        : "text-foreground max-w-[95%] whitespace-pre-wrap"
-                    }
-                  >
-                    {text}
-                  </div>
+                  {m.text}
                 </div>
-              );
-            })}
+              </div>
+            ))}
 
-            {status === "submitted" && (
-              <p className="text-muted-foreground animate-pulse">Digitando...</p>
-            )}
-            {error && (
-              <p className="text-destructive text-xs">
-                Não consegui responder agora. Tente novamente em instantes ou consulte o regulamento
-                do evento / a organização.
+            {messages.length > 0 && (
+              <p className="text-muted-foreground text-xs">
+                Escolha outra pergunta abaixo ou digite uma nova dúvida.
               </p>
             )}
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              {FAQ.map((item) => (
+                <button
+                  key={item.question}
+                  type="button"
+                  onClick={() => handleQuestion(item.question, item.answer)}
+                  className="border-primary/30 text-primary hover:bg-primary/10 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors text-left"
+                >
+                  {item.question}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="border-t p-3">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                send(input);
-              }}
-              className="flex items-center gap-2"
-            >
+            <form onSubmit={handleSubmit} className="flex items-center gap-2">
               <input
                 ref={inputRef}
                 value={input}
@@ -153,12 +218,12 @@ export function ChatWidget() {
                 placeholder="Escreva sua dúvida..."
                 className="border-input bg-background focus-visible:ring-ring h-10 flex-1 rounded-full border px-4 text-sm outline-none focus-visible:ring-2"
               />
-              <Button type="submit" size="icon" className="size-10 shrink-0 rounded-full" disabled={busy}>
+              <Button type="submit" size="icon" className="size-10 shrink-0 rounded-full">
                 <Send className="size-4" />
               </Button>
             </form>
-            <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5 text-xs font-medium">
-              <Phone className="size-3.5" /> Dúvidas específicas? Verifique o regulamento do evento ou fale com a organização.
+            <p className="text-muted-foreground mt-2 text-center text-xs font-medium">
+              Dúvidas específicas? Verifique o regulamento do evento ou fale com a organização.
             </p>
           </div>
         </div>
