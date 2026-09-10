@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+
 
 const SYSTEM_PROMPT = `Você é a Ana, atendente virtual do KIT RÁPIDO, sistema de gestão e entrega de kits de corridas e eventos esportivos.
 
@@ -36,17 +39,30 @@ export const Route = createFileRoute("/api/public/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
-        const key = process.env["LOVABLE_API_KEY"];
-        if (!key) {
-          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        const lovableKey = process.env["LOVABLE_API_KEY"];
+        const openaiKey = process.env["OPENAI_API_KEY"];
+
+        let model;
+        if (lovableKey) {
+          model = createLovableAiGatewayProvider(lovableKey)(
+            "google/gemini-3.8-flash",
+          );
+        } else if (openaiKey) {
+          model = createOpenAICompatible({
+            name: "openai",
+            baseURL: "https://api.openai.com/v1",
+            headers: { Authorization: `Bearer ${openaiKey}` },
+          })(process.env["OPENAI_MODEL"] ?? "gpt-4o-mini");
+        } else {
+          return new Response("Missing AI API key", { status: 500 });
         }
 
-        const gateway = createLovableAiGatewayProvider(key);
         const result = streamText({
-          model: gateway("google/gemini-3.8-flash"),
+          model,
           system: SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages as UIMessage[]),
         });
+
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages as UIMessage[],
