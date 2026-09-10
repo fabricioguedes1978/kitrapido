@@ -27,7 +27,7 @@ import {
   KIT_STATUS,
   downloadBlob,
   formatCPF,
-  isValidCPF,
+  
   logAudit,
   maskCPF,
   onlyDigits,
