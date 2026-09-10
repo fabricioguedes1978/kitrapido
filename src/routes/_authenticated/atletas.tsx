@@ -711,32 +711,38 @@ function Atletas() {
   function exportExcel() {
     const labels = event?.custom_field_labels ?? [];
     const headers = [
-      "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
-      "kit", "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
-      labels[0] || "extra1", labels[1] || "extra2", labels[2] || "extra3", labels[3] || "extra4",
-      labels[4] || "extra5",
+      "NUMERO", "NOME", "CPF", "TELEFONE", "EMAIL", "SEXO", "NASCIMENTO", "CIDADE",
+      "KIT", "CAMISA", "MODALIDADE", "CATEGORIA", "EQUIPE", "STATUS", "NUMERO DE INSCRICAO",
+      (labels[0] || "extra1").toUpperCase(), (labels[1] || "extra2").toUpperCase(),
+      (labels[2] || "extra3").toUpperCase(), (labels[3] || "extra4").toUpperCase(),
+      (labels[4] || "extra5").toUpperCase(),
     ];
-    const rows = athletes.map((a) => [
-      a.bib_number ?? "",
-      a.name,
-      a.cpf ?? "",
-      a.phone ?? "",
-      a.email ?? "",
-      a.gender ?? "",
-      formatDate(a.birth_date).replace("—", ""),
-      a.city ?? "",
-      a.kit_type ?? "",
-      a.shirt_size ?? "",
-      a.modality ?? "",
-      a.category ?? "",
-      a.equipe ?? "",
-      a.payment_status === "pendente" ? "PENDENTE" : "PAGO",
-      a.registration_number ?? "",
-      a.custom_1 ?? "",
-      a.custom_2 ?? "",
-      a.custom_3 ?? "",
-      a.custom_4 ?? "",
-      a.custom_5 ?? "",
+    const sorted = [...athletes].sort((a, b) => {
+      const na = parseInt(String(a.bib_number ?? "").replace(/\D/g, ""), 10) || Infinity;
+      const nb = parseInt(String(b.bib_number ?? "").replace(/\D/g, ""), 10) || Infinity;
+      return na - nb;
+    });
+    const rows = sorted.map((a) => [
+      (a.bib_number ?? "").toUpperCase(),
+      (a.name ?? "").toUpperCase(),
+      (a.cpf ?? "").toUpperCase(),
+      (a.phone ?? "").toUpperCase(),
+      (a.email ?? "").toUpperCase(),
+      (a.gender ?? "").toUpperCase(),
+      formatDate(a.birth_date).replace("—", "").toUpperCase(),
+      (a.city ?? "").toUpperCase(),
+      (a.kit_type ?? "").toUpperCase(),
+      (a.shirt_size ?? "").toUpperCase(),
+      (a.modality ?? "").toUpperCase(),
+      (a.category ?? "").toUpperCase(),
+      (a.equipe ?? "").toUpperCase(),
+      (a.payment_status === "pendente" ? "PENDENTE" : "PAGO"),
+      (a.registration_number ?? "").toUpperCase(),
+      (a.custom_1 ?? "").toUpperCase(),
+      (a.custom_2 ?? "").toUpperCase(),
+      (a.custom_3 ?? "").toUpperCase(),
+      (a.custom_4 ?? "").toUpperCase(),
+      (a.custom_5 ?? "").toUpperCase(),
     ]);
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     ws["!cols"] = headers.map((header, index) => ({
