@@ -1,0 +1,1 @@
+ALTER TABLE public.athletes DROP CONSTRAINT IF EXISTS athletes_cpf_valid;
