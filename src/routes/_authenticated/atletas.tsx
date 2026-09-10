@@ -406,7 +406,29 @@ function Atletas() {
     const sheetBib = new Map<string, number>();
     const sheetReg = new Map<string, number>();
     const issues: { line: number; name: string; problem: string }[] = [];
-    const records: { event_id: string; name: string; [k: string]: string | null }[] = [];
+    const records: {
+      event_id: string;
+      name: string;
+      gender: string | null;
+      birth_date: string | null;
+      city: string | null;
+      equipe: string | null;
+      cpf: string | null;
+      email: string | null;
+      phone: string | null;
+      registration_number: string | null;
+      bib_number: string;
+      modality: string | null;
+      category: string | null;
+      shirt_size: string | null;
+      kit_type: string | null;
+      payment_status: string;
+      custom_1: string | null;
+      custom_2: string | null;
+      custom_3: string | null;
+      custom_4: string | null;
+      custom_5: string | null;
+    }[] = [];
 
     mapped.forEach((r, index) => {
       const line = index + 2;
