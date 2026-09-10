@@ -461,7 +461,7 @@ function Atletas() {
       const chunk = unique.slice(i, i + 200);
       const { error, count } = await supabase
         .from("athletes")
-        .upsert(chunk, { onConflict: "event_id,bib_number", ignoreDuplicates: true, count: "exact" });
+        .insert(chunk, { count: "exact" });
       if (error) {
         toast.error("Erro na importação", {
           description:
