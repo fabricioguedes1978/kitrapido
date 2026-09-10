@@ -42,17 +42,21 @@ function Dashboard() {
     enabled: !!eventId,
     queryFn: async () => {
       const [athletes, deliveries, inventory] = await Promise.all([
-        supabase.from("athletes").select("id,kit_status,shirt_size,modality").eq("event_id", eventId!),
-        supabase
-          .from("deliveries")
-          .select("id,delivered_at,status,delivery_type")
-          .eq("event_id", eventId!)
-          .eq("status", "active"),
+        fetchAllRows<Record<string, unknown>>(() =>
+          supabase.from("athletes").select("id,kit_status,shirt_size,modality").eq("event_id", eventId!),
+        ),
+        fetchAllRows<Record<string, unknown>>(() =>
+          supabase
+            .from("deliveries")
+            .select("id,delivered_at,status,delivery_type")
+            .eq("event_id", eventId!)
+            .eq("status", "active"),
+        ),
         supabase.from("inventory").select("size,quantity_initial,quantity_current,low_stock_threshold").eq("event_id", eventId!),
       ]);
       return {
-        athletes: athletes.data ?? [],
-        deliveries: deliveries.data ?? [],
+        athletes,
+        deliveries,
         inventory: inventory.data ?? [],
       };
     },
