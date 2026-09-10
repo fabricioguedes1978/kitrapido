@@ -41,6 +41,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   athleteQrUrl,
+  formatDate,
   formatDateTime,
   formatTime,
   logAudit,
@@ -78,6 +79,8 @@ type Athlete = {
   event_id: string;
   name: string;
   cpf: string | null;
+  birth_date: string | null;
+  gender: string | null;
   registration_number: string | null;
   bib_number: string | null;
   modality: string | null;
@@ -159,7 +162,7 @@ function Central() {
         supabase
           .from("athletes")
           .select(
-            "id,event_id,name,cpf,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+            "id,event_id,name,cpf,birth_date,gender,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
           )
           .eq("event_id", eventId!)
           .order("name"),
@@ -689,6 +692,8 @@ function Central() {
                   </div>
 
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
+                    <Info label="Data de Nascimento" value={formatDate(selected.birth_date)} />
+                    <Info label="Sexo" value={selected.gender} />
                     <Info label="Tipo de Kit" value={selected.kit_type} />
                     <Info label="Tamanho da Camiseta" value={selected.shirt_size} />
                     <Info label="Modalidade" value={selected.modality} />
