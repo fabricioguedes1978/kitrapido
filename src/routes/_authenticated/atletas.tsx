@@ -810,10 +810,14 @@ function Atletas() {
               dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"
             }`}
           >
-            <Upload className="text-primary size-8" />
+            {importing ? (
+              <Loader2 className="text-primary size-8 animate-spin" />
+            ) : (
+              <Upload className="text-primary size-8" />
+            )}
             <p className="mt-3 text-sm font-semibold">
               {importing
-                ? "Importando arquivo…"
+                ? "Conferindo e importando a planilha…"
                 : "Arraste a planilha aqui ou clique para selecionar"}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
