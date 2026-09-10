@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+
 
 const SYSTEM_PROMPT = `Você é a Ana, atendente virtual do KIT RÁPIDO, sistema de gestão e entrega de kits de corridas e eventos esportivos.
 
