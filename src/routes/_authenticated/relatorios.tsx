@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
-import { KIT_STATUS, downloadBlob, formatDateTime, maskCPF } from "@/lib/fetch-all";
-import { fetchAllRows } from "@/lib/x-placeholder";cronochip";
+import { KIT_STATUS, downloadBlob, formatDateTime, maskCPF } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({

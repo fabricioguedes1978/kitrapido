@@ -35,8 +35,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/fetch-all";
-import { fetchAllRows } from "@/lib/x-placeholder";utils";
+import { cn } from "@/lib/utils";
+import { fetchAllRows } from "@/lib/fetch-all";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {

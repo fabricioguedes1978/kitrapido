@@ -15,8 +15,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { useAuth } from "@/hooks/useAuth";
-import { isValidCPF, maskCPF, onlyDigits } from "@/lib/fetch-all";
-import { fetchAllRows } from "@/lib/x-placeholder";cronochip";
+import { isValidCPF, maskCPF, onlyDigits } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/autorizacoes")({
   head: () => ({
