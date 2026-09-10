@@ -132,7 +132,8 @@ export function ChatWidget() {
             )}
             {error && (
               <p className="text-destructive text-xs">
-                Não consegui responder agora. Tente novamente ou fale no WhatsApp.
+                Não consegui responder agora. Tente novamente em instantes ou consulte o regulamento
+                do evento / a organização.
               </p>
             )}
           </div>
