@@ -55,8 +55,8 @@ function Relatorios() {
           .eq("event_id", eventId!),
       ]);
       return {
-        athletes: athletes.data ?? [],
-        deliveries: (deliveries.data ?? []) as unknown as {
+        athletes: athletesRes,
+        deliveries: deliveriesRows as unknown as {
           delivered_at: string;
           delivered_by_name: string | null;
           delivery_type: string;
