@@ -763,6 +763,29 @@ function Atletas() {
 
       <Card className={canImport ? "mb-4" : "mb-4 hidden"}>
         <CardContent className="p-4">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="button"
+              variant={importMode === "add" ? "default" : "outline"}
+              className="flex-1 justify-start text-left"
+              onClick={() => setImportMode("add")}
+            >
+              Adicionar aos atletas já cadastrados
+            </Button>
+            <Button
+              type="button"
+              variant={importMode === "replace" ? "destructive" : "outline"}
+              className="flex-1 justify-start text-left"
+              onClick={() => setImportMode("replace")}
+            >
+              Substituir toda a lista pela planilha
+            </Button>
+          </div>
+          <p className="text-muted-foreground mb-3 text-xs">
+            {importMode === "add"
+              ? "A planilha será somada à lista atual; atletas repetidos são ignorados."
+              : "Todos os atletas atuais deste evento serão excluídos antes de importar a nova planilha."}
+          </p>
           <div
             role="button"
             tabIndex={0}
