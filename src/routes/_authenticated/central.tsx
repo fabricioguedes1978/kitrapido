@@ -41,6 +41,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import {
   athleteQrUrl,
+  formatDate,
   formatDateTime,
   formatTime,
   logAudit,
