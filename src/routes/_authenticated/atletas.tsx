@@ -708,28 +708,49 @@ function Atletas() {
   }
 
 
-  function exportCsv() {
-    const csv = Papa.unparse(
-      athletes.map((a) => ({
-        Numero: a.bib_number,
-        Nome: a.name,
-        CPF: a.cpf,
-        Telefone: a.phone,
-        Email: a.email,
-        Sexo: a.gender,
-        Nascimento: a.birth_date,
-        Cidade: a.city,
-        Kit: a.kit_type,
-        Camisa: a.shirt_size,
-        Modalidade: a.modality,
-        Categoria: a.category,
-        Equipe: a.equipe,
-        Status: a.payment_status === "pendente" ? "Pendente" : "Pago",
-        "Numero de inscricao": a.registration_number,
-        "Status do kit": KIT_STATUS[a.kit_status] ?? a.kit_status,
-      })),
+  function exportExcel() {
+    const labels = event?.custom_field_labels ?? [];
+    const headers = [
+      "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
+      "kit", "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
+      labels[0] || "extra1", labels[1] || "extra2", labels[2] || "extra3", labels[3] || "extra4",
+      labels[4] || "extra5",
+    ];
+    const rows = athletes.map((a) => [
+      a.bib_number ?? "",
+      a.name,
+      a.cpf ?? "",
+      a.phone ?? "",
+      a.email ?? "",
+      a.gender ?? "",
+      formatDate(a.birth_date).replace("—", ""),
+      a.city ?? "",
+      a.kit_type ?? "",
+      a.shirt_size ?? "",
+      a.modality ?? "",
+      a.category ?? "",
+      a.equipe ?? "",
+      a.payment_status === "pendente" ? "PENDENTE" : "PAGO",
+      a.registration_number ?? "",
+      a.custom_1 ?? "",
+      a.custom_2 ?? "",
+      a.custom_3 ?? "",
+      a.custom_4 ?? "",
+      a.custom_5 ?? "",
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws["!cols"] = headers.map((header, index) => ({
+      wch: Math.min(38, Math.max(header.length + 2, ...rows.map((row) => String(row[index] ?? "").length + 2), 12)),
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Atletas");
+    const out = XLSX.write(wb, { bookType: "xlsx", type: "array" }) as ArrayBuffer;
+    downloadBlob(
+      out,
+      `atletas-${event?.slug ?? "evento"}.xlsx`,
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
-    downloadBlob("\uFEFF" + csv, `atletas-${event?.slug ?? "evento"}.csv`, "text/csv;charset=utf-8");
+    toast.success("Planilha Excel gerada no formato de importação.");
   }
 
   return (
@@ -739,7 +760,7 @@ function Atletas() {
         subtitle={`${athletes.length} inscritos · ${event?.name ?? ""}`}
         action={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={exportCsv}>
+            <Button variant="outline" onClick={exportExcel} title="Exportar planilha Excel">
               <Download className="size-4" />
             </Button>
             <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
