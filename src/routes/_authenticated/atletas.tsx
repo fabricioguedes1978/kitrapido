@@ -406,7 +406,7 @@ function Atletas() {
     const sheetBib = new Map<string, number>();
     const sheetReg = new Map<string, number>();
     const issues: { line: number; name: string; problem: string }[] = [];
-    const records: Record<string, string | null>[] = [];
+    const records: { event_id: string; name: string; [k: string]: string | null }[] = [];
 
     mapped.forEach((r, index) => {
       const line = index + 2;
