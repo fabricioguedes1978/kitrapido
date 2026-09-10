@@ -39,11 +39,18 @@ export const Route = createFileRoute("/api/public/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
+        const openRouterKey = process.env["OPENROUTER_API_KEY"];
         const lovableKey = process.env["LOVABLE_API_KEY"];
         const openaiKey = process.env["OPENAI_API_KEY"];
 
         let model;
-        if (lovableKey) {
+        if (openRouterKey) {
+          model = createOpenAICompatible({
+            name: "openrouter",
+            baseURL: "https://openrouter.ai/api/v1",
+            headers: { Authorization: `Bearer ${openRouterKey}` },
+          })(process.env["OPENROUTER_MODEL"] ?? "openai/gpt-4o-mini");
+        } else if (lovableKey) {
           model = createLovableAiGatewayProvider(lovableKey)(
             "google/gemini-3.8-flash",
           );
