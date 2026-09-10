@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { AlertTriangle, Download, Pencil, Plus, QrCode, Upload } from "lucide-react";
+import { AlertTriangle, Download, Pencil, Plus, QrCode, Trash2, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -195,6 +195,10 @@ function Atletas() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [lastFile, setLastFile] = useState<string | null>(null);
+  const [importMode, setImportMode] = useState<"add" | "replace">("add");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dupWarning, setDupWarning] = useState<string | null>(null);
@@ -380,7 +384,7 @@ function Atletas() {
 
 
 
-  async function importRows(rows: Record<string, unknown>[]) {
+  async function importRows(rows: Record<string, unknown>[], fresh = false) {
     if (!eventId) return;
     const map: Record<string, string> = { ...COLUMN_MAP };
     (event?.custom_field_labels ?? []).forEach((label, i) => {
@@ -431,9 +435,10 @@ function Atletas() {
       return;
     }
 
-    const seenCpf = new Set(athletes.map((a) => onlyDigits(a.cpf)).filter(Boolean));
-    const seenBib = new Set(athletes.map((a) => a.bib_number ?? "").filter(Boolean));
-    const seenReg = new Set(athletes.map((a) => a.registration_number ?? "").filter(Boolean));
+    const base = fresh ? [] : athletes;
+    const seenCpf = new Set(base.map((a) => onlyDigits(a.cpf)).filter(Boolean));
+    const seenBib = new Set(base.map((a) => a.bib_number ?? "").filter(Boolean));
+    const seenReg = new Set(base.map((a) => a.registration_number ?? "").filter(Boolean));
     let dupCpfCount = 0;
     let dupBibCount = 0;
     let dupRegCount = 0;
@@ -490,6 +495,27 @@ function Atletas() {
     });
   }
 
+  function parseFile(file: File, fresh: boolean) {
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    setLastFile(file.name);
+    setImporting(true);
+    if (ext === "csv") {
+      Papa.parse<Record<string, unknown>>(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (res) => void importRows(res.data, fresh),
+      });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const wb = XLSX.read(reader.result, { type: "array" });
+      const sheet = wb.Sheets[wb.SheetNames[0]!]!;
+      void importRows(XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet), fresh);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
   function handleFile(file: File) {
     if (!canImport) {
       toast.error("Envio de planilha não autorizado", {
@@ -506,23 +532,53 @@ function Atletas() {
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
     if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
-    setLastFile(file.name);
-    setImporting(true);
-    if (ext === "csv") {
-      Papa.parse<Record<string, unknown>>(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (res) => void importRows(res.data),
-      });
+    if (importMode === "replace" && athletes.length > 0) {
+      setPendingFile(file);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const wb = XLSX.read(reader.result, { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]!]!;
-      void importRows(XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet));
-    };
-    reader.readAsArrayBuffer(file);
+    parseFile(file, false);
+  }
+
+  /** Apaga todos os atletas do evento selecionado. */
+  async function deleteAllAthletes() {
+    if (!eventId) return false;
+    setDeleting(true);
+    const { error } = await supabase.from("athletes").delete().eq("event_id", eventId);
+    setDeleting(false);
+    if (error) {
+      toast.error("Não foi possível excluir os atletas", {
+        description:
+          error.code === "23503"
+            ? "Existem entregas registradas para atletas deste evento. Cancele as entregas antes de excluir."
+            : error.message,
+      });
+      return false;
+    }
+    void logAudit({
+      eventId,
+      action: `Excluiu todos os atletas (${athletes.length})`,
+      entity: "athletes",
+      userName: profile?.name ?? null,
+    });
+    await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
+    return true;
+  }
+
+  async function confirmDeleteAll() {
+    const ok = await deleteAllAthletes();
+    if (ok) {
+      setDeleteAllOpen(false);
+      toast.success("Todos os atletas deste evento foram excluídos.");
+    }
+  }
+
+  async function confirmReplaceImport() {
+    const file = pendingFile;
+    if (!file) return;
+    const ok = await deleteAllAthletes();
+    if (!ok) return;
+    setPendingFile(null);
+    parseFile(file, true);
   }
 
   async function saveAthlete() {
@@ -655,6 +711,16 @@ function Atletas() {
             <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" /> Importar
             </Button>
+            {canImport && (
+              <Button
+                variant="destructive"
+                disabled={locked || athletes.length === 0}
+                title="Excluir todos os atletas deste evento"
+                onClick={() => setDeleteAllOpen(true)}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            )}
             <Button disabled={locked} onClick={openNew}>
               <Plus className="size-4" />
             </Button>
@@ -697,6 +763,29 @@ function Atletas() {
 
       <Card className={canImport ? "mb-4" : "mb-4 hidden"}>
         <CardContent className="p-4">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="button"
+              variant={importMode === "add" ? "default" : "outline"}
+              className="flex-1 justify-start text-left"
+              onClick={() => setImportMode("add")}
+            >
+              Adicionar aos atletas já cadastrados
+            </Button>
+            <Button
+              type="button"
+              variant={importMode === "replace" ? "destructive" : "outline"}
+              className="flex-1 justify-start text-left"
+              onClick={() => setImportMode("replace")}
+            >
+              Substituir toda a lista pela planilha
+            </Button>
+          </div>
+          <p className="text-muted-foreground mb-3 text-xs">
+            {importMode === "add"
+              ? "A planilha será somada à lista atual; atletas repetidos são ignorados."
+              : "Todos os atletas atuais deste evento serão excluídos antes de importar a nova planilha."}
+          </p>
           <div
             role="button"
             tabIndex={0}
@@ -1142,6 +1231,46 @@ function Atletas() {
           </div>
           <DialogFooter>
             <Button onClick={() => void saveAthlete()} disabled={bibDuplicate}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteAllOpen} onOpenChange={(o) => !deleting && setDeleteAllOpen(o)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir todos os atletas?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">
+            Os <strong>{athletes.length}</strong> atletas de <strong>{event?.name ?? "este evento"}</strong>{" "}
+            serão apagados definitivamente. Essa ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setDeleteAllOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" disabled={deleting} onClick={() => void confirmDeleteAll()}>
+              {deleting ? "Excluindo…" : "Excluir todos"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pendingFile} onOpenChange={(o) => !deleting && !o && setPendingFile(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Substituir a lista de atletas?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">
+            Os <strong>{athletes.length}</strong> atletas atuais serão excluídos e a lista passará a ter
+            somente os dados da planilha <strong>{pendingFile?.name}</strong>. Essa ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setPendingFile(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" disabled={deleting} onClick={() => void confirmReplaceImport()}>
+              {deleting ? "Substituindo…" : "Substituir tudo"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
