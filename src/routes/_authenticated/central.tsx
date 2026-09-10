@@ -692,6 +692,8 @@ function Central() {
                   </div>
 
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
+                    <Info label="Data de Nascimento" value={formatDate(selected.birth_date)} />
+                    <Info label="Sexo" value={selected.gender} />
                     <Info label="Tipo de Kit" value={selected.kit_type} />
                     <Info label="Tamanho da Camiseta" value={selected.shirt_size} />
                     <Info label="Modalidade" value={selected.modality} />
