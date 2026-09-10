@@ -1280,6 +1280,36 @@ function Atletas() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!importIssues} onOpenChange={(o) => !o && setImportIssues(null)}>
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="text-destructive size-5" />
+              A planilha precisa de correção
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            Nada foi importado. Corrija as linhas abaixo na planilha e envie novamente.
+          </p>
+          <ul className="space-y-2 text-sm">
+            {(importIssues ?? []).slice(0, 100).map((issue) => (
+              <li key={`${issue.line}-${issue.problem}`} className="rounded-md border p-2">
+                <span className="font-semibold">Linha {issue.line}</span>
+                {issue.name ? ` — ${issue.name}` : ""}: {issue.problem}
+              </li>
+            ))}
+          </ul>
+          {(importIssues?.length ?? 0) > 100 && (
+            <p className="text-muted-foreground text-xs">
+              Mostrando as 100 primeiras de {importIssues?.length} linhas com problema.
+            </p>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setImportIssues(null)}>Entendi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
