@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { KIT_STATUS, downloadBlob, formatDateTime, maskCPF } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({
@@ -34,25 +35,37 @@ function Relatorios() {
     queryKey: ["reports", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const [athletes, deliveries, inventory] = await Promise.all([
-        supabase
-          .from("athletes")
-          .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
-          .eq("event_id", eventId!)
-          .order("name"),
-        supabase
-          .from("deliveries")
-          .select("delivered_at,delivered_by_name,delivery_type,third_party_name,status,athletes(name,bib_number,shirt_size)")
-          .eq("event_id", eventId!)
-          .order("delivered_at", { ascending: false }),
+      const [athletesRes, deliveriesRows, inventory] = await Promise.all([
+        fetchAllRows<{
+          id: string;
+          name: string;
+          cpf: string | null;
+          bib_number: string | null;
+          modality: string | null;
+          shirt_size: string | null;
+          kit_status: string;
+        }>(() =>
+          supabase
+            .from("athletes")
+            .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
+            .eq("event_id", eventId!)
+            .order("name"),
+        ),
+        fetchAllRows<Record<string, unknown>>(() =>
+          supabase
+            .from("deliveries")
+            .select("delivered_at,delivered_by_name,delivery_type,third_party_name,status,athletes(name,bib_number,shirt_size)")
+            .eq("event_id", eventId!)
+            .order("delivered_at", { ascending: false }),
+        ),
         supabase
           .from("inventory")
           .select("size,quantity_initial,quantity_current")
           .eq("event_id", eventId!),
       ]);
       return {
-        athletes: athletes.data ?? [],
-        deliveries: (deliveries.data ?? []) as unknown as {
+        athletes: athletesRes,
+        deliveries: deliveriesRows as unknown as {
           delivered_at: string;
           delivered_by_name: string | null;
           delivery_type: string;

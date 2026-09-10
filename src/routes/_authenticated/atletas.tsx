@@ -33,6 +33,7 @@ import {
   onlyDigits,
   qrPayload,
 } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/atletas")({
   head: () => ({
@@ -218,15 +219,16 @@ function Atletas() {
     queryKey: ["athletes", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("athletes")
-        .select(
-          "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
-        )
-        .eq("event_id", eventId!)
-        .order("name");
-      if (error) throw error;
-      return (data ?? []) as Athlete[];
+      const data = await fetchAllRows<Athlete>(() =>
+        supabase
+          .from("athletes")
+          .select(
+            "id,name,gender,birth_date,city,equipe,cpf,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          )
+          .eq("event_id", eventId!)
+          .order("name"),
+      );
+      return data;
     },
   });
 

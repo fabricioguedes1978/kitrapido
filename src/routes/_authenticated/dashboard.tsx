@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { fetchAllRows } from "@/lib/fetch-all";
 import {
   Bar,
   BarChart,
@@ -42,17 +43,21 @@ function Dashboard() {
     enabled: !!eventId,
     queryFn: async () => {
       const [athletes, deliveries, inventory] = await Promise.all([
-        supabase.from("athletes").select("id,kit_status,shirt_size,modality").eq("event_id", eventId!),
-        supabase
-          .from("deliveries")
-          .select("id,delivered_at,status,delivery_type")
-          .eq("event_id", eventId!)
-          .eq("status", "active"),
+        fetchAllRows<{ id: string; kit_status: string | null; shirt_size: string | null; modality: string | null }>(() =>
+          supabase.from("athletes").select("id,kit_status,shirt_size,modality").eq("event_id", eventId!),
+        ),
+        fetchAllRows<{ id: string; delivered_at: string; status: string; delivery_type: string }>(() =>
+          supabase
+            .from("deliveries")
+            .select("id,delivered_at,status,delivery_type")
+            .eq("event_id", eventId!)
+            .eq("status", "active"),
+        ),
         supabase.from("inventory").select("size,quantity_initial,quantity_current,low_stock_threshold").eq("event_id", eventId!),
       ]);
       return {
-        athletes: athletes.data ?? [],
-        deliveries: deliveries.data ?? [],
+        athletes,
+        deliveries,
         inventory: inventory.data ?? [],
       };
     },

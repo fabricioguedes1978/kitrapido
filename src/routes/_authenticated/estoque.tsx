@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { SHIRT_SIZES } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/estoque")({
   head: () => ({
@@ -61,12 +62,13 @@ function Estoque() {
     queryKey: ["inventory-athletes", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("athletes")
-        .select("shirt_size,kit_status,modality,kit_type,equipe")
-        .eq("event_id", eventId!);
-      if (error) throw error;
-      return (data ?? []) as Row[];
+      const data = await fetchAllRows<Row>(() =>
+        supabase
+          .from("athletes")
+          .select("shirt_size,kit_status,modality,kit_type,equipe")
+          .eq("event_id", eventId!),
+      );
+      return data;
     },
   });
 

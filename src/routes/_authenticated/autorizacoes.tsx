@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { useAuth } from "@/hooks/useAuth";
 import { isValidCPF, maskCPF, onlyDigits } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/autorizacoes")({
   head: () => ({
@@ -71,12 +72,13 @@ function Autorizacoes() {
     queryKey: ["athletes", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("athletes")
-        .select("id,name,bib_number,cpf")
-        .eq("event_id", eventId!)
-        .order("name");
-      return data ?? [];
+      return await fetchAllRows<{ id: string; name: string; bib_number: string | null; cpf: string | null }>(() =>
+        supabase
+          .from("athletes")
+          .select("id,name,bib_number,cpf")
+          .eq("event_id", eventId!)
+          .order("name"),
+      );
     },
   });
 

@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { downloadBlob, formatCPF, formatDate, formatDateTime, logAudit } from "@/lib/cronochip";
+import { fetchAllRows } from "@/lib/fetch-all";
 
 export const Route = createFileRoute("/_authenticated/entregas")({
   head: () => ({
@@ -98,15 +99,16 @@ function Entregas() {
     queryKey: ["deliveries-athletes", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("athletes")
-        .select(
-          "id,name,cpf,birth_date,gender,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,registration_status,payment_status,kit_status,city,equipe,custom_1,custom_2,custom_3,custom_4,custom_5",
-        )
-        .eq("event_id", eventId!)
-        .order("name");
-      if (error) throw error;
-      return (data ?? []) as AthleteRow[];
+      const data = await fetchAllRows<AthleteRow>(() =>
+        supabase
+          .from("athletes")
+          .select(
+            "id,name,cpf,birth_date,gender,email,phone,registration_number,bib_number,modality,category,shirt_size,kit_type,registration_status,payment_status,kit_status,city,equipe,custom_1,custom_2,custom_3,custom_4,custom_5",
+          )
+          .eq("event_id", eventId!)
+          .order("name"),
+      );
+      return data;
     },
   });
 
@@ -114,16 +116,17 @@ function Entregas() {
     queryKey: ["deliveries-full", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deliveries")
-        .select(
-          "id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,identification_method,status,cancel_reason,athletes(name,bib_number)",
-        )
-        .eq("event_id", eventId!)
-        .eq("status", "active")
-        .order("delivered_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as DeliveryRow[];
+      const data = await fetchAllRows<Record<string, unknown>>(() =>
+        supabase
+          .from("deliveries")
+          .select(
+            "id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,identification_method,status,cancel_reason,athletes(name,bib_number)",
+          )
+          .eq("event_id", eventId!)
+          .eq("status", "active")
+          .order("delivered_at", { ascending: false }),
+      );
+      return data as unknown as DeliveryRow[];
     },
   });
 
