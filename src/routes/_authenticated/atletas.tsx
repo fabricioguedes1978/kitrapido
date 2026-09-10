@@ -444,7 +444,6 @@ function Atletas() {
       if (!r["birth_date"]) problems.push("data de nascimento em branco");
       else if (!birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
       const cpf = r["cpf"] ? onlyDigits(r["cpf"]) : null;
-      if (cpf && (cpf.length !== 11 || !isValidCPF(cpf))) problems.push(`CPF inválido (${r["cpf"]})`);
       const bib = r["bib_number"] ?? "";
       if (!bib) problems.push("número em branco");
       else if (existingBib.has(bib)) problems.push(`número ${bib} já cadastrado neste evento`);
@@ -636,10 +635,6 @@ function Atletas() {
       return;
     }
     const cpfDigits = onlyDigits(form.cpf);
-    if (cpfDigits && (cpfDigits.length !== 11 || !isValidCPF(cpfDigits))) {
-      toast.error("CPF inválido", { description: "Digite um CPF válido com 11 dígitos ou deixe em branco." });
-      return;
-    }
     const birthIso = parseBrDate(form.birth_date);
     if (!birthIso) {
       toast.error("Data de nascimento inválida", {
