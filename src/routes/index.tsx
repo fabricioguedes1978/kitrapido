@@ -153,7 +153,7 @@ function Landing() {
             <div className="mt-6 flex flex-col gap-2.5 sm:mt-9 sm:flex-row sm:gap-3">
               <Button asChild size="lg" className="shadow-brand h-11 px-5 text-sm sm:h-14 sm:px-7 sm:text-base">
                 <Link to="/checkin">
-                  <QrCode className="size-4 sm:size-5" /> SOU ATLETA - QUERO FAZER CHECK-IN
+                  <QrCode className="size-4 sm:size-5" /> ATLETA CLIQUE AQUI E FAÇA SEU CHECK-IN
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-11 border-primary/50 px-5 text-sm text-primary sm:h-14 sm:px-7 sm:text-base">
