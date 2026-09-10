@@ -495,6 +495,27 @@ function Atletas() {
     });
   }
 
+  function parseFile(file: File, fresh: boolean) {
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    setLastFile(file.name);
+    setImporting(true);
+    if (ext === "csv") {
+      Papa.parse<Record<string, unknown>>(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (res) => void importRows(res.data, fresh),
+      });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const wb = XLSX.read(reader.result, { type: "array" });
+      const sheet = wb.Sheets[wb.SheetNames[0]!]!;
+      void importRows(XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet), fresh);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
   function handleFile(file: File) {
     if (!canImport) {
       toast.error("Envio de planilha não autorizado", {
@@ -511,23 +532,53 @@ function Atletas() {
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!eventId) { toast.error("Selecione um evento antes de importar."); return; }
     if (!["csv", "xlsx", "xls"].includes(ext ?? "")) { toast.error("Formato não suportado. Envie um arquivo CSV, XLSX ou XLS."); return; }
-    setLastFile(file.name);
-    setImporting(true);
-    if (ext === "csv") {
-      Papa.parse<Record<string, unknown>>(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (res) => void importRows(res.data),
-      });
+    if (importMode === "replace" && athletes.length > 0) {
+      setPendingFile(file);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const wb = XLSX.read(reader.result, { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]!]!;
-      void importRows(XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet));
-    };
-    reader.readAsArrayBuffer(file);
+    parseFile(file, false);
+  }
+
+  /** Apaga todos os atletas do evento selecionado. */
+  async function deleteAllAthletes() {
+    if (!eventId) return false;
+    setDeleting(true);
+    const { error } = await supabase.from("athletes").delete().eq("event_id", eventId);
+    setDeleting(false);
+    if (error) {
+      toast.error("Não foi possível excluir os atletas", {
+        description:
+          error.code === "23503"
+            ? "Existem entregas registradas para atletas deste evento. Cancele as entregas antes de excluir."
+            : error.message,
+      });
+      return false;
+    }
+    void logAudit({
+      eventId,
+      action: `Excluiu todos os atletas (${athletes.length})`,
+      entity: "athletes",
+      userName: profile?.name ?? null,
+    });
+    await qc.invalidateQueries({ queryKey: ["athletes", eventId] });
+    return true;
+  }
+
+  async function confirmDeleteAll() {
+    const ok = await deleteAllAthletes();
+    if (ok) {
+      setDeleteAllOpen(false);
+      toast.success("Todos os atletas deste evento foram excluídos.");
+    }
+  }
+
+  async function confirmReplaceImport() {
+    const file = pendingFile;
+    if (!file) return;
+    const ok = await deleteAllAthletes();
+    if (!ok) return;
+    setPendingFile(null);
+    parseFile(file, true);
   }
 
   async function saveAthlete() {
