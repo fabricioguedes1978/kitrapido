@@ -1234,6 +1234,46 @@ function Atletas() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={deleteAllOpen} onOpenChange={(o) => !deleting && setDeleteAllOpen(o)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir todos os atletas?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">
+            Os <strong>{athletes.length}</strong> atletas de <strong>{event?.name ?? "este evento"}</strong>{" "}
+            serão apagados definitivamente. Essa ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setDeleteAllOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" disabled={deleting} onClick={() => void confirmDeleteAll()}>
+              {deleting ? "Excluindo…" : "Excluir todos"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pendingFile} onOpenChange={(o) => !deleting && !o && setPendingFile(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Substituir a lista de atletas?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">
+            Os <strong>{athletes.length}</strong> atletas atuais serão excluídos e a lista passará a ter
+            somente os dados da planilha <strong>{pendingFile?.name}</strong>. Essa ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setPendingFile(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" disabled={deleting} onClick={() => void confirmReplaceImport()}>
+              {deleting ? "Substituindo…" : "Substituir tudo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
