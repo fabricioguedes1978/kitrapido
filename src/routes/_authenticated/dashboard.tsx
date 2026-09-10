@@ -42,10 +42,10 @@ function Dashboard() {
     enabled: !!eventId,
     queryFn: async () => {
       const [athletes, deliveries, inventory] = await Promise.all([
-        fetchAllRows<Record<string, unknown>>(() =>
+        fetchAllRows<{ id: string; kit_status: string | null; shirt_size: string | null; modality: string | null }>(() =>
           supabase.from("athletes").select("id,kit_status,shirt_size,modality").eq("event_id", eventId!),
         ),
-        fetchAllRows<Record<string, unknown>>(() =>
+        fetchAllRows<{ id: string; delivered_at: string; status: string; delivery_type: string }>(() =>
           supabase
             .from("deliveries")
             .select("id,delivered_at,status,delivery_type")

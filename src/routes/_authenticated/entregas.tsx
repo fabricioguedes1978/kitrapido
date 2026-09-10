@@ -115,16 +115,17 @@ function Entregas() {
     queryKey: ["deliveries-full", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deliveries")
-        .select(
-          "id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,identification_method,status,cancel_reason,athletes(name,bib_number)",
-        )
-        .eq("event_id", eventId!)
-        .eq("status", "active")
-        .order("delivered_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as DeliveryRow[];
+      const data = await fetchAllRows<Record<string, unknown>>(() =>
+        supabase
+          .from("deliveries")
+          .select(
+            "id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,identification_method,status,cancel_reason,athletes(name,bib_number)",
+          )
+          .eq("event_id", eventId!)
+          .eq("status", "active")
+          .order("delivered_at", { ascending: false }),
+      );
+      return data as unknown as DeliveryRow[];
     },
   });
 
