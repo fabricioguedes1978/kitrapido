@@ -152,14 +152,14 @@ function Landing() {
             </p>
             <div className="mt-6 flex flex-col gap-2.5 sm:mt-9 sm:flex-row sm:gap-3">
               <Button asChild size="lg" className="shadow-brand h-11 px-5 text-sm sm:h-14 sm:px-7 sm:text-base">
-                <a href="https://wa.me/5531998966300" target="_blank" rel="noopener noreferrer">
-                  Quero usar no meu evento <ArrowRight className="size-4 sm:size-5" />
-                </a>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-11 border-primary/50 px-5 text-sm text-primary sm:h-14 sm:px-7 sm:text-base">
                 <Link to="/checkin">
                   <QrCode className="size-4 sm:size-5" /> Sou atleta — check-in pelo CPF
                 </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-11 border-primary/50 px-5 text-sm text-primary sm:h-14 sm:px-7 sm:text-base">
+                <a href="https://wa.me/5531998966300" target="_blank" rel="noopener noreferrer">
+                  Quero usar no meu evento <ArrowRight className="size-4 sm:size-5" />
+                </a>
               </Button>
             </div>
             <div className="text-muted-foreground mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm sm:mt-9 sm:grid-cols-2 sm:gap-4">
