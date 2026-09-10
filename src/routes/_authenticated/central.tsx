@@ -154,16 +154,17 @@ function Central() {
     queryKey: ["athletes", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("athletes")
-        .select(
-          "id,event_id,name,cpf,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
-        )
-        .eq("event_id", eventId!)
-        .order("name");
-      if (error) throw error;
-      cacheAthletes(eventId!, data ?? []);
-      return (data ?? []) as Athlete[];
+      const data = await fetchAllRows<Athlete>(() =>
+        supabase
+          .from("athletes")
+          .select(
+            "id,event_id,name,cpf,registration_number,bib_number,modality,category,city,equipe,shirt_size,kit_type,kit_status,payment_status,custom_1,custom_2,custom_3,custom_4,custom_5",
+          )
+          .eq("event_id", eventId!)
+          .order("name"),
+      );
+      cacheAthletes(eventId!, data);
+      return data;
     },
   });
 

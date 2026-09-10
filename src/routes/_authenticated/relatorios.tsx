@@ -34,17 +34,21 @@ function Relatorios() {
     queryKey: ["reports", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const [athletes, deliveries, inventory] = await Promise.all([
-        supabase
-          .from("athletes")
-          .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
-          .eq("event_id", eventId!)
-          .order("name"),
-        supabase
-          .from("deliveries")
-          .select("delivered_at,delivered_by_name,delivery_type,third_party_name,status,athletes(name,bib_number,shirt_size)")
-          .eq("event_id", eventId!)
-          .order("delivered_at", { ascending: false }),
+      const [athletesRes, deliveriesRows, inventory] = await Promise.all([
+        fetchAllRows<Record<string, unknown>>(() =>
+          supabase
+            .from("athletes")
+            .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
+            .eq("event_id", eventId!)
+            .order("name"),
+        ),
+        fetchAllRows<Record<string, unknown>>(() =>
+          supabase
+            .from("deliveries")
+            .select("delivered_at,delivered_by_name,delivery_type,third_party_name,status,athletes(name,bib_number,shirt_size)")
+            .eq("event_id", eventId!)
+            .order("delivered_at", { ascending: false }),
+        ),
         supabase
           .from("inventory")
           .select("size,quantity_initial,quantity_current")
