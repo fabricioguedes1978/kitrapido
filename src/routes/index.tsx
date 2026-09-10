@@ -158,7 +158,7 @@ function Landing() {
               </Button>
               <Button asChild size="lg" variant="outline" className="h-11 border-primary/50 px-5 text-sm text-primary sm:h-14 sm:px-7 sm:text-base">
                 <a href="https://wa.me/5531998966300" target="_blank" rel="noopener noreferrer">
-                  Quero usar no meu evento <ArrowRight className="size-4 sm:size-5" />
+                  QUERO USAR NO MEU EVENTO - CLIQUE AQUI <ArrowRight className="size-4 sm:size-5" />
                 </a>
               </Button>
             </div>
