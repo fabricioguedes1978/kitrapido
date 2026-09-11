@@ -44,10 +44,11 @@ function Relatorios() {
           modality: string | null;
           shirt_size: string | null;
           kit_status: string;
+          online_checkin_at: string | null;
         }>(() =>
           supabase
             .from("athletes")
-            .select("id,name,cpf,bib_number,modality,shirt_size,kit_status")
+            .select("id,name,cpf,bib_number,modality,shirt_size,kit_status,online_checkin_at")
             .eq("event_id", eventId!)
             .order("name"),
         ),
@@ -139,6 +140,8 @@ function Relatorios() {
   ];
 
   const base = event?.slug ?? "evento";
+  const onlineCheckins = (data?.athletes ?? []).filter((athlete) => athlete.online_checkin_at).length;
+  const pendingOnlineCheckins = Math.max((data?.athletes.length ?? 0) - onlineCheckins, 0);
 
   function csv(rows: Row[], name: string) {
     downloadBlob("\uFEFF" + Papa.unparse(rows), `${name}-${base}.csv`, "text/csv;charset=utf-8");
@@ -197,6 +200,21 @@ function Relatorios() {
             </Card>
           );
         })}
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-2">
+        <Card className="shadow-card">
+          <CardContent className="pt-6">
+            <p className="text-muted-foreground text-sm">Atletas que fizeram check-in online</p>
+            <p className="numeric mt-2 text-3xl font-extrabold">{onlineCheckins}</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-6">
+            <p className="text-muted-foreground text-sm">Atletas que ainda não fizeram check-in online</p>
+            <p className="numeric mt-2 text-3xl font-extrabold">{pendingOnlineCheckins}</p>
+          </CardContent>
+        </Card>
       </div>
     </AppShell>
   );
