@@ -37,6 +37,7 @@ export type Database = {
           kit_type: string | null
           modality: string | null
           name: string
+          online_checkin_at: string | null
           payment_status: string
           phone: string | null
           registration_number: string | null
@@ -65,6 +66,7 @@ export type Database = {
           kit_type?: string | null
           modality?: string | null
           name: string
+          online_checkin_at?: string | null
           payment_status?: string
           phone?: string | null
           registration_number?: string | null
@@ -93,6 +95,7 @@ export type Database = {
           kit_type?: string | null
           modality?: string | null
           name?: string
+          online_checkin_at?: string | null
           payment_status?: string
           phone?: string | null
           registration_number?: string | null
