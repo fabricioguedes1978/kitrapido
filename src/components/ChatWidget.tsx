@@ -60,13 +60,20 @@ function Intro({ onClose }: { onClose: () => void }) {
   );
 }
 
-function QuestionButtons({ onQuestion, disabled = false }: { onQuestion: (question: string) => void; disabled?: boolean }) {
+function QuestionButtons({ onQuestion, disabled = false, selectedQuestion }: { onQuestion: (question: string) => void; disabled?: boolean; selectedQuestion?: string }) {
   return (
-    <div className="flex flex-wrap gap-2 pt-1">
+    <div className="space-y-2 pt-1">
       {FAQ.map((item) => (
-        <Button key={item.question} type="button" variant="outline" size="sm" disabled={disabled} className="border-primary/30 text-primary h-auto whitespace-normal rounded-full py-1.5 text-left text-xs" onClick={() => onQuestion(item.question)}>
-          {item.question}
-        </Button>
+        <div key={item.question} className="space-y-2">
+          <Button type="button" variant="outline" size="sm" disabled={disabled} aria-expanded={selectedQuestion === item.question} className="border-primary/30 text-primary h-auto w-full justify-start whitespace-normal rounded-full py-1.5 text-left text-xs" onClick={() => onQuestion(item.question)}>
+            {item.question}
+          </Button>
+          {selectedQuestion === item.question && (
+            <div className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
+              <MessageResponse>{item.answer}</MessageResponse>
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -75,12 +82,19 @@ function QuestionButtons({ onQuestion, disabled = false }: { onQuestion: (questi
 function FixedChat({ onClose, notice }: { onClose: () => void; notice?: string }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<FixedMessage[]>([]);
+  const [selectedQuestion, setSelectedQuestion] = useState<string>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => inputRef.current?.focus(), []);
 
   function answer(question: string) {
     const match = FAQ.find((item) => item.question === question);
+    if (match) {
+      setSelectedQuestion((current) => current === question ? undefined : question);
+      setInput("");
+      requestAnimationFrame(() => inputRef.current?.focus());
+      return;
+    }
     const reply = match?.answer ?? "Para dúvidas específicas, verifique o regulamento do evento ou fale com a organização no local de retirada.";
     const now = Date.now();
     setMessages((current) => [
@@ -105,7 +119,7 @@ function FixedChat({ onClose, notice }: { onClose: () => void; notice?: string }
               </MessageContent>
             </Message>
           ))}
-          <QuestionButtons onQuestion={answer} />
+          <QuestionButtons onQuestion={answer} selectedQuestion={selectedQuestion} />
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
