@@ -131,7 +131,7 @@ function ChatComposer({ input, setInput, inputRef, onSubmit, status, onStop }: {
         </PromptInputBody>
         <PromptInputFooter>
           <span className="text-muted-foreground text-[11px]">Consulte também o regulamento do evento.</span>
-          <PromptInputSubmit status={status} onStop={onStop} disabled={!input.trim() && !busy} />
+          <PromptInputSubmit {...(status ? { status } : {})} {...(onStop ? { onStop } : {})} disabled={!input.trim() && !busy} />
         </PromptInputFooter>
       </PromptInput>
     </div>
@@ -204,7 +204,11 @@ export function ChatWidget() {
             <div><p className="text-sm font-bold">Ana • KIT RÁPIDO</p><p className="text-xs opacity-90">{mode === "ai" && !aiUnavailable ? "Atendimento com IA" : "Dúvidas frequentes"}</p></div>
             <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Fechar atendimento" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><X className="size-5" /></Button>
           </header>
-          {mode === "ai" && !aiUnavailable ? <AiChat onClose={() => setOpen(false)} onUnavailable={() => setAiUnavailable(true)} /> : <FixedChat onClose={() => setOpen(false)} notice={aiUnavailable ? "A IA não está disponível agora. Continue pelas respostas fixas abaixo." : undefined} />}
+          {mode === "ai" && !aiUnavailable ? (
+            <AiChat onClose={() => setOpen(false)} onUnavailable={() => setAiUnavailable(true)} />
+          ) : (
+            <FixedChat onClose={() => setOpen(false)} {...(aiUnavailable ? { notice: "A IA não está disponível agora. Continue pelas respostas fixas abaixo." } : {})} />
+          )}
         </section>
       )}
     </>
