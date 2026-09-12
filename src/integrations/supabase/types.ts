@@ -159,6 +159,27 @@ export type Database = {
           },
         ]
       }
+      chat_settings: {
+        Row: {
+          id: string
+          mode: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       deliveries: {
         Row: {
           athlete_id: string

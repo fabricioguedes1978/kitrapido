@@ -27,6 +27,7 @@ import {
   AlertCircle,
   Lightbulb,
   MessageCircleQuestion,
+  MessagesSquare,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -59,6 +60,7 @@ const NAV: NavItem[] = [
   { to: "/tela-atleta", label: "Fundo personalizado", icon: ImageUp, roles: ["admin", "organizer"], sub: true },
   { to: "/dashboard", label: "Gestão", icon: LayoutDashboard, roles: ["admin", "organizer"] },
   { to: "/locais", label: "Locais de Retirada", icon: MapPin, roles: ["admin", "organizer"] },
+  { to: "/chat", label: "Chat", icon: MessagesSquare, roles: ["admin"] },
   { to: "/alterar-senha", label: "E-mail e Senha", icon: KeyRound, roles: ["admin"] },
 ];
 
