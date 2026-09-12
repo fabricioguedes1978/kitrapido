@@ -112,8 +112,8 @@ function FixedChat({ onClose, notice }: { onClose: () => void; notice?: string }
 
   return (
     <>
-      <Conversation className="min-h-0">
-        <ConversationContent className="gap-3 px-4 py-4 text-sm">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex flex-col gap-3 px-4 py-4 text-sm">
           {messages.length === 0 && <Intro onClose={onClose} />}
           {notice && <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">{notice}</p>}
           {messages.map((message) => (
@@ -124,9 +124,8 @@ function FixedChat({ onClose, notice }: { onClose: () => void; notice?: string }
             </Message>
           ))}
           <QuestionButtons onQuestion={answer} selectedQuestion={selectedQuestion} />
-        </ConversationContent>
-        <ConversationScrollButton />
-      </Conversation>
+        </div>
+      </div>
       <ChatComposer input={input} setInput={setInput} inputRef={inputRef} onSubmit={answer} />
     </>
   );
