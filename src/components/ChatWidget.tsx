@@ -65,7 +65,11 @@ function QuestionButtons({ onQuestion, disabled = false, selectedQuestion }: { o
     <div className="space-y-2 pt-1">
       {FAQ.map((item) => (
         <div key={item.question} className="space-y-2">
-          <Button type="button" variant="outline" size="sm" disabled={disabled} aria-expanded={selectedQuestion === item.question} className="border-primary/30 text-primary h-auto w-full justify-start whitespace-normal rounded-full py-1.5 text-left text-xs" onClick={() => onQuestion(item.question)}>
+          <Button type="button" variant="outline" size="sm" disabled={disabled} aria-expanded={selectedQuestion === item.question} className="border-primary/30 text-primary h-auto w-full justify-start whitespace-normal rounded-full py-1.5 text-left text-xs" onClick={(event) => {
+            const questionBlock = event.currentTarget.parentElement;
+            onQuestion(item.question);
+            requestAnimationFrame(() => requestAnimationFrame(() => questionBlock?.scrollIntoView({ block: "nearest", behavior: "smooth" })));
+          }}>
             {item.question}
           </Button>
           {selectedQuestion === item.question && (
