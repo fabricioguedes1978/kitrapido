@@ -60,7 +60,7 @@ function Intro({ onClose }: { onClose: () => void }) {
   );
 }
 
-function QuestionButtons({ onQuestion, disabled = false, selectedQuestion }: { onQuestion: (question: string) => void; disabled?: boolean; selectedQuestion?: string }) {
+function QuestionButtons({ onQuestion, disabled = false, selectedQuestion }: { onQuestion: (question: string) => void; disabled?: boolean; selectedQuestion?: string | undefined }) {
   return (
     <div className="space-y-2 pt-1">
       {FAQ.map((item) => (
@@ -95,7 +95,7 @@ function FixedChat({ onClose, notice }: { onClose: () => void; notice?: string }
       requestAnimationFrame(() => inputRef.current?.focus());
       return;
     }
-    const reply = match?.answer ?? "Para dúvidas específicas, verifique o regulamento do evento ou fale com a organização no local de retirada.";
+    const reply = "Para dúvidas específicas, verifique o regulamento do evento ou fale com a organização no local de retirada.";
     const now = Date.now();
     setMessages((current) => [
       ...current,
