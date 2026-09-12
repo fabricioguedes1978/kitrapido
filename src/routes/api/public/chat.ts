@@ -30,11 +30,35 @@ Regras:
 
 type ChatRequestBody = { messages?: unknown };
 
+function messageFromError(error: unknown) {
+  if (error instanceof Error && error.message) return error.message;
+  return "Não foi possível responder agora.";
+}
+
 export const Route = createFileRoute("/api/public/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { messages } = (await request.json()) as ChatRequestBody;
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: settings, error: settingsError } = await supabaseAdmin
+          .from("chat_settings")
+          .select("mode")
+          .eq("id", "global")
+          .maybeSingle();
+        if (settingsError) {
+          return new Response(settingsError.message, { status: 500 });
+        }
+        if (settings?.mode !== "ai") {
+          return new Response("As respostas com IA estão desativadas no momento.", { status: 403 });
+        }
+
+        let body: ChatRequestBody;
+        try {
+          body = (await request.json()) as ChatRequestBody;
+        } catch {
+          return new Response("Não foi possível ler a mensagem enviada.", { status: 400 });
+        }
+        const { messages } = body;
         if (!Array.isArray(messages)) {
           return new Response("Messages are required", { status: 400 });
         }
@@ -61,18 +85,20 @@ export const Route = createFileRoute("/api/public/chat")({
             headers: { Authorization: `Bearer ${openaiKey}` },
           })(process.env["OPENAI_MODEL"] ?? "gpt-4o-mini");
         } else {
-          return new Response("Missing AI API key", { status: 500 });
+          return new Response("A chave do atendimento com IA ainda não foi configurada.", { status: 500 });
         }
 
         const result = streamText({
           model,
           system: SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages as UIMessage[]),
+          maxRetries: 0,
         });
 
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages as UIMessage[],
+          onError: messageFromError,
         });
       },
     },
