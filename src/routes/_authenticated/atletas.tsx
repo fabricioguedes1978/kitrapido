@@ -10,6 +10,7 @@ import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -97,6 +98,12 @@ const EMPTY_FORM = {
 };
 
 const CUSTOM_KEYS = ["custom_1", "custom_2", "custom_3", "custom_4", "custom_5"] as const;
+const EXPORT_KEYS = [
+  "bib_number", "name", "cpf", "phone", "email", "gender", "birth_date", "city",
+  "kit_type", "shirt_size", "modality", "category", "equipe", "payment_status",
+  "registration_number", ...CUSTOM_KEYS,
+] as const;
+type ExportKey = (typeof EXPORT_KEYS)[number];
 
 
 const COLUMN_MAP: Record<string, string> = {
@@ -199,6 +206,8 @@ function Atletas() {
   const [importIssues, setImportIssues] = useState<{ line: number; name: string; problem: string }[] | null>(null);
   const [importMode, setImportMode] = useState<"add" | "replace">("add");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportFields, setExportFields] = useState<ExportKey[]>([...EXPORT_KEYS]);
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
@@ -708,42 +717,50 @@ function Atletas() {
   }
 
 
+  const exportColumns: { key: ExportKey; label: string; value: (athlete: Athlete) => string }[] = [
+    { key: "bib_number", label: "NÚMERO", value: (a) => a.bib_number ?? "" },
+    { key: "name", label: "NOME", value: (a) => a.name ?? "" },
+    { key: "cpf", label: "CPF", value: (a) => a.cpf ?? "" },
+    { key: "phone", label: "TELEFONE", value: (a) => a.phone ?? "" },
+    { key: "email", label: "EMAIL", value: (a) => a.email ?? "" },
+    { key: "gender", label: "SEXO", value: (a) => a.gender ?? "" },
+    { key: "birth_date", label: "NASCIMENTO", value: (a) => formatDate(a.birth_date).replace("—", "") },
+    { key: "city", label: "CIDADE", value: (a) => a.city ?? "" },
+    { key: "kit_type", label: "KIT", value: (a) => a.kit_type ?? "" },
+    { key: "shirt_size", label: "CAMISA", value: (a) => a.shirt_size ?? "" },
+    { key: "modality", label: "MODALIDADE", value: (a) => a.modality ?? "" },
+    { key: "category", label: "CATEGORIA", value: (a) => a.category ?? "" },
+    { key: "equipe", label: "EQUIPE", value: (a) => a.equipe ?? "" },
+    { key: "payment_status", label: "STATUS", value: (a) => a.payment_status === "pendente" ? "PENDENTE" : "PAGO" },
+    { key: "registration_number", label: "NÚMERO DE INSCRIÇÃO", value: (a) => a.registration_number ?? "" },
+    ...CUSTOM_KEYS.map((key, index) => ({
+      key,
+      label: (event?.custom_field_labels?.[index]?.trim() || `EXTRA ${index + 1}`).toUpperCase(),
+      value: (athlete: Athlete) => athlete[key] ?? "",
+    })),
+  ];
+
+  function openExport() {
+    setExportFields([...EXPORT_KEYS]);
+    setExportOpen(true);
+  }
+
+  function toggleExportField(key: ExportKey, checked: boolean) {
+    setExportFields((current) => checked
+      ? [...current, key]
+      : current.filter((field) => field !== key));
+  }
+
   function exportExcel() {
-    const labels = event?.custom_field_labels ?? [];
-    const headers = [
-      "NUMERO", "NOME", "CPF", "TELEFONE", "EMAIL", "SEXO", "NASCIMENTO", "CIDADE",
-      "KIT", "CAMISA", "MODALIDADE", "CATEGORIA", "EQUIPE", "STATUS", "NUMERO DE INSCRICAO",
-      (labels[0] || "extra1").toUpperCase(), (labels[1] || "extra2").toUpperCase(),
-      (labels[2] || "extra3").toUpperCase(), (labels[3] || "extra4").toUpperCase(),
-      (labels[4] || "extra5").toUpperCase(),
-    ];
+    const columns = exportColumns.filter((column) => exportFields.includes(column.key));
+    if (!columns.length) return;
+    const headers = columns.map((column) => column.label);
     const sorted = [...athletes].sort((a, b) => {
       const na = parseInt(String(a.bib_number ?? "").replace(/\D/g, ""), 10) || Infinity;
       const nb = parseInt(String(b.bib_number ?? "").replace(/\D/g, ""), 10) || Infinity;
       return na - nb;
     });
-    const rows = sorted.map((a) => [
-      (a.bib_number ?? "").toUpperCase(),
-      (a.name ?? "").toUpperCase(),
-      (a.cpf ?? "").toUpperCase(),
-      (a.phone ?? "").toUpperCase(),
-      (a.email ?? "").toUpperCase(),
-      (a.gender ?? "").toUpperCase(),
-      formatDate(a.birth_date).replace("—", "").toUpperCase(),
-      (a.city ?? "").toUpperCase(),
-      (a.kit_type ?? "").toUpperCase(),
-      (a.shirt_size ?? "").toUpperCase(),
-      (a.modality ?? "").toUpperCase(),
-      (a.category ?? "").toUpperCase(),
-      (a.equipe ?? "").toUpperCase(),
-      (a.payment_status === "pendente" ? "PENDENTE" : "PAGO"),
-      (a.registration_number ?? "").toUpperCase(),
-      (a.custom_1 ?? "").toUpperCase(),
-      (a.custom_2 ?? "").toUpperCase(),
-      (a.custom_3 ?? "").toUpperCase(),
-      (a.custom_4 ?? "").toUpperCase(),
-      (a.custom_5 ?? "").toUpperCase(),
-    ]);
+    const rows = sorted.map((athlete) => columns.map((column) => column.value(athlete).toUpperCase()));
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     ws["!cols"] = headers.map((header, index) => ({
       wch: Math.min(38, Math.max(header.length + 2, ...rows.map((row) => String(row[index] ?? "").length + 2), 12)),
@@ -756,6 +773,7 @@ function Atletas() {
       `atletas-${event?.slug ?? "evento"}.xlsx`,
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
+    setExportOpen(false);
     toast.success("Planilha Excel gerada no formato de importação.");
   }
 
@@ -766,7 +784,7 @@ function Atletas() {
         subtitle={`${athletes.length} inscritos · ${event?.name ?? ""}`}
         action={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={exportExcel} title="Exportar planilha Excel">
+            <Button variant="outline" onClick={openExport} title="Exportar planilha Excel">
               <Download className="size-4" />
             </Button>
             <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
@@ -1315,6 +1333,53 @@ function Atletas() {
             </Button>
             <Button variant="destructive" disabled={deleting} onClick={() => void confirmDeleteAll()}>
               {deleting ? "Excluindo…" : "Excluir todos"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="max-h-[85vh] max-w-xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Escolha os dados da planilha</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            Marque os dados que deseja incluir no arquivo dos inscritos.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" size="sm" variant="outline" onClick={() => setExportFields([...EXPORT_KEYS])}>
+              Selecionar todos
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={() => setExportFields([])}>
+              Limpar seleção
+            </Button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {exportColumns.map((column) => {
+              const checked = exportFields.includes(column.key);
+              return (
+                <label
+                  key={column.key}
+                  htmlFor={`export-${column.key}`}
+                  className="hover:bg-muted flex min-h-10 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm font-medium"
+                >
+                  <Checkbox
+                    id={`export-${column.key}`}
+                    checked={checked}
+                    onCheckedChange={(value) => toggleExportField(column.key, value === true)}
+                  />
+                  <span>{column.label}</span>
+                </label>
+              );
+            })}
+          </div>
+          {!exportFields.length && (
+            <p className="text-destructive text-sm font-medium">Selecione pelo menos um dado para baixar a planilha.</p>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setExportOpen(false)}>Cancelar</Button>
+            <Button type="button" disabled={!exportFields.length} onClick={exportExcel}>
+              <Download className="size-4" /> Baixar planilha
             </Button>
           </DialogFooter>
         </DialogContent>
