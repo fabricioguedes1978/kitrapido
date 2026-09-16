@@ -1,4 +1,4 @@
-const logoAsset = { url: "/kit-rapido-logo.png" };
+import logoAsset from "@/assets/kit-rapido-logo-nova.png.asset.json";
 import { cn } from "@/lib/utils";
 
 export function Brand({
