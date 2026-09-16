@@ -791,15 +791,6 @@ export type Database = {
       }
       revoke_team_invite: { Args: { _invite_id: string }; Returns: boolean }
       shares_managed_event: { Args: { _user_id: string }; Returns: boolean }
-      validate_team_invite: {
-        Args: { _code: string; _cpf: string }
-        Returns: {
-          event_name: string
-          invite_expires_at: string
-          invite_name: string
-          invite_role: Database["public"]["Enums"]["app_role"]
-        }[]
-      }
     }
     Enums: {
       app_role: "admin" | "organizer" | "attendant"
