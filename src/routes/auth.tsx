@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
-import { cpfLogin } from "@/lib/team.functions";
+import { cpfLogin, teamAuthPassword } from "@/lib/team.functions";
 
 type LoginProfile = "admin" | "gerente" | "staff";
 
@@ -55,7 +55,8 @@ function AuthPage() {
       }
     }
     const identifier = isCpf ? cpfLogin(digits) : typed;
-    const { error } = await supabase.auth.signInWithPassword({ email: identifier, password });
+    const loginPassword = isCpf ? teamAuthPassword(password) : password;
+    const { error } = await supabase.auth.signInWithPassword({ email: identifier, password: loginPassword });
     setLoading(false);
     if (error) { toast.error("Não foi possível entrar", { description: error.message }); return; }
     navigate({ to: "/central", replace: true });

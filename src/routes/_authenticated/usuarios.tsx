@@ -90,8 +90,8 @@ function Usuarios() {
     const cpf = onlyDigits(form.cpf);
     if (!isValidCPF(cpf)) { toast.error("Informe um CPF válido."); return; }
     const password = form.password;
-    if (password.length < 6) {
-      toast.error(`Crie uma senha com pelo menos 6 caracteres para o ${newOpen === "organizer" ? "gerente" : "staff"}.`);
+    if (!password) {
+      toast.error(`Informe uma senha para o ${newOpen === "organizer" ? "gerente" : "staff"}.`);
       return;
     }
     setSaving(true);
@@ -259,10 +259,11 @@ function Usuarios() {
                 autoComplete="new-password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="mínimo 6 caracteres"
+                placeholder="Digite a senha desejada"
+                maxLength={128}
               />
               <p className="text-muted-foreground text-xs">
-                Pode usar letras, números e caracteres especiais.
+                Pode ser somente números, somente letras ou conter caracteres especiais.
               </p>
             </div>
           </div>
