@@ -11,5 +11,5 @@
 - [x] Validar permissões, ativação e login.
 
 - [x] Separar a consulta por CPF da confirmação de check-in online.
-- [ ] Adicionar confirmação individual de check-in em cada evento do atleta.
-- [ ] Validar consulta, confirmação e consulta posterior da credencial.
+- [x] Adicionar confirmação individual de check-in em cada evento do atleta.
+- [x] Validar consulta, confirmação e consulta posterior da credencial.
