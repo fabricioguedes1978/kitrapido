@@ -22,6 +22,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Acesse o painel de entrega de kits do Kit Rápido." },
       { property: "og:title", content: "Entrar — Kit Rápido" },
       { property: "og:description", content: "Acesso restrito a organizadores e atendentes." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -172,6 +174,11 @@ function AuthPage() {
               <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
                 Entrar
               </Button>
+              {profile !== "admin" && (
+                <Button asChild type="button" variant="outline" className="w-full">
+                  <Link to="/ativar-acesso">Ativar meu acesso</Link>
+                </Button>
+              )}
             </form>
           )}
         </CardContent>
