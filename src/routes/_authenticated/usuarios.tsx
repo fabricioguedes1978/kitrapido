@@ -59,12 +59,28 @@ function Usuarios() {
     queryKey: ["members", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!eventId) return [];
+
+      const { data: memberData, error: memberError } = await supabase
         .from("event_members")
-        .select("id,user_id,role,profiles:user_id(name,email,cpf)")
-        .eq("event_id", eventId!);
-      if (error) throw error;
-      return (data ?? []) as unknown as MemberRow[];
+        .select("id,user_id,role")
+        .eq("event_id", eventId);
+      if (memberError) throw memberError;
+
+      const userIds = (memberData ?? []).map((member) => member.user_id);
+      if (userIds.length === 0) return [];
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id,name,email,cpf")
+        .in("id", userIds);
+      if (profileError) throw profileError;
+
+      const profilesById = new Map((profileData ?? []).map((profile) => [profile.id, profile]));
+      return (memberData ?? []).map((member) => ({
+        ...member,
+        profiles: profilesById.get(member.user_id) ?? null,
+      })) as MemberRow[];
     },
   });
 
