@@ -28,7 +28,7 @@ export function Brand({
         )}
       >
         <img
-          src="/kit-rapido-logo.png"
+          src="/kit-rapido-logo.png?v=20260916"
           alt="Kit Rápido"
           className="h-full w-auto max-w-full object-contain"
         />
