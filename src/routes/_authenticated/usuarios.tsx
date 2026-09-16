@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { KeyRound, ShieldCheck, UserPlus } from "lucide-react";
+import { Eye, EyeOff, KeyRound, ShieldCheck, UserPlus } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -52,6 +52,7 @@ function Usuarios() {
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
   const [form, setForm] = useState({ name: "", cpf: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const { data: members = [] } = useQuery({
@@ -82,6 +83,7 @@ function Usuarios() {
 
   function openNew(kind: "organizer" | "attendant") {
     setForm({ name: "", cpf: "", password: "" });
+    setShowPassword(false);
     setNewOpen(kind);
   }
 
@@ -203,6 +205,7 @@ function Usuarios() {
                             cpf: m.profiles?.cpf ?? "",
                             password: "",
                           });
+                          setShowPassword(false);
                           setNewOpen(m.role === "organizer" ? "organizer" : "attendant");
                         }}
                       >
@@ -255,14 +258,29 @@ function Usuarios() {
             </div>
             <div className="space-y-1.5">
               <Label>{newOpen === "organizer" ? "Senha do gerente" : "Senha do staff"}</Label>
-              <Input
-                type="password"
-                autoComplete="new-password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="Digite a senha desejada"
-                maxLength={128}
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Digite a senha desejada"
+                  maxLength={128}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground absolute top-1/2 right-0.5 -translate-y-1/2 shadow-none"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  aria-pressed={showPassword}
+                  title={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
+              </div>
               <p className="text-muted-foreground text-xs">
                 Pode ser somente números, somente letras ou conter caracteres especiais.
               </p>
