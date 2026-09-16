@@ -67,6 +67,7 @@ type KitRow = {
   qr_payload: string;
   custom_labels: string[] | null;
   custom_values: string[] | null;
+  online_checkin_at: string | null;
 };
 
 function Checkin() {
@@ -83,12 +84,21 @@ function Checkin() {
     }
     setLoading(true);
     const { data, error } = await supabase.rpc("public_kit_lookup_all", { _doc: digits });
+    const { data: statuses, error: statusError } = error
+      ? { data: null, error: null }
+      : await supabase.rpc("public_online_checkin_status_all", { _doc: digits });
     setLoading(false);
-    if (error) {
+    if (error || statusError) {
       toast.error("Não foi possível consultar agora. Tente novamente.");
       return;
     }
-    setRows((data as KitRow[] | null) ?? []);
+    const checkins = new Map((statuses ?? []).map((status) => [status.athlete_id, status.online_checkin_at]));
+    setRows(
+      ((data as Omit<KitRow, "online_checkin_at">[] | null) ?? []).map((row) => ({
+        ...row,
+        online_checkin_at: checkins.get(row.athlete_id) ?? null,
+      })),
+    );
   }
 
   return (
@@ -116,7 +126,7 @@ function Checkin() {
             />
           </div>
           <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Consultando…" : "Fazer check-in"}
+            {loading ? "Consultando…" : "Consultar"}
           </Button>
         </form>
 
@@ -134,7 +144,15 @@ function Checkin() {
         )}
 
         <div className="mt-4 space-y-6">
-          {rows?.map((row, idx) => <KitCard key={row.athlete_id} row={row} index={idx} total={rows.length} />)}
+          {rows?.map((row, idx) => (
+            <KitCard
+              key={row.athlete_id}
+              row={row}
+              index={idx}
+              total={rows.length}
+              cpf={doc.replace(/\D/g, "")}
+            />
+          ))}
         </div>
       </main>
       <ChatWidget />
@@ -154,8 +172,10 @@ function genderLabel(v?: string | null) {
   return v || "—";
 }
 
-function KitCard({ row, index, total }: { row: KitRow; index: number; total: number }) {
+function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total: number; cpf: string }) {
   const qrRef = useRef<HTMLDivElement>(null);
+  const [checkedInAt, setCheckedInAt] = useState(row.online_checkin_at);
+  const [checkingIn, setCheckingIn] = useState(false);
   const delivered = row.kit_status !== "pending" && row.kit_status !== "blocked";
   const scanUrl = athleteQrUrl(row.event_id, row.athlete_id);
   const extras = customFields(row.custom_labels, row.custom_values ?? []);
@@ -174,6 +194,22 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
     { label: "Cidade", value: row.pickup_city || "" },
   ].filter((l) => l.value);
   const mapsHref = mapsUrl(row.pickup_maps_url, row.pickup_address, row.pickup_city);
+
+  async function confirmCheckin() {
+    if (checkedInAt || checkingIn) return;
+    setCheckingIn(true);
+    const { data, error } = await supabase.rpc("confirm_public_online_checkin", {
+      _athlete_id: row.athlete_id,
+      _doc: cpf,
+    });
+    setCheckingIn(false);
+    if (error || !data) {
+      toast.error("Não foi possível realizar o check-in. Tente novamente.");
+      return;
+    }
+    setCheckedInAt(data);
+    toast.success("CHECK-IN REALIZADO COM SUCESSO");
+  }
 
 
   const athleteRows = [
@@ -231,8 +267,29 @@ function KitCard({ row, index, total }: { row: KitRow; index: number; total: num
               <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
             </div>
           ) : (
-            <div className="border-warning/30 bg-warning/15 text-warning flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
-              <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
+            <div className="border-warning/30 bg-warning/15 flex flex-col gap-3 rounded-lg border px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-warning flex items-center gap-2 text-sm font-bold">
+                <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                disabled={Boolean(checkedInAt) || checkingIn}
+                onClick={() => void confirmCheckin()}
+                className={
+                  checkedInAt
+                    ? "bg-success text-success-foreground opacity-100"
+                    : "bg-warning text-warning-foreground hover:bg-warning/90"
+                }
+              >
+                {checkedInAt ? (
+                  <><CheckCircle2 /> CHECK-IN REALIZADO</>
+                ) : checkingIn ? (
+                  "REALIZANDO…"
+                ) : (
+                  "REALIZAR CHECK-IN"
+                )}
+              </Button>
             </div>
           )}
 
