@@ -248,8 +248,9 @@ function Usuarios() {
               <Input
                 inputMode="numeric"
                 value={form.cpf}
-                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
                 placeholder="000.000.000-00"
+                maxLength={14}
               />
             </div>
             <div className="space-y-1.5">
