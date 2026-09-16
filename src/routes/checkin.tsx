@@ -267,27 +267,27 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
               <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
             </div>
           ) : (
-            <div className="border-warning/30 bg-warning/15 flex flex-col gap-3 rounded-lg border px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-3">
               <Button
                 type="button"
-                size="sm"
+                size="lg"
                 disabled={Boolean(checkedInAt) || checkingIn}
                 onClick={() => void confirmCheckin()}
-                className={
+                className={`w-full ${
                   checkedInAt
                     ? "bg-success text-success-foreground opacity-100"
                     : "bg-warning text-warning-foreground hover:bg-warning/90"
-                }
+                }`}
               >
                 {checkedInAt ? (
                   <><CheckCircle2 /> CHECK-IN REALIZADO</>
                 ) : checkingIn ? (
                   "REALIZANDO…"
                 ) : (
-                  "REALIZAR CHECK-IN"
+                  "REALIZAR CHECK-IN — CLIQUE AQUI"
                 )}
               </Button>
-              <div className="text-warning flex items-center gap-2 text-sm font-bold sm:justify-end sm:text-right">
+              <div className="border-warning/30 bg-warning/15 text-warning flex items-center justify-center gap-2 rounded-lg border px-3 py-3 text-center text-sm font-bold">
                 <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
               </div>
             </div>
