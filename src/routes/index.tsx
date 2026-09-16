@@ -21,7 +21,6 @@ import { ChatWidget } from "@/components/ChatWidget";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-const mockupDevices = { url: "/mockup-devices-v4.png" };
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -175,7 +174,7 @@ function Landing() {
           <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[480px] lg:max-w-[560px]">
             <div className="bg-primary/15 absolute -inset-4 -z-10 rotate-[-6deg] rounded-[38%_14%_30%_16%] sm:-inset-6" />
             <img
-              src={mockupDevices.url}
+              src="/mockup-devices-v4.png"
               alt="Demonstração do painel KIT RÁPIDO no tablet e da credencial com QR Code no celular"
               width={1024}
               height={768}

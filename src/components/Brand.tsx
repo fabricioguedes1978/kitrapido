@@ -1,4 +1,3 @@
-import logoAsset from "@/assets/kit-rapido-logo-nova.png.asset.json";
 import { cn } from "@/lib/utils";
 
 export function Brand({
@@ -29,7 +28,7 @@ export function Brand({
         )}
       >
         <img
-          src={logoAsset.url}
+          src="/kit-rapido-logo.png"
           alt="Kit Rápido"
           className="h-full w-auto max-w-full object-contain"
         />
