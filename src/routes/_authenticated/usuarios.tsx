@@ -211,7 +211,7 @@ function Usuarios() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {canManage && (
+                    {(isAdmin || m.role === "attendant") && (
                       <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>
                         Remover
                       </Button>

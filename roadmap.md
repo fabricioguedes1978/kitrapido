@@ -6,6 +6,6 @@
 - [x] Renderizar os seis vídeos com a Ana corrigida.
 - [x] Validar imagem, áudio, duração e privacidade dos arquivos finais.
 
-- [ ] Implementar convites seguros para gerente e staff.
-- [ ] Criar ativação pública por CPF e código.
-- [ ] Validar permissões, ativação e login.
+- [x] Implementar convites seguros para gerente e staff.
+- [x] Criar ativação pública por CPF e código.
+- [x] Validar permissões, ativação e login.
