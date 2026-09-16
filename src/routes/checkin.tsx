@@ -268,9 +268,6 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
             </div>
           ) : (
             <div className="border-warning/30 bg-warning/15 flex flex-col gap-3 rounded-lg border px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-warning flex items-center gap-2 text-sm font-bold">
-                <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
-              </div>
               <Button
                 type="button"
                 size="sm"
@@ -290,6 +287,9 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
                   "REALIZAR CHECK-IN"
                 )}
               </Button>
+              <div className="text-warning flex items-center gap-2 text-sm font-bold sm:justify-end sm:text-right">
+                <Ticket className="size-5" /> KIT PENDENTE DE RETIRADA
+              </div>
             </div>
           )}
 
