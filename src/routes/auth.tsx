@@ -136,6 +136,7 @@ function AuthPage() {
                   required
                   inputMode={profile === "admin" ? "email" : "numeric"}
                   placeholder={profile === "admin" ? "seu@email.com" : "000.000.000-00"}
+                  maxLength={profile === "admin" ? undefined : 14}
                   value={email}
                   onChange={(e) => setEmail(profile === "admin" ? e.target.value : formatCPF(e.target.value))}
                 />
