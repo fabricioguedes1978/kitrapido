@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ShieldCheck, UserCog, Users, ClipboardCheck, ArrowLeft } from "lucide-react";
+import { ShieldCheck, UserCog, Users, ClipboardCheck, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [profile, setProfile] = useState<LoginProfile | null>(null);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ function AuthPage() {
     setProfile(p);
     setEmail("");
     setPassword("");
+    setShowPassword(false);
   }
 
   return (
@@ -143,14 +145,29 @@ function AuthPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground absolute top-1/2 right-0.5 -translate-y-1/2 shadow-none"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    aria-pressed={showPassword}
+                    title={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </Button>
+                </div>
               </div>
               <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
                 Entrar
