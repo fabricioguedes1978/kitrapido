@@ -322,6 +322,23 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
             ))}
           </dl>
 
+          <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
+            <div ref={qrRef}>
+              <QRCodeSVG value={scanUrl} size={192} level="M" />
+            </div>
+            <p className="text-muted-foreground text-center text-xs">
+              A equipe de entrega lê este QR Code, confere seus dados e registra o kit como entregue.
+            </p>
+            <div className="grid w-full grid-cols-2 gap-2">
+              <Button variant="outline" onClick={() => void saveCredential("png")}>
+                <ImageIcon className="size-4" /> Salvar imagem
+              </Button>
+              <Button variant="outline" onClick={() => void saveCredential("pdf")}>
+                <FileDown className="size-4" /> Salvar PDF
+              </Button>
+            </div>
+          </div>
+
           {(pickupLines.length > 0 || pickupInfo || mapsHref) && (
             <div className="bg-primary/5 border-primary/20 space-y-3 rounded-xl border p-4">
               <p className="text-primary flex items-center gap-2 text-sm font-bold uppercase">
@@ -344,24 +361,6 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
               )}
             </div>
           )}
-
-
-        <div className="bg-card flex flex-col items-center gap-3 rounded-xl border p-5">
-          <div ref={qrRef}>
-            <QRCodeSVG value={scanUrl} size={192} level="M" />
-          </div>
-          <p className="text-muted-foreground text-center text-xs">
-            A equipe de entrega lê este QR Code, confere seus dados e registra o kit como entregue.
-          </p>
-          <div className="grid w-full grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => void saveCredential("png")}>
-              <ImageIcon className="size-4" /> Salvar imagem
-            </Button>
-            <Button variant="outline" onClick={() => void saveCredential("pdf")}>
-              <FileDown className="size-4" /> Salvar PDF
-            </Button>
-          </div>
-        </div>
         </div>
       </CardContent>
     </Card>
