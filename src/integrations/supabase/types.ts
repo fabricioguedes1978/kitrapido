@@ -688,6 +688,10 @@ export type Database = {
       can_edit_athletes: { Args: { _event_id: string }; Returns: boolean }
       can_import_athletes: { Args: { _event_id: string }; Returns: boolean }
       can_manage_event: { Args: { _event_id: string }; Returns: boolean }
+      confirm_public_online_checkin: {
+        Args: { _athlete_id: string; _doc: string }
+        Returns: string
+      }
       create_team_invite: {
         Args: {
           _cpf: string
@@ -787,6 +791,13 @@ export type Database = {
           qr_payload: string
           shirt_size: string
           start_location: string
+        }[]
+      }
+      public_online_checkin_status_all: {
+        Args: { _doc: string }
+        Returns: {
+          athlete_id: string
+          online_checkin_at: string
         }[]
       }
       revoke_team_invite: { Args: { _invite_id: string }; Returns: boolean }
