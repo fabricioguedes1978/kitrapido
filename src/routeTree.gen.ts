@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AtivarAcessoRouteImport } from './routes/ativar-acesso'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CheckinRouteImport } from './routes/checkin'
 import { Route as ConsultaRouteImport } from './routes/consulta'
@@ -41,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtivarAcessoRoute = AtivarAcessoRouteImport.update({
+  id: '/ativar-acesso',
+  path: '/ativar-acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -159,6 +165,7 @@ const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ativar-acesso': typeof AtivarAcessoRoute
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ativar-acesso': typeof AtivarAcessoRoute
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/ativar-acesso': typeof AtivarAcessoRoute
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ativar-acesso'
     | '/auth'
     | '/checkin'
     | '/consulta'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ativar-acesso'
     | '/auth'
     | '/checkin'
     | '/consulta'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/ativar-acesso'
     | '/auth'
     | '/checkin'
     | '/consulta'
@@ -316,6 +328,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AtivarAcessoRoute: typeof AtivarAcessoRoute
   AuthRoute: typeof AuthRoute
   CheckinRoute: typeof CheckinRoute
   ConsultaRoute: typeof ConsultaRoute
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ativar-acesso': {
+      id: '/ativar-acesso'
+      path: '/ativar-acesso'
+      fullPath: '/ativar-acesso'
+      preLoaderRoute: typeof AtivarAcessoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -541,6 +561,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AtivarAcessoRoute: AtivarAcessoRoute,
   AuthRoute: AuthRoute,
   CheckinRoute: CheckinRoute,
   ConsultaRoute: ConsultaRoute,

@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, EyeOff, KeyRound, ShieldCheck, UserPlus } from "lucide-react";
+import { Check, Clipboard, Clock3, ShieldCheck, Trash2, UserPlus } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,12 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
-import { saveEventTeamUser } from "@/lib/team.functions";
 import { ROLE_LABEL, formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
@@ -39,21 +36,27 @@ type MemberRow = {
   profiles: { name: string; email: string; cpf: string | null } | null;
 };
 
+type InviteRow = {
+  id: string;
+  cpf: string;
+  name: string;
+  role: "organizer" | "attendant";
+  status: string;
+  created_at: string;
+  expires_at: string;
+};
+
 function Usuarios() {
   const { event, eventId } = useCurrentEvent();
   const { isAdmin, isOrganizer } = useAuth();
   const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
-  const saveTeamUser = useServerFn(saveEventTeamUser);
-
-  const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"organizer" | "attendant">("attendant");
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
-  const [form, setForm] = useState({ name: "", cpf: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({ name: "", cpf: "" });
   const [saving, setSaving] = useState(false);
+  const [createdInvite, setCreatedInvite] = useState<{ code: string; expiresAt: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const { data: members = [] } = useQuery({
     queryKey: ["members", eventId],
@@ -84,22 +87,21 @@ function Usuarios() {
     },
   });
 
-  const { data: profiles = [] } = useQuery({
-    queryKey: ["profiles"],
+  const { data: invites = [] } = useQuery({
+    queryKey: ["team-invites", eventId],
+    enabled: !!eventId && canManage,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id,name,email").order("name");
-      return data ?? [];
+      if (!eventId) return [];
+      const { data, error } = await supabase.rpc("list_team_invites", { _event_id: eventId });
+      if (error) throw error;
+      return (data ?? []) as InviteRow[];
     },
   });
 
-  const available = useMemo(
-    () => profiles.filter((p) => !members.some((m) => m.user_id === p.id)),
-    [profiles, members],
-  );
-
   function openNew(kind: "organizer" | "attendant") {
-    setForm({ name: "", cpf: "", password: "" });
-    setShowPassword(false);
+    setForm({ name: "", cpf: "" });
+    setCreatedInvite(null);
+    setCopied(false);
     setNewOpen(kind);
   }
 
@@ -107,48 +109,48 @@ function Usuarios() {
     if (!eventId || !newOpen) return;
     const cpf = onlyDigits(form.cpf);
     if (!isValidCPF(cpf)) { toast.error("Informe um CPF válido."); return; }
-    const password = form.password;
-    if (!password) {
-      toast.error(`Informe uma senha para o ${newOpen === "organizer" ? "gerente" : "staff"}.`);
+    if (form.name.trim().length < 2) {
+      toast.error("Informe o nome da pessoa.");
       return;
     }
     setSaving(true);
-    try {
-      await saveTeamUser({
-        data: { eventId, cpf, name: form.name.trim() || formatCPF(cpf), password, role: newOpen },
-      });
-      await qc.invalidateQueries({ queryKey: ["members", eventId] });
-      setNewOpen(null);
-      toast.success(newOpen === "organizer" ? "Gerente cadastrado." : "Staff cadastrado.", {
-        description: `Entra com o CPF ${formatCPF(cpf)} e a senha definida agora.`,
-      });
-    } catch (err) {
-      toast.error("Não foi possível salvar", { description: (err as Error).message });
-    }
+    const { data, error } = await supabase.rpc("create_team_invite", {
+      _event_id: eventId,
+      _cpf: cpf,
+      _name: form.name.trim(),
+      _role: newOpen,
+    });
     setSaving(false);
-  }
-
-  async function add() {
-    if (!eventId) return;
-    const profile = available.find((p) => p.email.toLowerCase() === email.trim().toLowerCase());
-    if (!profile)
-      { toast.error("Usuário não encontrado", {
-        description: "A pessoa precisa criar a conta no sistema antes de ser vinculada.",
-      }); return; }
-    const { error } = await supabase
-      .from("event_members")
-      .insert({ event_id: eventId, user_id: profile.id, role });
-    if (error) { toast.error("Não foi possível vincular", { description: error.message }); return; }
-    await qc.invalidateQueries({ queryKey: ["members", eventId] });
-    setOpen(false);
-    setEmail("");
-    toast.success("Usuário vinculado ao evento.");
+    if (error || !data?.[0]) {
+      toast.error("Não foi possível criar o convite", { description: error?.message });
+      return;
+    }
+    setCreatedInvite({ code: data[0].activation_code, expiresAt: data[0].invite_expires_at });
+    await qc.invalidateQueries({ queryKey: ["team-invites", eventId] });
+    toast.success("Convite criado.");
   }
 
   async function remove(id: string) {
     const { error } = await supabase.from("event_members").delete().eq("id", id);
     if (error) { toast.error("Não foi possível remover"); return; }
     await qc.invalidateQueries({ queryKey: ["members", eventId] });
+  }
+
+  async function revokeInvite(id: string) {
+    const { error } = await supabase.rpc("revoke_team_invite", { _invite_id: id });
+    if (error) {
+      toast.error("Não foi possível cancelar o convite", { description: error.message });
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: ["team-invites", eventId] });
+    toast.success("Convite cancelado.");
+  }
+
+  async function copyInvite() {
+    if (!createdInvite) return;
+    await navigator.clipboard.writeText(createdInvite.code);
+    setCopied(true);
+    toast.success("Código copiado.");
   }
 
   return (
@@ -158,17 +160,16 @@ function Usuarios() {
         subtitle={event?.name ?? ""}
         action={
           <div className="flex flex-wrap gap-2">
-            {canManage && (
+            {isAdmin && (
               <Button onClick={() => openNew("organizer")}>
-                <ShieldCheck className="size-4" /> Novo gerente
+                <ShieldCheck className="size-4" /> Convidar gerente
               </Button>
             )}
-            <Button variant={canManage ? "outline" : "default"} onClick={() => openNew("attendant")}>
-              <UserPlus className="size-4" /> Novo staff
-            </Button>
-            <Button variant="ghost" onClick={() => setOpen(true)}>
-              Vincular por e-mail
-            </Button>
+            {canManage && (
+              <Button variant={isAdmin ? "outline" : "default"} onClick={() => openNew("attendant")}>
+                <UserPlus className="size-4" /> Convidar staff
+              </Button>
+            )}
           </div>
         }
       />
@@ -176,13 +177,12 @@ function Usuarios() {
       <Card className="mb-4">
         <CardContent className="text-muted-foreground space-y-1 py-4 text-sm">
           <p>
-            <strong className="text-foreground">Gerente:</strong> entra com o CPF e a senha criada
-            pelo administrador. A senha pode conter letras, números e caracteres especiais. Pode
-            cadastrar atletas, editar dados e criar os staffs deste evento.
+            <strong className="text-foreground">Gerente:</strong> recebe um código do administrador,
+            ativa o acesso com CPF e cria a própria senha. Pode convidar somente staffs deste evento.
           </p>
           <p>
-            <strong className="text-foreground">Staff:</strong> entra com o CPF e a senha criada pelo
-            gerente. Só faz a entrega do kit, inclusive para terceiros informando quem retirou.
+            <strong className="text-foreground">Staff:</strong> recebe um código do administrador ou
+            gerente, ativa o acesso e cria a própria senha.
           </p>
         </CardContent>
       </Card>
@@ -211,26 +211,11 @@ function Usuarios() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {m.profiles?.cpf && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setForm({
-                            name: m.profiles?.name ?? "",
-                            cpf: m.profiles?.cpf ?? "",
-                            password: "",
-                          });
-                          setShowPassword(false);
-                          setNewOpen(m.role === "organizer" ? "organizer" : "attendant");
-                        }}
-                      >
-                        <KeyRound className="size-4" /> Senha
+                    {(isAdmin || m.role === "attendant") && (
+                      <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>
+                        Remover
                       </Button>
                     )}
-                    <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>
-                      Remover
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -246,14 +231,55 @@ function Usuarios() {
         </CardContent>
       </Card>
 
+      {canManage && invites.some((invite) => invite.status === "pending") && (
+        <Card className="mt-4">
+          <CardContent className="p-0">
+            <div className="border-b px-4 py-3">
+              <h2 className="font-semibold">Convites pendentes</h2>
+              <p className="text-muted-foreground text-xs">O código aparece somente no momento da criação.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Função</TableHead><TableHead>Validade</TableHead><TableHead /></TableRow></TableHeader>
+                <TableBody>
+                  {invites.filter((invite) => invite.status === "pending").map((invite) => (
+                    <TableRow key={invite.id}>
+                      <TableCell className="font-medium">{invite.name}</TableCell>
+                      <TableCell>{formatCPF(invite.cpf)}</TableCell>
+                      <TableCell><Badge variant="secondary">{invite.role === "organizer" ? "Gerente" : "Staff"}</Badge></TableCell>
+                      <TableCell className="text-muted-foreground"><span className="inline-flex items-center gap-1"><Clock3 className="size-3.5" /> {new Date(invite.expires_at).toLocaleDateString("pt-BR")}</span></TableCell>
+                      <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => void revokeInvite(invite.id)}><Trash2 /> Cancelar</Button></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Dialog open={!!newOpen} onOpenChange={(v) => !v && setNewOpen(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {newOpen === "organizer" ? "Gerente do evento" : "Staff de entrega"}
+              {createdInvite ? "Convite criado" : newOpen === "organizer" ? "Convidar gerente" : "Convidar staff"}
             </DialogTitle>
+            <DialogDescription>
+              {createdInvite ? "Entregue este código à pessoa. Ele não será mostrado novamente." : "O convite é válido por 7 dias e só pode ser usado uma vez."}
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
+          {createdInvite ? (
+            <div className="space-y-4">
+              <div className="bg-muted rounded-md border p-4 text-center">
+                <p className="text-muted-foreground text-xs">Código de ativação</p>
+                <p className="mt-1 font-mono text-2xl font-bold">{createdInvite.code}</p>
+              </div>
+              <Button className="w-full" variant="outline" onClick={() => void copyInvite()}>
+                {copied ? <Check /> : <Clipboard />} {copied ? "Código copiado" : "Copiar código"}
+              </Button>
+              <p className="text-muted-foreground text-center text-xs">A pessoa deve acessar “Ativar meu acesso” na tela de login.</p>
+            </div>
+          ) : <div className="space-y-3">
             <div className="space-y-1.5">
               <Label>Nome</Label>
               <Input
@@ -272,69 +298,13 @@ function Usuarios() {
                 maxLength={14}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label>{newOpen === "organizer" ? "Senha do gerente" : "Senha do staff"}</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="Digite a senha desejada"
-                  maxLength={128}
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground absolute top-1/2 right-0.5 -translate-y-1/2 shadow-none"
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                  aria-pressed={showPassword}
-                  title={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </Button>
-              </div>
-              <p className="text-muted-foreground text-xs">
-                Pode ser somente números, somente letras ou conter caracteres especiais.
-              </p>
-            </div>
-          </div>
+          </div>}
           <DialogFooter>
-            <Button disabled={saving} onClick={() => void saveNew()}>
-              Salvar acesso
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Vincular usuário ao evento</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label>E-mail cadastrado</Label>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="pessoa@email.com" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Função</Label>
-              <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="organizer">Gerente</SelectItem>
-                  <SelectItem value="attendant">Staff</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => void add()}>Vincular</Button>
+            {createdInvite ? (
+              <Button onClick={() => setNewOpen(null)}>Concluir</Button>
+            ) : (
+              <Button disabled={saving} onClick={() => void saveNew()}>Criar convite</Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

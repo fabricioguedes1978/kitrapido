@@ -555,6 +555,59 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invites: {
+        Row: {
+          accepted_user_id: string | null
+          code_hash: string
+          cpf: string
+          created_at: string
+          event_id: string
+          expires_at: string
+          id: string
+          invited_by: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_user_id?: string | null
+          code_hash: string
+          cpf: string
+          created_at?: string
+          event_id: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_user_id?: string | null
+          code_hash?: string
+          cpf?: string
+          created_at?: string
+          event_id?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          name?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       third_party_authorizations: {
         Row: {
           athlete_id: string
@@ -635,6 +688,19 @@ export type Database = {
       can_edit_athletes: { Args: { _event_id: string }; Returns: boolean }
       can_import_athletes: { Args: { _event_id: string }; Returns: boolean }
       can_manage_event: { Args: { _event_id: string }; Returns: boolean }
+      create_team_invite: {
+        Args: {
+          _cpf: string
+          _event_id: string
+          _name: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: {
+          activation_code: string
+          invite_expires_at: string
+          invite_id: string
+        }[]
+      }
       has_event_access: { Args: { _event_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -645,6 +711,18 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_valid_cpf: { Args: { _cpf: string }; Returns: boolean }
+      list_team_invites: {
+        Args: { _event_id: string }
+        Returns: {
+          cpf: string
+          created_at: string
+          expires_at: string
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+        }[]
+      }
       public_kit_lookup: {
         Args: { _doc: string; _slug: string }
         Returns: {
@@ -711,6 +789,7 @@ export type Database = {
           start_location: string
         }[]
       }
+      revoke_team_invite: { Args: { _invite_id: string }; Returns: boolean }
       shares_managed_event: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
