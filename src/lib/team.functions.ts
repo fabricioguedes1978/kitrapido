@@ -8,6 +8,10 @@ export function cpfLogin(cpf: string) {
   return `${cpf.replace(/\D/g, "")}@${TEAM_EMAIL_DOMAIN}`;
 }
 
+export function teamAuthPassword(password: string) {
+  return password.length >= 6 ? password : `kit-${password}-access`;
+}
+
 type Input = {
   eventId: string;
   cpf: string;
@@ -22,8 +26,8 @@ export const saveEventTeamUser = createServerFn({ method: "POST" })
     const cpf = input.cpf.replace(/\D/g, "");
     if (cpf.length !== 11 || !isValidCPF(cpf)) throw new Error("Informe um CPF válido com 11 dígitos.");
     if (!input.eventId) throw new Error("Selecione um evento.");
-    if (!input.password || input.password.length < 6)
-      throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+    if (!input.password) throw new Error("Informe uma senha.");
+    if (input.password.length > 128) throw new Error("A senha pode ter no máximo 128 caracteres.");
     if (input.role !== "organizer" && input.role !== "attendant")
       throw new Error("Função inválida.");
     return { ...input, cpf, name: input.name.trim() };
@@ -41,6 +45,7 @@ export const saveEventTeamUser = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const email = cpfLogin(data.cpf);
+    const authPassword = teamAuthPassword(data.password);
 
     const { data: existing } = await supabaseAdmin
       .from("profiles")
@@ -52,13 +57,13 @@ export const saveEventTeamUser = createServerFn({ method: "POST" })
 
     if (userId) {
       const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-        password: data.password,
+        password: authPassword,
       });
       if (error) throw new Error(error.message);
     } else {
       const created = await supabaseAdmin.auth.admin.createUser({
         email,
-        password: data.password,
+        password: authPassword,
         email_confirm: true,
         user_metadata: { name: data.name || data.cpf },
       });
