@@ -15,5 +15,5 @@
 - [x] Validar consulta, confirmação e consulta posterior da credencial.
 
 - [x] Permitir que gerente e staff sejam vinculados a vários eventos.
-- [ ] Regularizar convites pendentes de contas existentes.
-- [ ] Validar a visualização de vários eventos no seletor.
+- [x] Regularizar convites pendentes de contas existentes.
+- [x] Validar a visualização de vários eventos no seletor.
