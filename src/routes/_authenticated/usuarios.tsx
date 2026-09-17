@@ -125,6 +125,18 @@ function Usuarios() {
       toast.error("Não foi possível criar o convite", { description: error?.message });
       return;
     }
+    if (!data[0].activation_code) {
+      setNewOpen(null);
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["members", eventId] }),
+        qc.invalidateQueries({ queryKey: ["team-invites", eventId] }),
+        qc.invalidateQueries({ queryKey: ["events"] }),
+      ]);
+      toast.success("Acesso vinculado ao evento", {
+        description: "A pessoa já possui conta e pode usar a senha atual.",
+      });
+      return;
+    }
     setCreatedInvite({ code: data[0].activation_code, expiresAt: data[0].invite_expires_at });
     await qc.invalidateQueries({ queryKey: ["team-invites", eventId] });
     toast.success("Convite criado.");

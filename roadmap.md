@@ -13,3 +13,7 @@
 - [x] Separar a consulta por CPF da confirmação de check-in online.
 - [x] Adicionar confirmação individual de check-in em cada evento do atleta.
 - [x] Validar consulta, confirmação e consulta posterior da credencial.
+
+- [x] Permitir que gerente e staff sejam vinculados a vários eventos.
+- [x] Regularizar convites pendentes de contas existentes.
+- [x] Validar a visualização de vários eventos no seletor.
