@@ -17,3 +17,5 @@
 - [x] Permitir que gerente e staff sejam vinculados a vários eventos.
 - [x] Regularizar convites pendentes de contas existentes.
 - [x] Validar a visualização de vários eventos no seletor.
+
+- [x] Sinalizar atletas menores de 18 anos na lista e na Central de Entrega.

@@ -129,6 +129,21 @@ export function formatDate(value?: string | null) {
   return new Date(value).toLocaleDateString("pt-BR");
 }
 
+export function isUnder18(value?: string | null, today = new Date()) {
+  if (!value) return false;
+  const [yearText, monthText, dayText] = value.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  if (!year || !month || !day) return false;
+  let age = today.getFullYear() - year;
+  const birthdayHasPassed =
+    today.getMonth() + 1 > month ||
+    (today.getMonth() + 1 === month && today.getDate() >= day);
+  if (!birthdayHasPassed) age -= 1;
+  return age >= 0 && age < 18;
+}
+
 export async function logAudit(entry: {
   eventId?: string | null;
   action: string;

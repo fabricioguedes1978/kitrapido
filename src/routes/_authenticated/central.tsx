@@ -44,6 +44,7 @@ import {
   formatDate,
   formatDateTime,
   formatTime,
+  isUnder18,
   logAudit,
   maskCPF,
   onlyDigits,
@@ -537,7 +538,14 @@ function Central() {
                     className="bg-card hover:border-primary grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border p-3 text-left transition-colors"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-semibold">{a.name}</p>
+                      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                        <p className="truncate font-semibold">{a.name}</p>
+                        {isUnder18(a.birth_date) && (
+                          <Badge className="border-warning/30 bg-warning/15 text-warning shrink-0 text-[10px] font-bold uppercase">
+                            Menor de 18 anos
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-muted-foreground truncate text-xs">
                         Nº {a.bib_number ?? "—"} · {a.modality ?? "—"} · {maskCPF(a.cpf)}
                       </p>
@@ -673,7 +681,14 @@ function Central() {
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-muted-foreground text-xs tracking-wide uppercase">Atleta</p>
-                      <p className="text-2xl font-extrabold">{selected.name}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-2xl font-extrabold">{selected.name}</p>
+                        {isUnder18(selected.birth_date) && (
+                          <Badge className="border-warning/30 bg-warning/15 text-warning font-bold uppercase">
+                            <AlertTriangle className="size-3.5" /> Menor de 18 anos
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-muted-foreground text-sm">CPF: {maskCPF(selected.cpf)}</p>
                       <div className="mt-1">
                         <PaymentBadge athlete={selected} />

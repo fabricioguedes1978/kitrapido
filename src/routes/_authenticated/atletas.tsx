@@ -28,7 +28,7 @@ import {
   KIT_STATUS,
   downloadBlob,
   formatCPF,
-  
+  isUnder18,
   logAudit,
   maskCPF,
   onlyDigits,
@@ -989,7 +989,14 @@ function Atletas() {
                       >
                         <Pencil className="size-4" />
                       </Button>
-                      <span className="max-w-[200px] truncate">{a.name}</span>
+                      <div className="flex min-w-0 flex-col items-start gap-1">
+                        <span className="max-w-[200px] truncate">{a.name}</span>
+                        {isUnder18(a.birth_date) && (
+                          <Badge className="border-warning/30 bg-warning/15 text-warning text-[10px] font-bold uppercase">
+                            Menor de 18 anos
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
