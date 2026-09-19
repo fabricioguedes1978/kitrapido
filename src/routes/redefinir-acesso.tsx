@@ -40,10 +40,22 @@ function ResetTeamAccessPage() {
     event.preventDefault();
     const cpfDigits = onlyDigits(cpf);
     const cleanCode = code.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
-    if (!isValidCPF(cpfDigits)) return toast.error("Informe um CPF válido.");
-    if (cleanCode.length !== 8) return toast.error("Informe o código com 8 caracteres.");
-    if (!password || password.length > 128) return toast.error("Informe uma senha com até 128 caracteres.");
-    if (password !== confirm) return toast.error("As senhas não coincidem.");
+    if (!isValidCPF(cpfDigits)) {
+      toast.error("Informe um CPF válido.");
+      return;
+    }
+    if (cleanCode.length !== 8) {
+      toast.error("Informe o código com 8 caracteres.");
+      return;
+    }
+    if (!password || password.length > 128) {
+      toast.error("Informe uma senha com até 128 caracteres.");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
 
     setLoading(true);
     try {
