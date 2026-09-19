@@ -8,6 +8,13 @@
       "when": 1789668456546,
       "tag": "0000_link_existing_team_users_to_multiple_events",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789778708801,
+      "tag": "0001_team_password_recovery",
+      "breakpoints": true
     }
   ]
 }

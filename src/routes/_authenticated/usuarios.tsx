@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Clipboard, Clock3, ShieldCheck, Trash2, UserPlus } from "lucide-react";
+import { Check, Clipboard, Clock3, KeyRound, ShieldCheck, Trash2, UserPlus } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { ROLE_LABEL, formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
+import { createTeamPasswordReset } from "@/lib/team-password.functions";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
@@ -51,12 +53,16 @@ function Usuarios() {
   const { isAdmin, isOrganizer } = useAuth();
   const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
+  const createPasswordReset = useServerFn(createTeamPasswordReset);
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
   const [form, setForm] = useState({ name: "", cpf: "" });
   const [saving, setSaving] = useState(false);
   const [createdInvite, setCreatedInvite] = useState<{ code: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [resetMember, setResetMember] = useState<MemberRow | null>(null);
+  const [resetCode, setResetCode] = useState<string | null>(null);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const { data: members = [] } = useQuery({
     queryKey: ["members", eventId],
@@ -165,6 +171,30 @@ function Usuarios() {
     toast.success("Código copiado.");
   }
 
+  async function generateResetCode() {
+    if (!eventId || !resetMember) return;
+    setResetLoading(true);
+    try {
+      const result = await createPasswordReset({
+        data: { eventId, userId: resetMember.user_id },
+      });
+      setResetCode(result.code);
+      toast.success("Código de recuperação criado.");
+    } catch (error) {
+      toast.error("Não foi possível gerar o código", {
+        description: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  }
+
+  async function copyResetCode() {
+    if (!resetCode) return;
+    await navigator.clipboard.writeText(resetCode);
+    toast.success("Código copiado.");
+  }
+
   return (
     <AppShell>
       <PageHeader
@@ -223,11 +253,12 @@ function Usuarios() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {(isAdmin || m.role === "attendant") && (
-                      <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>
-                        Remover
+                    {(isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => { setResetCode(null); setResetMember(m); }}>
+                        <KeyRound /> Redefinir senha
                       </Button>
-                    )}
+                      <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>Remover</Button>
+                    </div>}
                   </TableCell>
                 </TableRow>
               ))}
@@ -317,6 +348,38 @@ function Usuarios() {
             ) : (
               <Button disabled={saving} onClick={() => void saveNew()}>Criar convite</Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!resetMember} onOpenChange={(open) => { if (!open) { setResetMember(null); setResetCode(null); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{resetCode ? "Código de recuperação" : "Redefinir senha"}</DialogTitle>
+            <DialogDescription>
+              {resetCode
+                ? "Entregue este código à pessoa. Ele aparece somente agora e vale por 30 minutos."
+                : `Gerar um código temporário para ${resetMember?.profiles?.name ?? "esta pessoa"}?`}
+            </DialogDescription>
+          </DialogHeader>
+          {resetCode && <div className="space-y-4">
+            <div className="bg-muted rounded-md border p-4 text-center">
+              <p className="text-muted-foreground text-xs">Código de recuperação</p>
+              <p className="mt-1 font-mono text-2xl font-bold">{resetCode}</p>
+            </div>
+            <Button className="w-full" variant="outline" onClick={() => void copyResetCode()}>
+              <Clipboard /> Copiar código
+            </Button>
+            <p className="text-muted-foreground text-center text-xs">
+              A pessoa deve usar “Esqueci minha senha” na tela de login.
+            </p>
+          </div>}
+          <DialogFooter>
+            {resetCode
+              ? <Button onClick={() => { setResetMember(null); setResetCode(null); }}>Concluir</Button>
+              : <Button disabled={resetLoading} onClick={() => void generateResetCode()}>
+                  {resetLoading && <Clock3 className="animate-spin" />} Gerar código
+                </Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>

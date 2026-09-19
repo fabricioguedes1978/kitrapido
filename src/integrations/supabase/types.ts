@@ -608,6 +608,53 @@ export type Database = {
           },
         ]
       }
+      team_password_resets: {
+        Row: {
+          code_hash: string
+          cpf: string
+          created_at: string
+          event_id: string
+          expires_at: string
+          id: string
+          requested_by: string
+          status: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          cpf: string
+          created_at?: string
+          event_id: string
+          expires_at?: string
+          id?: string
+          requested_by: string
+          status?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          cpf?: string
+          created_at?: string
+          event_id?: string
+          expires_at?: string
+          id?: string
+          requested_by?: string
+          status?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_password_resets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       third_party_authorizations: {
         Row: {
           athlete_id: string
