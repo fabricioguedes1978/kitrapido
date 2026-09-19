@@ -22,4 +22,4 @@
 
 - [x] Permitir recuperação segura de senha para gerente e staff por código temporário.
 
-- [ ] Permitir troca de função para contas da equipe sem vínculo com eventos.
+- [x] Permitir troca de função para contas da equipe sem vínculo com eventos.
