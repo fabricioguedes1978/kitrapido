@@ -21,3 +21,5 @@
 - [x] Sinalizar atletas menores de 18 anos na lista e na Central de Entrega.
 
 - [x] Permitir recuperação segura de senha para gerente e staff por código temporário.
+
+- [ ] Permitir troca de função para contas da equipe sem vínculo com eventos.
