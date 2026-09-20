@@ -216,11 +216,12 @@ function Central() {
     queryKey: ["delivery-cancel-permission", eventId, user?.id],
     enabled: !!eventId && !!user?.id && isAttendant,
     queryFn: async () => {
+      if (!eventId || !user) return false;
       const { data, error } = await supabase
         .from("event_members")
         .select("can_cancel_deliveries")
-        .eq("event_id", eventId!)
-        .eq("user_id", user!.id)
+        .eq("event_id", eventId)
+        .eq("user_id", user.id)
         .eq("role", "attendant")
         .maybeSingle();
       if (error) throw error;
