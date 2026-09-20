@@ -721,11 +721,6 @@ function Central() {
                             Menor de 18 anos
                           </Badge>
                         )}
-                        {activeThirdPartyDeliveries.has(a.id) && (
-                          <span className="text-muted-foreground text-xs font-medium">
-                            Retirado por: {activeThirdPartyDeliveries.get(a.id)}
-                          </span>
-                        )}
                       </div>
                       <p className="text-muted-foreground truncate text-xs">
                         Nº {a.bib_number ?? "—"} · {a.modality ?? "—"} · {maskCPF(a.cpf)}
@@ -887,6 +882,11 @@ function Central() {
                             "Não informado"}
                         </p>
                         <p>Atendente: {activeDelivery.delivered_by_name ?? "—"}</p>
+                        {activeDelivery.delivery_type === "third_party" && activeDelivery.third_party_name && (
+                          <p>
+                            Retirado por: <strong>{activeDelivery.third_party_name}</strong>
+                          </p>
+                        )}
                       </>
                     )}
                     {!activeDelivery && queuedOffline && <p>Registrada offline, aguardando sincronização.</p>}

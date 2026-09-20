@@ -26,4 +26,4 @@
 
 - [x] Implementar retirada de vários kits por busca ou QR Code, exigindo apenas o nome do responsável.
 
-- [x] Mostrar na busca da Central o nome do responsável por kits retirados por terceiros.
+- [x] Mostrar na faixa vermelha da Central o nome do responsável por kits retirados por terceiros.
