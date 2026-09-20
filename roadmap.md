@@ -25,3 +25,5 @@
 - [x] Permitir troca de função para contas da equipe sem vínculo com eventos.
 
 - [x] Implementar retirada de vários kits por busca ou QR Code, exigindo apenas o nome do responsável.
+
+- [x] Mostrar na busca da Central o nome do responsável por kits retirados por terceiros.

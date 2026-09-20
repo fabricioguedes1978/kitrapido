@@ -106,6 +106,7 @@ type Delivery = {
   delivered_at: string;
   delivered_by_name: string | null;
   delivery_type: string;
+  third_party_name: string | null;
   location_id: string | null;
   status: string;
 };
@@ -204,7 +205,7 @@ function Central() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deliveries")
-        .select("id,athlete_id,delivered_at,delivered_by_name,delivery_type,location_id,status")
+        .select("id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,location_id,status")
         .eq("event_id", eventId!)
         .order("delivered_at", { ascending: false });
       if (error) throw error;
@@ -275,6 +276,21 @@ function Central() {
 
   const activeDeliveryIds = useMemo(
     () => new Set(deliveries.filter((d) => d.status === "active").map((d) => d.athlete_id)),
+    [deliveries],
+  );
+
+  const activeThirdPartyDeliveries = useMemo(
+    () =>
+      new Map(
+        deliveries
+          .filter(
+            (delivery) =>
+              delivery.status === "active" &&
+              delivery.delivery_type === "third_party" &&
+              Boolean(delivery.third_party_name?.trim()),
+          )
+          .map((delivery) => [delivery.athlete_id, delivery.third_party_name?.trim() ?? ""]),
+      ),
     [deliveries],
   );
 
@@ -704,6 +720,11 @@ function Central() {
                           <Badge className="border-warning/30 bg-warning/15 text-warning shrink-0 text-[10px] font-bold uppercase">
                             Menor de 18 anos
                           </Badge>
+                        )}
+                        {activeThirdPartyDeliveries.has(a.id) && (
+                          <span className="text-muted-foreground text-xs font-medium">
+                            Retirado por: {activeThirdPartyDeliveries.get(a.id)}
+                          </span>
                         )}
                       </div>
                       <p className="text-muted-foreground truncate text-xs">
