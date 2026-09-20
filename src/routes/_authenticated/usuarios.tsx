@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +36,7 @@ type MemberRow = {
   id: string;
   user_id: string;
   role: string;
+  can_cancel_deliveries: boolean;
   profiles: { name: string; email: string; cpf: string | null } | null;
 };
 
@@ -46,6 +48,7 @@ type InviteRow = {
   status: string;
   created_at: string;
   expires_at: string;
+  can_cancel_deliveries: boolean;
 };
 
 function Usuarios() {
@@ -56,7 +59,7 @@ function Usuarios() {
   const createPasswordReset = useServerFn(createTeamPasswordReset);
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
-  const [form, setForm] = useState({ name: "", cpf: "" });
+  const [form, setForm] = useState({ name: "", cpf: "", canCancelDeliveries: false });
   const [saving, setSaving] = useState(false);
   const [createdInvite, setCreatedInvite] = useState<{ code: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -72,7 +75,7 @@ function Usuarios() {
 
       const { data: memberData, error: memberError } = await supabase
         .from("event_members")
-        .select("id,user_id,role")
+        .select("id,user_id,role,can_cancel_deliveries")
         .eq("event_id", eventId);
       if (memberError) throw memberError;
 
@@ -98,14 +101,14 @@ function Usuarios() {
     enabled: !!eventId && canManage,
     queryFn: async () => {
       if (!eventId) return [];
-      const { data, error } = await supabase.rpc("list_team_invites", { _event_id: eventId });
+      const { data, error } = await supabase.rpc("list_team_invites_with_permissions", { _event_id: eventId });
       if (error) throw error;
       return (data ?? []) as InviteRow[];
     },
   });
 
   function openNew(kind: "organizer" | "attendant") {
-    setForm({ name: "", cpf: "" });
+    setForm({ name: "", cpf: "", canCancelDeliveries: false });
     setCreatedInvite(null);
     setCopied(false);
     setNewOpen(kind);
@@ -120,11 +123,12 @@ function Usuarios() {
       return;
     }
     setSaving(true);
-    const { data, error } = await supabase.rpc("create_team_invite", {
+    const { data, error } = await supabase.rpc("create_team_invite_with_permissions", {
       _event_id: eventId,
       _cpf: cpf,
       _name: form.name.trim(),
       _role: newOpen,
+      _can_cancel_deliveries: newOpen === "attendant" && form.canCancelDeliveries,
     });
     setSaving(false);
     if (error || !data?.[0]) {
@@ -152,6 +156,19 @@ function Usuarios() {
     const { error } = await supabase.from("event_members").delete().eq("id", id);
     if (error) { toast.error("Não foi possível remover"); return; }
     await qc.invalidateQueries({ queryKey: ["members", eventId] });
+  }
+
+  async function setCancelPermission(member: MemberRow, allowed: boolean) {
+    const { error } = await supabase.rpc("set_attendant_cancel_permission", {
+      _member_id: member.id,
+      _allowed: allowed,
+    });
+    if (error) {
+      toast.error("Não foi possível alterar a permissão", { description: error.message });
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: ["members", eventId] });
+    toast.success(allowed ? "Cancelamento autorizado para este staff." : "Cancelamento desabilitado para este staff.");
   }
 
   async function revokeInvite(id: string) {
@@ -237,6 +254,7 @@ function Usuarios() {
                 <TableHead>Nome</TableHead>
                 <TableHead>CPF / acesso</TableHead>
                 <TableHead>Função</TableHead>
+                <TableHead>Cancelar entrega</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
@@ -252,6 +270,22 @@ function Usuarios() {
                       {m.role === "organizer" ? "Gerente" : (ROLE_LABEL[m.role] ?? m.role)}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    {m.role === "attendant" ? (
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={m.can_cancel_deliveries}
+                          onCheckedChange={(checked) => void setCancelPermission(m, checked)}
+                          aria-label={`Permitir que ${m.profiles?.name ?? "este staff"} cancele entregas`}
+                        />
+                        <span className="text-muted-foreground text-xs">
+                          {m.can_cancel_deliveries ? "Permitido" : "Bloqueado"}
+                        </span>
+                      </div>
+                    ) : (
+                      <Badge variant="secondary">Sempre permitido</Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     {(isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" onClick={() => { setResetCode(null); setResetMember(m); }}>
@@ -264,7 +298,7 @@ function Usuarios() {
               ))}
               {members.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-muted-foreground">
+                  <TableCell colSpan={5} className="text-muted-foreground">
                     Nenhuma pessoa vinculada a este evento.
                   </TableCell>
                 </TableRow>
@@ -283,13 +317,14 @@ function Usuarios() {
             </div>
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Função</TableHead><TableHead>Validade</TableHead><TableHead /></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Função</TableHead><TableHead>Cancelar entrega</TableHead><TableHead>Validade</TableHead><TableHead /></TableRow></TableHeader>
                 <TableBody>
                   {invites.filter((invite) => invite.status === "pending").map((invite) => (
                     <TableRow key={invite.id}>
                       <TableCell className="font-medium">{invite.name}</TableCell>
                       <TableCell>{formatCPF(invite.cpf)}</TableCell>
                       <TableCell><Badge variant="secondary">{invite.role === "organizer" ? "Gerente" : "Staff"}</Badge></TableCell>
+                      <TableCell>{invite.role === "attendant" ? (invite.can_cancel_deliveries ? "Permitido" : "Bloqueado") : "Sempre permitido"}</TableCell>
                       <TableCell className="text-muted-foreground"><span className="inline-flex items-center gap-1"><Clock3 className="size-3.5" /> {new Date(invite.expires_at).toLocaleDateString("pt-BR")}</span></TableCell>
                       <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => void revokeInvite(invite.id)}><Trash2 /> Cancelar</Button></TableCell>
                     </TableRow>
@@ -341,6 +376,19 @@ function Usuarios() {
                 maxLength={14}
               />
             </div>
+            {newOpen === "attendant" && (
+              <div className="flex items-center justify-between gap-4 rounded-md border p-3">
+                <div>
+                  <Label htmlFor="invite-cancel-permission">Permitir cancelamento de entrega</Label>
+                  <p className="text-muted-foreground mt-1 text-xs">Autoriza este staff a cancelar entregas somente neste evento.</p>
+                </div>
+                <Switch
+                  id="invite-cancel-permission"
+                  checked={form.canCancelDeliveries}
+                  onCheckedChange={(checked) => setForm({ ...form, canCancelDeliveries: checked })}
+                />
+              </div>
+            )}
           </div>}
           <DialogFooter>
             {createdInvite ? (

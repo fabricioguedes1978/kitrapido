@@ -135,8 +135,7 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
 
 function Central() {
   const { event, eventId } = useCurrentEvent();
-  const { user, profile, isAttendant } = useAuth();
-  const canCancel = true;
+  const { user, profile, isAdmin, isOrganizer, isAttendant } = useAuth();
   const simple = isAttendant;
   const qc = useQueryClient();
 
@@ -212,6 +211,23 @@ function Central() {
       return (data ?? []) as Delivery[];
     },
   });
+
+  const { data: staffCanCancel = false } = useQuery({
+    queryKey: ["delivery-cancel-permission", eventId, user?.id],
+    enabled: !!eventId && !!user?.id && isAttendant,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("event_members")
+        .select("can_cancel_deliveries")
+        .eq("event_id", eventId!)
+        .eq("user_id", user!.id)
+        .eq("role", "attendant")
+        .maybeSingle();
+      if (error) throw error;
+      return data?.can_cancel_deliveries ?? false;
+    },
+  });
+  const canCancel = isAdmin || isOrganizer || staffCanCancel;
 
   const { data: locations = [] } = useQuery({
     queryKey: ["locations", eventId],
@@ -504,7 +520,7 @@ function Central() {
   }
 
   async function cancelDelivery() {
-    if (!activeDelivery || !selected) return;
+    if (!activeDelivery || !selected || !canCancel) return;
     setCancelling(true);
     const { error } = await supabase
       .from("deliveries")
