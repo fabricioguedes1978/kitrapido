@@ -86,14 +86,31 @@ const FILTER_LABEL: Record<StatusFilter, string> = {
 
 function Entregas() {
   const { event, eventId } = useCurrentEvent();
-  const { isAdmin, isOrganizer, profile } = useAuth();
-  const canManage = isAdmin || isOrganizer;
+  const { user, isAdmin, isOrganizer, isAttendant, profile } = useAuth();
   const qc = useQueryClient();
   const [term, setTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("delivered");
   const [cancelling, setCancelling] = useState<DeliveryRow | null>(null);
   const [editing, setEditing] = useState<DeliveryRow | null>(null);
   const [editName, setEditName] = useState("");
+
+  const { data: staffCanCancel = false } = useQuery({
+    queryKey: ["delivery-cancel-permission", eventId, user?.id],
+    enabled: !!eventId && !!user?.id && isAttendant,
+    queryFn: async () => {
+      if (!eventId || !user) return false;
+      const { data, error } = await supabase
+        .from("event_members")
+        .select("can_cancel_deliveries")
+        .eq("event_id", eventId)
+        .eq("user_id", user.id)
+        .eq("role", "attendant")
+        .maybeSingle();
+      if (error) throw error;
+      return data?.can_cancel_deliveries ?? false;
+    },
+  });
+  const canCancel = isAdmin || isOrganizer || staffCanCancel;
 
   const { data: athletes = [] } = useQuery({
     queryKey: ["deliveries-athletes", eventId],
@@ -219,7 +236,7 @@ function Entregas() {
   }
 
   async function cancel() {
-    if (!cancelling) return;
+    if (!cancelling || !canCancel) return;
     const { error } = await supabase
       .from("deliveries")
       .update({
@@ -358,7 +375,7 @@ function Entregas() {
                         Quem retirou
                       </Button>
                     )}
-                    {canManage && row.delivery && (
+                    {canCancel && row.delivery && (
                       <Button variant="ghost" size="sm" onClick={() => setCancelling(row.delivery)}>
                         Cancelar
                       </Button>
