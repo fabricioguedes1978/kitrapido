@@ -23,3 +23,5 @@
 - [x] Permitir recuperação segura de senha para gerente e staff por código temporário.
 
 - [x] Permitir troca de função para contas da equipe sem vínculo com eventos.
+
+- [x] Implementar retirada de vários kits por busca ou QR Code, exigindo apenas o nome do responsável.

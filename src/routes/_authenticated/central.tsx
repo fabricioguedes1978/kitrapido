@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Camera,
   CheckCircle2,
+  ListChecks,
   MonitorSmartphone,
   Package,
   ScanLine,
@@ -153,6 +154,12 @@ function Central() {
   const [locationId, setLocationId] = useState<string>("");
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkSelections, setBulkSelections] = useState<Record<string, "qrcode" | "busca">>({});
+  const [bulkResponsibleName, setBulkResponsibleName] = useState("");
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkSubmitting, setBulkSubmitting] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{ delivered: number; failed: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: athletes = [] } = useQuery({
@@ -266,6 +273,38 @@ function Central() {
     (d) => d.status === "active" && new Date(d.delivered_at).toDateString() === new Date().toDateString(),
   ).length;
 
+  const activeDeliveryIds = useMemo(
+    () => new Set(deliveries.filter((d) => d.status === "active").map((d) => d.athlete_id)),
+    [deliveries],
+  );
+
+  const bulkAthletes = useMemo(
+    () => roster.filter((athlete) => bulkSelections[athlete.id]),
+    [roster, bulkSelections],
+  );
+
+  function addBulkAthlete(athlete: Athlete, identificationMethod: "qrcode" | "busca") {
+    if (activeDeliveryIds.has(athlete.id) || isQueuedAthlete(athlete.id) || athlete.kit_status !== "pending") {
+      toast.error(`O kit de ${athlete.name} já foi entregue.`);
+      return;
+    }
+    if (bulkSelections[athlete.id]) {
+      toast.info(`${athlete.name} já está na lista.`);
+      return;
+    }
+    setBulkSelections((current) => ({ ...current, [athlete.id]: identificationMethod }));
+    setTerm("");
+    toast.success(`${athlete.name} adicionado à retirada.`);
+  }
+
+  function removeBulkAthlete(athleteId: string) {
+    setBulkSelections((current) => {
+      const next = { ...current };
+      delete next[athleteId];
+      return next;
+    });
+  }
+
   const labelsKey = (event?.custom_field_labels ?? []).join("|");
   const extras = useMemo(
     () =>
@@ -304,6 +343,10 @@ function Central() {
     if (parsed.kind === "athlete") {
       const found = roster.find((a) => a.id === parsed.athleteId);
       if (!found) { toast.error("Atleta não encontrado neste evento."); return; }
+      if (bulkMode) {
+        addBulkAthlete(found, "qrcode");
+        return;
+      }
       setAsThirdParty(false);
       setSelected(found);
       return;
@@ -312,8 +355,82 @@ function Central() {
     if (!auth) { toast.error("Autorização inválida ou cancelada."); return; }
     const found = roster.find((a) => a.id === auth.athlete_id);
     if (!found) { toast.error("Atleta da autorização não encontrado."); return; }
+    if (bulkMode) {
+      addBulkAthlete(found, "qrcode");
+      return;
+    }
     setAsThirdParty(true);
     setSelected(found);
+  }
+
+  async function confirmBulkDelivery() {
+    if (!eventId || bulkAthletes.length === 0 || bulkResponsibleName.trim().length < 3) return;
+    setBulkSubmitting(true);
+    const responsibleName = bulkResponsibleName.trim();
+    let delivered = 0;
+    let failed = 0;
+
+    for (const athlete of bulkAthletes) {
+      const payload = {
+        event_id: eventId,
+        athlete_id: athlete.id,
+        kit_name: athlete.kit_type,
+        shirt_size: athlete.shirt_size,
+        location_id: locationId || null,
+        delivered_by: user?.id ?? null,
+        delivered_by_name: profile?.name || profile?.email || null,
+        delivery_type: "third_party" as const,
+        third_party_name: responsibleName,
+        third_party_cpf: null,
+        identification_method: bulkSelections[athlete.id] ?? "busca",
+      };
+
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        enqueueDelivery({
+          ...payload,
+          localId: crypto.randomUUID(),
+          athlete_name: athlete.name,
+          bib_number: athlete.bib_number,
+          kit_id: null,
+          delivered_at: new Date().toISOString(),
+        });
+        delivered += 1;
+        continue;
+      }
+
+      const { error } = await supabase.from("deliveries").insert(payload);
+      if (error) {
+        failed += 1;
+        continue;
+      }
+      delivered += 1;
+      void logAudit({
+        eventId,
+        action: `Entrega múltipla de kit para ${athlete.name} (nº ${athlete.bib_number ?? "—"}); responsável: ${responsibleName}`,
+        entity: "deliveries",
+        entityId: athlete.id,
+        newData: payload,
+        userName: profile?.name ?? null,
+      });
+    }
+
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["deliveries", eventId] }),
+      qc.invalidateQueries({ queryKey: ["athletes", eventId] }),
+      qc.invalidateQueries({ queryKey: ["inventory", eventId] }),
+    ]);
+    setBulkSubmitting(false);
+    setBulkConfirmOpen(false);
+    setBulkSelections({});
+    setBulkResponsibleName("");
+    setBulkResult({ delivered, failed });
+    if (failed > 0) {
+      toast.warning(`${delivered} kit(s) entregue(s) e ${failed} não registrado(s).`);
+    } else if (typeof navigator !== "undefined" && !navigator.onLine) {
+      toast.warning(`${delivered} entrega(s) salvas offline para sincronização.`);
+    } else {
+      toast.success(`${delivered} kits entregues com sucesso.`);
+    }
   }
 
   async function confirmDelivery() {
@@ -467,6 +584,24 @@ function Central() {
     );
   }
 
+  if (bulkResult) {
+    return (
+      <AppShell>
+        <div className="bg-success/12 border-success/30 flex min-h-[60vh] flex-col items-center justify-center gap-3 rounded-2xl border p-8 text-center">
+          <CheckCircle2 className="text-success size-20" />
+          <h1 className="text-success text-3xl font-extrabold">RETIRADA CONCLUÍDA</h1>
+          <p className="text-2xl font-bold">{bulkResult.delivered} KITS ENTREGUES</p>
+          {bulkResult.failed > 0 && (
+            <p className="text-destructive font-semibold">{bulkResult.failed} kits não foram registrados.</p>
+          )}
+          <Button className="mt-4" size="lg" onClick={() => setBulkResult(null)}>
+            Nova retirada
+          </Button>
+        </div>
+      </AppShell>
+    );
+  }
+
 
 
   return (
@@ -525,6 +660,26 @@ function Central() {
                 Pesquisar somente por equipe
               </Label>
             </div>
+            <div className="border-primary/20 bg-primary/5 mt-3 flex items-start gap-3 rounded-lg border p-3">
+              <Checkbox
+                id="bulk-mode"
+                className="mt-0.5 size-5"
+                checked={bulkMode}
+                onCheckedChange={(checked) => {
+                  const enabled = checked === true;
+                  setBulkMode(enabled);
+                  setBulkSelections({});
+                  setBulkResponsibleName("");
+                  setTerm("");
+                }}
+              />
+              <div>
+                <Label htmlFor="bulk-mode" className="cursor-pointer font-bold">
+                  Retirada de vários kits
+                </Label>
+                <p className="text-muted-foreground text-xs">Selecione atletas por busca ou QR Code.</p>
+              </div>
+            </div>
 
             {results.length > 0 && (
               <div className="mt-3 space-y-2">
@@ -532,6 +687,11 @@ function Central() {
                   <button
                     key={a.id}
                     onClick={() => {
+                      if (bulkMode) {
+                        if (bulkSelections[a.id]) removeBulkAthlete(a.id);
+                        else addBulkAthlete(a, "busca");
+                        return;
+                      }
                       setSelected(a);
                       setMethod("busca");
                     }}
@@ -550,7 +710,15 @@ function Central() {
                         Nº {a.bib_number ?? "—"} · {a.modality ?? "—"} · {maskCPF(a.cpf)}
                       </p>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
+                    <div className="flex shrink-0 items-center gap-3">
+                      {bulkMode && (
+                        <Checkbox
+                          checked={!!bulkSelections[a.id]}
+                          disabled={activeDeliveryIds.has(a.id) || isQueuedAthlete(a.id) || a.kit_status !== "pending"}
+                          className="pointer-events-none size-5"
+                        />
+                      )}
+                      <div className="flex flex-col items-end gap-1">
                       <PaymentBadge athlete={a} />
                       <Badge
                         className={cn(
@@ -562,13 +730,75 @@ function Central() {
                       >
                         {a.kit_status === "pending" ? "KIT PENDENTE" : "KIT ENTREGUE"}
                       </Badge>
+                      </div>
                     </div>
                   </button>
                 ))}
               </div>
             )}
 
-            <section className="mt-8">
+            {bulkMode && (
+              <section className="mt-5 border-y py-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <ListChecks className="text-primary size-5" /> Kits selecionados
+                  </h2>
+                  <Badge variant="secondary">{bulkAthletes.length}</Badge>
+                </div>
+                {bulkAthletes.length === 0 ? (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    Pesquise ou leia o QR Code dos atletas que deseja adicionar.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {bulkAthletes.map((athlete) => (
+                      <div key={athlete.id} className="bg-card flex items-center gap-3 rounded-lg border p-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold">{athlete.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            Nº {athlete.bib_number ?? "—"} · {athlete.shirt_size ?? "Sem camiseta"}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          aria-label={`Remover ${athlete.name}`}
+                          onClick={() => removeBulkAthlete(athlete.id)}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {locations.length > 0 && bulkAthletes.length > 0 && (
+                  <div className="mt-4 space-y-1.5">
+                    <Label>Local de retirada</Label>
+                    <Select value={locationId} onValueChange={setLocationId}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecione o local" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>{location.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <Button
+                  size="lg"
+                  className="mt-4 h-14 w-full"
+                  disabled={bulkAthletes.length === 0}
+                  onClick={() => setBulkConfirmOpen(true)}
+                >
+                  Confirmar retirada de {bulkAthletes.length} kit(s)
+                </Button>
+              </section>
+            )}
+
+            {!bulkMode && <section className="mt-8">
               <div className="mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                 <h2 className="text-lg font-bold">Últimas entregas</h2>
                 <span className="text-primary text-sm font-bold">Hoje: {todayCount}</span>
@@ -599,7 +829,7 @@ function Central() {
                     })}
                 </CardContent>
               </Card>
-            </section>
+            </section>}
 
             {!simple && (
               <section className="mt-8">
@@ -840,6 +1070,46 @@ function Central() {
         )}
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
+
+        <Dialog open={bulkConfirmOpen} onOpenChange={(open) => !bulkSubmitting && setBulkConfirmOpen(open)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar retirada de vários kits</DialogTitle>
+              <DialogDescription>
+                Informe somente o nome da pessoa que está retirando os {bulkAthletes.length} kits.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="bulk-responsible">Nome do responsável pela retirada</Label>
+                <Input
+                  id="bulk-responsible"
+                  value={bulkResponsibleName}
+                  onChange={(event) => setBulkResponsibleName(event.target.value)}
+                  placeholder="Nome completo"
+                  autoComplete="name"
+                />
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3 text-sm">
+                <p className="font-bold">{bulkAthletes.length} kits serão entregues</p>
+                <p className="text-muted-foreground mt-1 line-clamp-3">
+                  {bulkAthletes.map((athlete) => athlete.name).join(", ")}
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" disabled={bulkSubmitting} onClick={() => setBulkConfirmOpen(false)}>
+                Voltar
+              </Button>
+              <Button
+                disabled={bulkSubmitting || bulkResponsibleName.trim().length < 3}
+                onClick={() => void confirmBulkDelivery()}
+              >
+                {bulkSubmitting ? "Registrando..." : "Confirmar todas as entregas"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog
           open={thirdOpen}
