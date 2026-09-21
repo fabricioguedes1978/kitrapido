@@ -136,7 +136,6 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
 function Central() {
   const { event, eventId } = useCurrentEvent();
   const { user, profile, isAdmin, isOrganizer, isAttendant } = useAuth();
-  const simple = isAttendant;
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
@@ -864,17 +863,15 @@ function Central() {
               </Card>
             </section>}
 
-            {!simple && (
-              <section className="mt-8">
-                <h2 className="text-lg font-bold mb-3">Resumo do evento</h2>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <StatCard label="Kits Entregues" value={stats.delivered} icon={CheckCircle2} color="text-primary" />
-                  <StatCard label="Atletas Inscritos" value={stats.total} icon={Users} color="text-chart-3" />
-                  <StatCard label="Kits Restantes" value={stats.pending} icon={Package} color="text-warning" />
-                  <StatCard label="Taxa de Entrega" value={`${stats.rate}%`} icon={Search} color="text-success" />
-                </div>
-              </section>
-            )}
+            <section className="mt-8">
+              <h2 className="text-lg font-bold mb-3">Resumo do evento</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard label="Kits Entregues" value={stats.delivered} icon={CheckCircle2} color="text-primary" />
+                <StatCard label="Atletas Inscritos" value={stats.total} icon={Users} color="text-chart-3" />
+                <StatCard label="Kits Restantes" value={stats.pending} icon={Package} color="text-warning" />
+                <StatCard label="Taxa de Entrega" value={`${stats.rate}%`} icon={Search} color="text-success" />
+              </div>
+            </section>
           </>
         )}
 
