@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -9,17 +9,12 @@ const createResetSchema = z.object({
   userId: z.string().uuid(),
 });
 
-const useResetSchema = z.object({
-  cpf: z.string().regex(/^\d{11}$/),
-  code: z.string().regex(/^[A-Z0-9]{8}$/),
-  password: z.string().min(1).max(128),
-});
-
-function hashCode(code: string) {
-  return createHash("sha256").update(code, "utf8").digest("hex");
+function createTemporaryPassword() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from(randomBytes(10), (value) => alphabet[value % alphabet.length]).join("");
 }
 
-export const createTeamPasswordReset = createServerFn({ method: "POST" })
+export const createTemporaryTeamPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => createResetSchema.parse(input))
   .handler(async ({ data, context }) => {
@@ -43,83 +38,26 @@ export const createTeamPasswordReset = createServerFn({ method: "POST" })
 
     const { data: profile, error: profileError } = await context.supabase
       .from("profiles")
-      .select("cpf,name")
+      .select("name")
       .eq("id", data.userId)
       .maybeSingle();
-    const cpf = (profile?.cpf ?? "").replace(/\D/g, "");
-    if (profileError || cpf.length !== 11) throw new Error("Esta pessoa não possui um CPF válido cadastrado.");
+    if (profileError || !profile) throw new Error("Não foi possível localizar esta pessoa.");
 
-    const code = randomBytes(4).toString("hex").toUpperCase();
+    const temporaryPassword = createTemporaryPassword();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin
-      .from("team_password_resets")
-      .update({ status: "revoked" })
-      .eq("user_id", data.userId)
-      .eq("status", "pending");
-
-    const { data: reset, error: resetError } = await supabaseAdmin
-      .from("team_password_resets")
-      .insert({
-        event_id: data.eventId,
-        user_id: data.userId,
-        cpf,
-        code_hash: hashCode(code),
-        requested_by: context.userId,
-      })
-      .select("id,expires_at")
-      .single();
-    if (resetError || !reset) throw new Error("Não foi possível gerar o código de recuperação.");
+    const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      password: teamAuthPassword(temporaryPassword),
+    });
+    if (passwordError) throw new Error("Não foi possível gerar a senha temporária.");
 
     await context.supabase.from("audit_logs").insert({
       user_id: context.userId,
       event_id: data.eventId,
-      action: "Código de redefinição de senha gerado",
-      entity: "team_password_reset",
-      entity_id: reset.id,
+      action: "Senha temporária da equipe gerada",
+      entity: "team_access",
+      entity_id: data.userId,
       new_data: { target_user_id: data.userId, target_name: profile?.name ?? null },
     });
 
-    return { code, expiresAt: reset.expires_at };
-  });
-
-export const resetTeamPassword = createServerFn({ method: "POST" })
-  .inputValidator((input) => useResetSchema.parse(input))
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: match } = await supabaseAdmin
-      .from("team_password_resets")
-      .select("id,user_id,event_id")
-      .eq("cpf", data.cpf)
-      .eq("code_hash", hashCode(data.code))
-      .eq("status", "pending")
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!match) return { ok: false as const };
-
-    const { data: claimed, error: claimError } = await supabaseAdmin
-      .from("team_password_resets")
-      .update({ status: "used", used_at: new Date().toISOString() })
-      .eq("id", match.id)
-      .eq("status", "pending")
-      .select("id")
-      .maybeSingle();
-    if (claimError || !claimed) return { ok: false as const };
-
-    const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(match.user_id, {
-      password: teamAuthPassword(data.password),
-    });
-    if (passwordError) throw new Error("Não foi possível salvar a nova senha. Solicite outro código.");
-
-    await supabaseAdmin.from("audit_logs").insert({
-      user_id: match.user_id,
-      event_id: match.event_id,
-      action: "Senha da equipe redefinida",
-      entity: "team_password_reset",
-      entity_id: match.id,
-    });
-
-    return { ok: true as const };
+    return { temporaryPassword };
   });

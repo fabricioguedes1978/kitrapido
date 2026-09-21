@@ -29,3 +29,5 @@
 - [x] Mostrar na faixa vermelha da Central o nome do responsável por kits retirados por terceiros.
 
 - [x] Permitir que administrador e gerente autorizem individualmente cada staff a cancelar entregas por evento.
+
+- [x] Substituir a recuperação por código pela geração segura de senha temporária para gerente e staff.
