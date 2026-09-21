@@ -136,7 +136,6 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
 function Central() {
   const { event, eventId } = useCurrentEvent();
   const { user, profile, isAdmin, isOrganizer, isAttendant } = useAuth();
-  const simple = isAttendant;
   const qc = useQueryClient();
 
   const [term, setTerm] = useState("");
