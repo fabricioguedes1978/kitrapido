@@ -15,7 +15,6 @@ import { Route as AtivarAcessoRouteImport } from './routes/ativar-acesso'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CheckinRouteImport } from './routes/checkin'
 import { Route as ConsultaRouteImport } from './routes/consulta'
-import { Route as RedefinirAcessoRouteImport } from './routes/redefinir-acesso'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAlterarSenhaRouteImport } from './routes/_authenticated/alterar-senha'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
@@ -63,11 +62,6 @@ const CheckinRoute = CheckinRouteImport.update({
 const ConsultaRoute = ConsultaRouteImport.update({
   id: '/consulta',
   path: '/consulta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RedefinirAcessoRoute = RedefinirAcessoRouteImport.update({
-  id: '/redefinir-acesso',
-  path: '/redefinir-acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -175,7 +169,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
-  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
@@ -202,7 +195,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
-  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
@@ -231,7 +223,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
-  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
@@ -260,7 +251,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
-    | '/redefinir-acesso'
     | '/reset-password'
     | '/alterar-senha'
     | '/atletas'
@@ -287,7 +277,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
-    | '/redefinir-acesso'
     | '/reset-password'
     | '/alterar-senha'
     | '/atletas'
@@ -315,7 +304,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
-    | '/redefinir-acesso'
     | '/reset-password'
     | '/_authenticated/alterar-senha'
     | '/_authenticated/atletas'
@@ -344,7 +332,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CheckinRoute: typeof CheckinRoute
   ConsultaRoute: typeof ConsultaRoute
-  RedefinirAcessoRoute: typeof RedefinirAcessoRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicChatRoute: typeof ApiPublicChatRoute
   EventoSlugKitRoute: typeof EventoSlugKitRoute
@@ -392,13 +379,6 @@ declare module '@tanstack/react-router' {
       path: '/consulta'
       fullPath: '/consulta'
       preLoaderRoute: typeof ConsultaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/redefinir-acesso': {
-      id: '/redefinir-acesso'
-      path: '/redefinir-acesso'
-      fullPath: '/redefinir-acesso'
-      preLoaderRoute: typeof RedefinirAcessoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -585,7 +565,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CheckinRoute: CheckinRoute,
   ConsultaRoute: ConsultaRoute,
-  RedefinirAcessoRoute: RedefinirAcessoRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicChatRoute: ApiPublicChatRoute,
   EventoSlugKitRoute: EventoSlugKitRoute,
