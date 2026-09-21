@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Clipboard, Clock3, KeyRound, ShieldCheck, Trash2, UserPlus } from "lucide-react";
+import { Check, Clipboard, Clock3, KeyRound, Loader2, ShieldCheck, Trash2, UserPlus } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { ROLE_LABEL, formatCPF, isValidCPF, onlyDigits } from "@/lib/cronochip";
-import { createTeamPasswordReset } from "@/lib/team-password.functions";
+import { createTemporaryTeamPassword } from "@/lib/team-password.functions";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
@@ -56,7 +56,7 @@ function Usuarios() {
   const { isAdmin, isOrganizer } = useAuth();
   const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
-  const createPasswordReset = useServerFn(createTeamPasswordReset);
+  const generateTemporaryPassword = useServerFn(createTemporaryTeamPassword);
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
   const [form, setForm] = useState({ name: "", cpf: "", canCancelDeliveries: false });
@@ -64,7 +64,7 @@ function Usuarios() {
   const [createdInvite, setCreatedInvite] = useState<{ code: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [resetMember, setResetMember] = useState<MemberRow | null>(null);
-  const [resetCode, setResetCode] = useState<string | null>(null);
+  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
 
   const { data: members = [] } = useQuery({
@@ -188,17 +188,17 @@ function Usuarios() {
     toast.success("Código copiado.");
   }
 
-  async function generateResetCode() {
+  async function generatePassword() {
     if (!eventId || !resetMember) return;
     setResetLoading(true);
     try {
-      const result = await createPasswordReset({
+      const result = await generateTemporaryPassword({
         data: { eventId, userId: resetMember.user_id },
       });
-      setResetCode(result.code);
-      toast.success("Código de recuperação criado.");
+      setTemporaryPassword(result.temporaryPassword);
+      toast.success("Senha temporária gerada.");
     } catch (error) {
-      toast.error("Não foi possível gerar o código", {
+      toast.error("Não foi possível gerar a senha temporária", {
         description: error instanceof Error ? error.message : undefined,
       });
     } finally {
@@ -206,10 +206,10 @@ function Usuarios() {
     }
   }
 
-  async function copyResetCode() {
-    if (!resetCode) return;
-    await navigator.clipboard.writeText(resetCode);
-    toast.success("Código copiado.");
+  async function copyTemporaryPassword() {
+    if (!temporaryPassword) return;
+    await navigator.clipboard.writeText(temporaryPassword);
+    toast.success("Senha copiada.");
   }
 
   return (
@@ -287,9 +287,9 @@ function Usuarios() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    {(isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => { setResetCode(null); setResetMember(m); }}>
-                        <KeyRound /> Redefinir senha
+                    {canManage && (isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => { setTemporaryPassword(null); setResetMember(m); }}>
+                        <KeyRound /> Gerar senha temporária
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => void remove(m.id)}>Remover</Button>
                     </div>}
@@ -400,33 +400,33 @@ function Usuarios() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!resetMember} onOpenChange={(open) => { if (!open) { setResetMember(null); setResetCode(null); } }}>
+      <Dialog open={!!resetMember} onOpenChange={(open) => { if (!open) { setResetMember(null); setTemporaryPassword(null); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{resetCode ? "Código de recuperação" : "Redefinir senha"}</DialogTitle>
+            <DialogTitle>{temporaryPassword ? "Senha temporária" : "Gerar senha temporária"}</DialogTitle>
             <DialogDescription>
-              {resetCode
-                ? "Entregue este código à pessoa. Ele aparece somente agora e vale por 30 minutos."
-                : `Gerar um código temporário para ${resetMember?.profiles?.name ?? "esta pessoa"}?`}
+              {temporaryPassword
+                ? "Entregue esta senha à pessoa. Ela será exibida somente agora."
+                : `A senha atual de ${resetMember?.profiles?.name ?? "esta pessoa"} será substituída imediatamente.`}
             </DialogDescription>
           </DialogHeader>
-          {resetCode && <div className="space-y-4">
+          {temporaryPassword && <div className="space-y-4">
             <div className="bg-muted rounded-md border p-4 text-center">
-              <p className="text-muted-foreground text-xs">Código de recuperação</p>
-              <p className="mt-1 font-mono text-2xl font-bold">{resetCode}</p>
+              <p className="text-muted-foreground text-xs">Nova senha temporária</p>
+              <p className="mt-1 font-mono text-2xl font-bold">{temporaryPassword}</p>
             </div>
-            <Button className="w-full" variant="outline" onClick={() => void copyResetCode()}>
-              <Clipboard /> Copiar código
+            <Button className="w-full" variant="outline" onClick={() => void copyTemporaryPassword()}>
+              <Clipboard /> Copiar senha
             </Button>
             <p className="text-muted-foreground text-center text-xs">
-              A pessoa deve usar “Esqueci minha senha” na tela de login.
+              A pessoa já pode entrar normalmente com o CPF e esta senha.
             </p>
           </div>}
           <DialogFooter>
-            {resetCode
-              ? <Button onClick={() => { setResetMember(null); setResetCode(null); }}>Concluir</Button>
-              : <Button disabled={resetLoading} onClick={() => void generateResetCode()}>
-                  {resetLoading && <Clock3 className="animate-spin" />} Gerar código
+            {temporaryPassword
+              ? <Button onClick={() => { setResetMember(null); setTemporaryPassword(null); }}>Concluir</Button>
+              : <Button disabled={resetLoading} onClick={() => void generatePassword()}>
+                  {resetLoading && <Loader2 className="animate-spin" />} Gerar senha
                 </Button>}
           </DialogFooter>
         </DialogContent>
