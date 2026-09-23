@@ -37,6 +37,7 @@ type MemberRow = {
   user_id: string;
   role: string;
   can_cancel_deliveries: boolean;
+  can_import_athletes: boolean;
   profiles: { name: string; email: string; cpf: string | null } | null;
 };
 
@@ -49,6 +50,7 @@ type InviteRow = {
   created_at: string;
   expires_at: string;
   can_cancel_deliveries: boolean;
+  can_import_athletes: boolean;
 };
 
 function Usuarios() {
@@ -59,7 +61,7 @@ function Usuarios() {
   const generateTemporaryPassword = useServerFn(createTemporaryTeamPassword);
 
   const [newOpen, setNewOpen] = useState<null | "organizer" | "attendant">(null);
-  const [form, setForm] = useState({ name: "", cpf: "", canCancelDeliveries: false });
+  const [form, setForm] = useState({ name: "", cpf: "", canCancelDeliveries: false, canImportAthletes: false });
   const [saving, setSaving] = useState(false);
   const [createdInvite, setCreatedInvite] = useState<{ code: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -75,7 +77,7 @@ function Usuarios() {
 
       const { data: memberData, error: memberError } = await supabase
         .from("event_members")
-        .select("id,user_id,role,can_cancel_deliveries")
+        .select("id,user_id,role,can_cancel_deliveries,can_import_athletes")
         .eq("event_id", eventId);
       if (memberError) throw memberError;
 
@@ -101,14 +103,14 @@ function Usuarios() {
     enabled: !!eventId && canManage,
     queryFn: async () => {
       if (!eventId) return [];
-      const { data, error } = await supabase.rpc("list_team_invites_with_permissions", { _event_id: eventId });
+      const { data, error } = await supabase.rpc("list_team_invites_with_access_permissions", { _event_id: eventId });
       if (error) throw error;
       return (data ?? []) as InviteRow[];
     },
   });
 
   function openNew(kind: "organizer" | "attendant") {
-    setForm({ name: "", cpf: "", canCancelDeliveries: false });
+    setForm({ name: "", cpf: "", canCancelDeliveries: false, canImportAthletes: false });
     setCreatedInvite(null);
     setCopied(false);
     setNewOpen(kind);
@@ -123,12 +125,13 @@ function Usuarios() {
       return;
     }
     setSaving(true);
-    const { data, error } = await supabase.rpc("create_team_invite_with_permissions", {
+    const { data, error } = await supabase.rpc("create_team_invite_with_access_permissions", {
       _event_id: eventId,
       _cpf: cpf,
       _name: form.name.trim(),
       _role: newOpen,
       _can_cancel_deliveries: newOpen === "attendant" && form.canCancelDeliveries,
+      _can_import_athletes: newOpen === "organizer" && form.canImportAthletes,
     });
     setSaving(false);
     if (error || !data?.[0]) {
@@ -169,6 +172,19 @@ function Usuarios() {
     }
     await qc.invalidateQueries({ queryKey: ["members", eventId] });
     toast.success(allowed ? "Cancelamento autorizado para este staff." : "Cancelamento desabilitado para este staff.");
+  }
+
+  async function setImportPermission(member: MemberRow, allowed: boolean) {
+    const { error } = await supabase.rpc("set_organizer_import_permission", {
+      _member_id: member.id,
+      _allowed: allowed,
+    });
+    if (error) {
+      toast.error("Não foi possível alterar a permissão", { description: error.message });
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: ["members", eventId] });
+    toast.success(allowed ? "Importação liberada para este gerente." : "Importação bloqueada para este gerente.");
   }
 
   async function revokeInvite(id: string) {
@@ -255,6 +271,7 @@ function Usuarios() {
                 <TableHead>CPF / acesso</TableHead>
                 <TableHead>Função</TableHead>
                 <TableHead>Cancelar entrega</TableHead>
+                <TableHead>Importar planilha</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
@@ -286,6 +303,26 @@ function Usuarios() {
                       <Badge variant="secondary">Sempre permitido</Badge>
                     )}
                   </TableCell>
+                  <TableCell>
+                    {m.role === "organizer" ? (
+                      isAdmin ? (
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={m.can_import_athletes}
+                            onCheckedChange={(checked) => void setImportPermission(m, checked)}
+                            aria-label={`Permitir que ${m.profiles?.name ?? "este gerente"} importe planilhas`}
+                          />
+                          <span className="text-muted-foreground text-xs">
+                            {m.can_import_athletes ? "Permitido" : "Bloqueado"}
+                          </span>
+                        </div>
+                      ) : (
+                        <Badge variant="secondary">{m.can_import_athletes ? "Permitido" : "Bloqueado"}</Badge>
+                      )
+                    ) : (
+                      <span className="text-muted-foreground text-xs">Não disponível</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     {canManage && (isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" onClick={() => { setTemporaryPassword(null); setResetMember(m); }}>
@@ -298,7 +335,7 @@ function Usuarios() {
               ))}
               {members.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-muted-foreground">
+                  <TableCell colSpan={6} className="text-muted-foreground">
                     Nenhuma pessoa vinculada a este evento.
                   </TableCell>
                 </TableRow>
@@ -317,7 +354,7 @@ function Usuarios() {
             </div>
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Função</TableHead><TableHead>Cancelar entrega</TableHead><TableHead>Validade</TableHead><TableHead /></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Função</TableHead><TableHead>Cancelar entrega</TableHead><TableHead>Importar planilha</TableHead><TableHead>Validade</TableHead><TableHead /></TableRow></TableHeader>
                 <TableBody>
                   {invites.filter((invite) => invite.status === "pending").map((invite) => (
                     <TableRow key={invite.id}>
@@ -325,6 +362,7 @@ function Usuarios() {
                       <TableCell>{formatCPF(invite.cpf)}</TableCell>
                       <TableCell><Badge variant="secondary">{invite.role === "organizer" ? "Gerente" : "Staff"}</Badge></TableCell>
                       <TableCell>{invite.role === "attendant" ? (invite.can_cancel_deliveries ? "Permitido" : "Bloqueado") : "Sempre permitido"}</TableCell>
+                      <TableCell>{invite.role === "organizer" ? (invite.can_import_athletes ? "Permitido" : "Bloqueado") : "Não disponível"}</TableCell>
                       <TableCell className="text-muted-foreground"><span className="inline-flex items-center gap-1"><Clock3 className="size-3.5" /> {new Date(invite.expires_at).toLocaleDateString("pt-BR")}</span></TableCell>
                       <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => void revokeInvite(invite.id)}><Trash2 /> Cancelar</Button></TableCell>
                     </TableRow>
@@ -386,6 +424,19 @@ function Usuarios() {
                   id="invite-cancel-permission"
                   checked={form.canCancelDeliveries}
                   onCheckedChange={(checked) => setForm({ ...form, canCancelDeliveries: checked })}
+                />
+              </div>
+            )}
+            {newOpen === "organizer" && isAdmin && (
+              <div className="flex items-center justify-between gap-4 rounded-md border p-3">
+                <div>
+                  <Label htmlFor="invite-import-permission">Permitir importação de planilha de inscritos</Label>
+                  <p className="text-muted-foreground mt-1 text-xs">Libera este gerente para adicionar ou substituir atletas por planilha neste evento.</p>
+                </div>
+                <Switch
+                  id="invite-import-permission"
+                  checked={form.canImportAthletes}
+                  onCheckedChange={(checked) => setForm({ ...form, canImportAthletes: checked })}
                 />
               </div>
             )}
