@@ -36,6 +36,13 @@
       "when": 1790197186159,
       "tag": "0004_manager_athlete_import_permission",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790197250547,
+      "tag": "0005_secure_manager_athlete_import",
+      "breakpoints": true
     }
   ]
 }

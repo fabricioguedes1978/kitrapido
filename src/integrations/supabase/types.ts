@@ -752,6 +752,10 @@ export type Database = {
         Args: { _athlete_id: string; _doc: string }
         Returns: string
       }
+      create_athlete_manually: {
+        Args: { _athlete: Json; _event_id: string }
+        Returns: string
+      }
       create_team_invite: {
         Args: {
           _cpf: string
