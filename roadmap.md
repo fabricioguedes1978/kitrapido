@@ -34,4 +34,4 @@
 
 - [x] Exibir o resumo do evento na Central de Entrega também para staff.
 
-- [ ] Permitir que o administrador bloqueie ou libere individualmente a importação de planilhas para cada gerente por evento.
+- [x] Permitir que o administrador bloqueie ou libere individualmente a importação de planilhas para cada gerente por evento.
