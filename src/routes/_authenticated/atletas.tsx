@@ -191,7 +191,17 @@ function Atletas() {
   const { profile, isAdmin } = useAuth();
   const lockAt = event?.athletes_lock_at ?? null;
   const locked = !isAdmin && !!lockAt && new Date(lockAt).getTime() <= Date.now();
-  const canImport = isAdmin || !!event?.allow_organizer_import;
+  const { data: importAllowed = false } = useQuery({
+    queryKey: ["athlete-import-permission", eventId],
+    enabled: !!eventId,
+    queryFn: async () => {
+      if (!eventId) return false;
+      const { data, error } = await supabase.rpc("can_import_athletes", { _event_id: eventId });
+      if (error) throw error;
+      return data;
+    },
+  });
+  const canImport = isAdmin || importAllowed;
   const lockLabel = lockAt
     ? new Date(lockAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
     : null;
@@ -398,6 +408,11 @@ function Atletas() {
 
   async function importRows(rows: Record<string, unknown>[], fresh = false) {
     if (!eventId) return;
+    if (!canImport) {
+      setImporting(false);
+      toast.error("Envio de planilha não autorizado");
+      return;
+    }
     const map: Record<string, string> = { ...COLUMN_MAP };
     (event?.custom_field_labels ?? []).forEach((label, i) => {
       if (label?.trim()) map[normalizeKey(label)] = CUSTOM_KEYS[i]!;
@@ -589,6 +604,10 @@ function Atletas() {
   /** Apaga todos os atletas do evento selecionado. */
   async function deleteAllAthletes() {
     if (!eventId) return false;
+    if (!canImport) {
+      toast.error("Exclusão da lista não autorizada");
+      return false;
+    }
     setDeleting(true);
     const { error } = await supabase.from("athletes").delete().eq("event_id", eventId);
     setDeleting(false);
@@ -692,7 +711,7 @@ function Atletas() {
     };
     const { error } = editingId
       ? await supabase.from("athletes").update(payload).eq("id", editingId)
-      : await supabase.from("athletes").insert({ event_id: eventId, ...payload });
+      : await supabase.rpc("create_athlete_manually", { _event_id: eventId, _athlete: payload });
     if (error) {
       const dup = error.code === "23505";
       const msg = dup
@@ -787,9 +806,11 @@ function Atletas() {
             <Button variant="outline" onClick={openExport} title="Exportar planilha Excel">
               <Download className="size-4" />
             </Button>
-            <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
-              <Upload className="size-4" /> Importar
-            </Button>
+            {canImport && (
+              <Button variant="outline" disabled={locked} onClick={() => fileRef.current?.click()}>
+                <Upload className="size-4" /> Importar
+              </Button>
+            )}
             {canImport && (
               <Button
                 variant="destructive"
@@ -834,8 +855,8 @@ function Atletas() {
       {!canImport && (
         <Card className="mb-4">
           <CardContent className="text-muted-foreground p-4 text-sm">
-            O envio da planilha de inscritos deste evento está liberado apenas para o administrador.
-            Peça a ele a autorização na tela de Eventos para poder enviar a planilha.
+            A importação de planilhas está bloqueada para seu acesso neste evento.
+            Peça ao administrador para liberar a autorização na tela Equipe do evento.
           </CardContent>
         </Card>
       )}
