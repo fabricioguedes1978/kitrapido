@@ -275,6 +275,7 @@ export type Database = {
       event_members: {
         Row: {
           can_cancel_deliveries: boolean
+          can_import_athletes: boolean
           created_at: string
           event_id: string
           id: string
@@ -283,6 +284,7 @@ export type Database = {
         }
         Insert: {
           can_cancel_deliveries?: boolean
+          can_import_athletes?: boolean
           created_at?: string
           event_id: string
           id?: string
@@ -291,6 +293,7 @@ export type Database = {
         }
         Update: {
           can_cancel_deliveries?: boolean
+          can_import_athletes?: boolean
           created_at?: string
           event_id?: string
           id?: string
@@ -562,6 +565,7 @@ export type Database = {
         Row: {
           accepted_user_id: string | null
           can_cancel_deliveries: boolean
+          can_import_athletes: boolean
           code_hash: string
           cpf: string
           created_at: string
@@ -577,6 +581,7 @@ export type Database = {
         Insert: {
           accepted_user_id?: string | null
           can_cancel_deliveries?: boolean
+          can_import_athletes?: boolean
           code_hash: string
           cpf: string
           created_at?: string
@@ -592,6 +597,7 @@ export type Database = {
         Update: {
           accepted_user_id?: string | null
           can_cancel_deliveries?: boolean
+          can_import_athletes?: boolean
           code_hash?: string
           cpf?: string
           created_at?: string
@@ -759,6 +765,21 @@ export type Database = {
           invite_id: string
         }[]
       }
+      create_team_invite_with_access_permissions: {
+        Args: {
+          _can_cancel_deliveries?: boolean
+          _can_import_athletes?: boolean
+          _cpf: string
+          _event_id: string
+          _name: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: {
+          activation_code: string
+          invite_expires_at: string
+          invite_id: string
+        }[]
+      }
       create_team_invite_with_permissions: {
         Args: {
           _can_cancel_deliveries?: boolean
@@ -786,6 +807,20 @@ export type Database = {
       list_team_invites: {
         Args: { _event_id: string }
         Returns: {
+          cpf: string
+          created_at: string
+          expires_at: string
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+        }[]
+      }
+      list_team_invites_with_access_permissions: {
+        Args: { _event_id: string }
+        Returns: {
+          can_cancel_deliveries: boolean
+          can_import_athletes: boolean
           cpf: string
           created_at: string
           expires_at: string
@@ -883,6 +918,10 @@ export type Database = {
       }
       revoke_team_invite: { Args: { _invite_id: string }; Returns: boolean }
       set_attendant_cancel_permission: {
+        Args: { _allowed: boolean; _member_id: string }
+        Returns: boolean
+      }
+      set_organizer_import_permission: {
         Args: { _allowed: boolean; _member_id: string }
         Returns: boolean
       }

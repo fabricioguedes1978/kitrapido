@@ -29,6 +29,13 @@
       "when": 1789908450059,
       "tag": "0003_staff_delivery_cancellation_permission",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790197186159,
+      "tag": "0004_manager_athlete_import_permission",
+      "breakpoints": true
     }
   ]
 }
