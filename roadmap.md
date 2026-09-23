@@ -33,3 +33,5 @@
 - [x] Substituir a recuperação por código pela geração segura de senha temporária para gerente e staff.
 
 - [x] Exibir o resumo do evento na Central de Entrega também para staff.
+
+- [ ] Permitir que o administrador bloqueie ou libere individualmente a importação de planilhas para cada gerente por evento.
