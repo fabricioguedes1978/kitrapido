@@ -116,6 +116,13 @@ function isPaid(a: Athlete) {
   return s === "pago" || s === "paid";
 }
 
+function normalizeSearch(value: string | null | undefined) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolean }) {
   const paid = isPaid(athlete);
   return (
@@ -260,18 +267,18 @@ function Central() {
   }, []);
 
   const results = useMemo(() => {
-    const q = term.trim().toLowerCase();
+    const q = normalizeSearch(term.trim());
     if (q.length < 2) return [];
     const digits = onlyDigits(q);
     return roster
       .filter((a) => {
         if (teamOnly) {
-          return (a.equipe ?? "").toLowerCase().includes(q);
+          return normalizeSearch(a.equipe).includes(q);
         }
         return (
-          a.name.toLowerCase().includes(q) ||
-          (a.bib_number ?? "").toLowerCase().includes(q) ||
-          (a.registration_number ?? "").toLowerCase().includes(q) ||
+          normalizeSearch(a.name).includes(q) ||
+          normalizeSearch(a.bib_number).includes(q) ||
+          normalizeSearch(a.registration_number).includes(q) ||
           (digits.length >= 3 && onlyDigits(a.cpf).includes(digits))
         );
       })
