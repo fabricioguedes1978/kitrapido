@@ -54,7 +54,7 @@ type InviteRow = {
 
 function Usuarios() {
   const { event, eventId } = useCurrentEvent();
-  const { isAdmin, isOrganizer } = useAuth();
+  const { isAdmin, isOrganizer, user } = useAuth();
   const canManage = isAdmin || isOrganizer;
   const qc = useQueryClient();
 
@@ -323,7 +323,7 @@ function Usuarios() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    {canManage && (isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
+                    {canManage && m.user_id !== user?.id && (isAdmin || m.role === "attendant") && <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" onClick={() => { setResetLink(null); setResetMember(m); }}>
                         <KeyRound /> Gerar link de redefinição
                       </Button>
