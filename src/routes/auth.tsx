@@ -175,9 +175,14 @@ function AuthPage() {
                 Entrar
               </Button>
               {profile !== "admin" && (
-                <Button asChild type="button" variant="outline" className="w-full">
-                  <Link to="/ativar-acesso">Ativar meu acesso</Link>
-                </Button>
+                <div className="space-y-2">
+                  <Button asChild type="button" variant="outline" className="w-full">
+                    <Link to="/ativar-acesso">Ativar meu acesso</Link>
+                  </Button>
+                  <p className="text-muted-foreground text-center text-xs">
+                    Esqueceu a senha? Solicite ao administrador ou gerente um link para criar uma nova senha.
+                  </p>
+                </div>
               )}
             </form>
           )}
