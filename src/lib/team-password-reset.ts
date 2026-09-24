@@ -1,5 +1,10 @@
-export const TEAM_PASSWORD_RESET_API =
-  "https://event-kit-sync.lovable.app/api/public/team-password-reset";
+const PUBLISHED_RESET_API = "https://event-kit-sync.lovable.app/api/public/team-password-reset";
+
+function getTeamPasswordResetApi() {
+  const hostname = window.location.hostname;
+  const runsOnLovable = hostname === "localhost" || hostname.endsWith(".lovable.app");
+  return runsOnLovable ? "/api/public/team-password-reset" : PUBLISHED_RESET_API;
+}
 
 type IssueResetLinkResponse = {
   token: string;
@@ -16,7 +21,7 @@ export async function issueTeamPasswordResetLink(
   eventId: string,
   userId: string,
 ): Promise<IssueResetLinkResponse> {
-  const response = await fetch(TEAM_PASSWORD_RESET_API, {
+  const response = await fetch(getTeamPasswordResetApi(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +35,7 @@ export async function issueTeamPasswordResetLink(
 }
 
 export async function consumeTeamPasswordResetLink(token: string, cpf: string, password: string) {
-  const response = await fetch(TEAM_PASSWORD_RESET_API, {
+  const response = await fetch(getTeamPasswordResetApi(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "consume", token, cpf, password }),
