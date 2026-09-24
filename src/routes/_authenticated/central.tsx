@@ -1086,11 +1086,12 @@ function Central() {
                   <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                     <Button
                       size="lg"
-                      className="h-16 text-lg"
+                      variant={activeDelivery || queuedOffline ? "destructive" : "default"}
+                      className="h-16 text-lg disabled:opacity-100"
                       disabled={!!activeDelivery || queuedOffline}
                       onClick={() => setConfirming(true)}
                     >
-                      ENTREGAR KIT
+                      {activeDelivery || queuedOffline ? "KIT ENTREGUE" : "ENTREGAR KIT"}
                     </Button>
                     <Button
                       size="lg"
