@@ -15,6 +15,7 @@ import { Route as AtivarAcessoRouteImport } from './routes/ativar-acesso'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CheckinRouteImport } from './routes/checkin'
 import { Route as ConsultaRouteImport } from './routes/consulta'
+import { Route as RedefinirAcessoRouteImport } from './routes/redefinir-acesso'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAlterarSenhaRouteImport } from './routes/_authenticated/alterar-senha'
 import { Route as AuthenticatedAtletasRouteImport } from './routes/_authenticated/atletas'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTelaAtletaRouteImport } from './routes/_authenticated/tela-atleta'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as ApiPublicChatRouteImport } from './routes/api/public/chat'
+import { Route as ApiPublicTeamPasswordResetRouteImport } from './routes/api/public/team-password-reset'
 import { Route as EventoSlugKitRouteImport } from './routes/evento.$slug.kit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -62,6 +64,11 @@ const CheckinRoute = CheckinRouteImport.update({
 const ConsultaRoute = ConsultaRouteImport.update({
   id: '/consulta',
   path: '/consulta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirAcessoRoute = RedefinirAcessoRouteImport.update({
+  id: '/redefinir-acesso',
+  path: '/redefinir-acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -157,6 +164,12 @@ const ApiPublicChatRoute = ApiPublicChatRouteImport.update({
   path: '/api/public/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTeamPasswordResetRoute =
+  ApiPublicTeamPasswordResetRouteImport.update({
+    id: '/api/public/team-password-reset',
+    path: '/api/public/team-password-reset',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EventoSlugKitRoute = EventoSlugKitRouteImport.update({
   id: '/evento/$slug/kit',
   path: '/evento/$slug/kit',
@@ -169,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
+  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
@@ -187,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/api/public/chat': typeof ApiPublicChatRoute
+  '/api/public/team-password-reset': typeof ApiPublicTeamPasswordResetRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesByTo {
@@ -195,6 +210,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
+  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/atletas': typeof AuthenticatedAtletasRoute
@@ -213,6 +229,7 @@ export interface FileRoutesByTo {
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/api/public/chat': typeof ApiPublicChatRoute
+  '/api/public/team-password-reset': typeof ApiPublicTeamPasswordResetRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRoutesById {
@@ -223,6 +240,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/checkin': typeof CheckinRoute
   '/consulta': typeof ConsultaRoute
+  '/redefinir-acesso': typeof RedefinirAcessoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/alterar-senha': typeof AuthenticatedAlterarSenhaRoute
   '/_authenticated/atletas': typeof AuthenticatedAtletasRoute
@@ -241,6 +259,7 @@ export interface FileRoutesById {
   '/_authenticated/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/api/public/chat': typeof ApiPublicChatRoute
+  '/api/public/team-password-reset': typeof ApiPublicTeamPasswordResetRoute
   '/evento/$slug/kit': typeof EventoSlugKitRoute
 }
 export interface FileRouteTypes {
@@ -251,6 +270,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
+    | '/redefinir-acesso'
     | '/reset-password'
     | '/alterar-senha'
     | '/atletas'
@@ -269,6 +289,7 @@ export interface FileRouteTypes {
     | '/tela-atleta'
     | '/usuarios'
     | '/api/public/chat'
+    | '/api/public/team-password-reset'
     | '/evento/$slug/kit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -277,6 +298,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
+    | '/redefinir-acesso'
     | '/reset-password'
     | '/alterar-senha'
     | '/atletas'
@@ -295,6 +317,7 @@ export interface FileRouteTypes {
     | '/tela-atleta'
     | '/usuarios'
     | '/api/public/chat'
+    | '/api/public/team-password-reset'
     | '/evento/$slug/kit'
   id:
     | '__root__'
@@ -304,6 +327,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/checkin'
     | '/consulta'
+    | '/redefinir-acesso'
     | '/reset-password'
     | '/_authenticated/alterar-senha'
     | '/_authenticated/atletas'
@@ -322,6 +346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tela-atleta'
     | '/_authenticated/usuarios'
     | '/api/public/chat'
+    | '/api/public/team-password-reset'
     | '/evento/$slug/kit'
   fileRoutesById: FileRoutesById
 }
@@ -332,8 +357,10 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CheckinRoute: typeof CheckinRoute
   ConsultaRoute: typeof ConsultaRoute
+  RedefinirAcessoRoute: typeof RedefinirAcessoRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicChatRoute: typeof ApiPublicChatRoute
+  ApiPublicTeamPasswordResetRoute: typeof ApiPublicTeamPasswordResetRoute
   EventoSlugKitRoute: typeof EventoSlugKitRoute
 }
 
@@ -379,6 +406,13 @@ declare module '@tanstack/react-router' {
       path: '/consulta'
       fullPath: '/consulta'
       preLoaderRoute: typeof ConsultaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-acesso': {
+      id: '/redefinir-acesso'
+      path: '/redefinir-acesso'
+      fullPath: '/redefinir-acesso'
+      preLoaderRoute: typeof RedefinirAcessoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -507,6 +541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/team-password-reset': {
+      id: '/api/public/team-password-reset'
+      path: '/api/public/team-password-reset'
+      fullPath: '/api/public/team-password-reset'
+      preLoaderRoute: typeof ApiPublicTeamPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/evento/$slug/kit': {
       id: '/evento/$slug/kit'
       path: '/evento/$slug/kit'
@@ -565,8 +606,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CheckinRoute: CheckinRoute,
   ConsultaRoute: ConsultaRoute,
+  RedefinirAcessoRoute: RedefinirAcessoRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicChatRoute: ApiPublicChatRoute,
+  ApiPublicTeamPasswordResetRoute: ApiPublicTeamPasswordResetRoute,
   EventoSlugKitRoute: EventoSlugKitRoute,
 }
 export const routeTree = rootRouteImport

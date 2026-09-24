@@ -35,3 +35,5 @@
 - [x] Exibir o resumo do evento na Central de Entrega também para staff.
 
 - [x] Permitir que o administrador bloqueie ou libere individualmente a importação de planilhas para cada gerente por evento.
+
+- [x] Substituir a senha temporária por um link único para redefinição da senha da equipe.
