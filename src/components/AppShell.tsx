@@ -139,10 +139,10 @@ export function EventSelector({ className }: { className?: string }) {
     void navigate({ to: "/central" });
   };
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex min-w-0 items-center gap-2", className)}>
       <Flag className="text-primary size-4 shrink-0" />
       <Select value={eventId ?? ""} onValueChange={handleSelect}>
-        <SelectTrigger className="h-9 w-full max-w-[18rem] border-transparent bg-transparent shadow-none hover:bg-muted/50">
+        <SelectTrigger className="h-auto min-h-9 min-w-0 flex-1 border-transparent bg-transparent text-left shadow-none hover:bg-muted/50 [&>span]:min-w-0 [&>span]:whitespace-normal [&>span]:break-words [&>span]:line-clamp-none lg:max-w-[18rem] lg:[&>span]:line-clamp-1">
           <SelectValue placeholder="Selecione o evento" />
         </SelectTrigger>
         <SelectContent>
@@ -443,10 +443,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="bg-card/90 sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-2.5 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto]">
+        <header className="bg-card/90 sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-b px-4 py-2.5 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="shrink-0 lg:hidden">
+              <Button variant="outline" size="icon" className="col-start-1 row-start-2 shrink-0 lg:hidden">
                 <Menu className="size-5" />
                 <span className="sr-only">Abrir menu</span>
               </Button>
@@ -456,10 +456,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <SidebarBody onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
-          <div className="min-w-0">
+          <div className="col-span-2 row-start-1 min-w-0 lg:col-span-1 lg:col-start-1 lg:row-auto">
             <EventSelector />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="col-start-2 row-start-2 flex min-w-0 items-center justify-end gap-3 lg:row-auto">
             <HelpButton />
             <OnlineIndicator className="shrink-0" />
             <UserAvatar />
