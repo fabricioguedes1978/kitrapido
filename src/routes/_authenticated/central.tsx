@@ -797,6 +797,9 @@ function Central() {
                           <p className="text-muted-foreground text-xs">
                             Nº {athlete.bib_number ?? "—"} · {athlete.shirt_size ?? "Sem camiseta"}
                           </p>
+                          <p className="text-muted-foreground mt-1 text-xs leading-relaxed break-words">
+                            Modalidade: {athlete.modality || "—"} · Categoria: {athlete.category || "—"}
+                          </p>
                         </div>
                         <Button
                           type="button"
