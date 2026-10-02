@@ -17,9 +17,11 @@ export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({
     meta: [
       { title: "Relatórios — Kit Rápido" },
-      { name: "description", content: "Exporte entregas, pendentes e estoque em PDF, Excel ou CSV." },
+      { name: "description", content: "Exporte entregas, pendentes e inscritos em PDF, Excel ou CSV." },
       { property: "og:title", content: "Relatórios — Kit Rápido" },
       { property: "og:description", content: "Relatórios completos da operação de entrega de kits." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -35,7 +37,7 @@ function Relatorios() {
     queryKey: ["reports", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const [athletesRes, deliveriesRows, inventory] = await Promise.all([
+      const [athletesRes, deliveriesRows] = await Promise.all([
         fetchAllRows<{
           id: string;
           name: string;
@@ -59,10 +61,6 @@ function Relatorios() {
             .eq("event_id", eventId!)
             .order("delivered_at", { ascending: false }),
         ),
-        supabase
-          .from("inventory")
-          .select("size,quantity_initial,quantity_current")
-          .eq("event_id", eventId!),
       ]);
       return {
         athletes: athletesRes,
@@ -74,7 +72,6 @@ function Relatorios() {
           status: string;
           athletes: { name: string; bib_number: string | null; shirt_size: string | null } | null;
         }[],
-        inventory: inventory.data ?? [],
       };
     },
   });
@@ -110,18 +107,6 @@ function Relatorios() {
             Modalidade: a.modality ?? "",
             Camiseta: a.shirt_size ?? "",
           })),
-    },
-    {
-      key: "estoque",
-      title: "Estoque de camisetas",
-      description: "Saldo atual e consumo por tamanho.",
-      rows: () =>
-        (data?.inventory ?? []).map((i) => ({
-          Tamanho: i.size,
-          Inicial: i.quantity_initial,
-          Entregues: i.quantity_initial - i.quantity_current,
-          Saldo: i.quantity_current,
-        })),
     },
     {
       key: "geral",
