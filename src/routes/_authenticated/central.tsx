@@ -149,6 +149,7 @@ function Central() {
   const [term, setTerm] = useState("");
   const [teamOnly, setTeamOnly] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
+  const [usbActive, setUsbActive] = useState(false);
   const [selected, setSelected] = useState<Athlete | null>(null);
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
   const [confirming, setConfirming] = useState(false);
@@ -170,6 +171,23 @@ function Central() {
   const inputRef = useRef<HTMLInputElement>(null);
   const usbInputRef = useRef<HTMLInputElement>(null);
   const [usbValue, setUsbValue] = useState("");
+  const usbTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!usbActive || selected || success || bulkResult) return;
+    usbInputRef.current?.focus();
+  }, [usbActive, selected, success, bulkResult]);
+
+  useEffect(() => {
+    if (!usbActive || !usbValue.trim() || selected || success || bulkResult) return;
+    // USB readers without an Enter suffix are processed after their last keystroke.
+    usbTimerRef.current = setTimeout(() => {
+      if (parseQrPayload(usbValue)) submitUsbScan(usbValue);
+    }, 350);
+    return () => {
+      if (usbTimerRef.current) clearTimeout(usbTimerRef.current);
+    };
+  }, [usbActive, usbValue, selected, success, bulkResult]);
 
   const { data: athletes = [] } = useQuery({
     queryKey: ["athletes", eventId],
@@ -408,11 +426,12 @@ function Central() {
   function submitUsbScan(raw: string) {
     const value = raw.trim();
     if (!value) return;
+    if (usbTimerRef.current) clearTimeout(usbTimerRef.current);
     setUsbValue("");
     setTerm("");
     handleScan(value);
     // In multi-kit mode, keep the reader ready for the next athlete.
-    if (bulkMode) requestAnimationFrame(() => usbInputRef.current?.focus());
+    if (bulkMode && usbActive) requestAnimationFrame(() => usbInputRef.current?.focus());
   }
 
   async function confirmBulkDelivery() {
@@ -590,8 +609,8 @@ function Central() {
     setTimeout(() => {
       setSuccess(null);
       publishDisplay({ status: "idle" });
-      inputRef.current?.focus();
-    }, 4000);
+      if (!usbActive) inputRef.current?.focus();
+    }, usbActive ? 1500 : 4000);
   }
 
   const stats = useMemo(() => {
@@ -666,8 +685,17 @@ function Central() {
             <p className="text-muted-foreground truncate text-sm">{event?.name}</p>
           </div>
           <div className="flex shrink-0 gap-2">
-            <Button size="lg" className="h-11 gap-2" onClick={() => setScanOpen(true)}>
-              <ScanLine className="size-5" /> Escanear QR Code
+            <Button
+              size="lg"
+              variant="outline"
+              aria-pressed={usbActive}
+              className={cn("h-11 gap-2", usbActive && "border-success bg-success text-success-foreground hover:bg-success/90 hover:text-success-foreground")}
+              onClick={() => {
+                setUsbActive((current) => !current);
+                setUsbValue("");
+              }}
+            >
+              <ScanLine className="size-5" /> Leitor USB {usbActive ? "ligado" : "desligado"}
             </Button>
           </div>
         </header>
@@ -688,32 +716,27 @@ function Central() {
               </Button>
             </div>
 
-            <div className="mt-4 space-y-1.5">
+            {usbActive && <div className="mt-4 space-y-1.5">
               <Label htmlFor="usb-reader" className="flex items-center gap-2 font-semibold">
                 <Usb className="size-4" /> Leitor de QR Code USB
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="usb-reader"
-                  ref={usbInputRef}
-                  value={usbValue}
-                  onChange={(e) => setUsbValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || (e.key === "Tab" && usbValue.trim())) {
-                      e.preventDefault();
-                      submitUsbScan(usbValue);
-                    }
-                  }}
-                  placeholder="Clique aqui e leia o QR Code com o leitor USB"
-                  aria-label="Leitura do QR Code por leitor USB"
-                  autoComplete="off"
-                  className="h-11 min-w-0 flex-1"
-                />
-                <Button type="button" variant="outline" className="h-11 shrink-0" disabled={!usbValue.trim()} onClick={() => submitUsbScan(usbValue)}>
-                  Ler código
-                </Button>
-              </div>
-            </div>
+              <Input
+                id="usb-reader"
+                ref={usbInputRef}
+                value={usbValue}
+                onChange={(e) => setUsbValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || (e.key === "Tab" && usbValue.trim())) {
+                    e.preventDefault();
+                    submitUsbScan(usbValue);
+                  }
+                }}
+                placeholder="Aguardando leitura do QR Code USB"
+                aria-label="Leitura automática do QR Code por leitor USB"
+                autoComplete="off"
+                className="h-11 w-full"
+              />
+            </div>}
 
             <div className="relative mt-4">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2" />
