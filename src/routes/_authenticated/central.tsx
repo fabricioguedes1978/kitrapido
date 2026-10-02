@@ -15,6 +15,7 @@ import {
   Undo2,
   UserCheck,
   Users,
+  Usb,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -167,6 +168,8 @@ function Central() {
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
   const [bulkResult, setBulkResult] = useState<{ delivered: number; failed: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const usbInputRef = useRef<HTMLInputElement>(null);
+  const [usbValue, setUsbValue] = useState("");
 
   const { data: athletes = [] } = useQuery({
     queryKey: ["athletes", eventId],
@@ -400,6 +403,16 @@ function Central() {
     }
     setAsThirdParty(true);
     setSelected(found);
+  }
+
+  function submitUsbScan(raw: string) {
+    const value = raw.trim();
+    if (!value) return;
+    setUsbValue("");
+    setTerm("");
+    handleScan(value);
+    // In multi-kit mode, keep the reader ready for the next athlete.
+    if (bulkMode) requestAnimationFrame(() => usbInputRef.current?.focus());
   }
 
   async function confirmBulkDelivery() {
@@ -675,12 +688,45 @@ function Central() {
               </Button>
             </div>
 
+            <div className="mt-4 space-y-1.5">
+              <Label htmlFor="usb-reader" className="flex items-center gap-2 font-semibold">
+                <Usb className="size-4" /> Leitor de QR Code USB
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="usb-reader"
+                  ref={usbInputRef}
+                  value={usbValue}
+                  onChange={(e) => setUsbValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || (e.key === "Tab" && usbValue.trim())) {
+                      e.preventDefault();
+                      submitUsbScan(usbValue);
+                    }
+                  }}
+                  placeholder="Clique aqui e leia o QR Code com o leitor USB"
+                  aria-label="Leitura do QR Code por leitor USB"
+                  autoComplete="off"
+                  className="h-11 min-w-0 flex-1"
+                />
+                <Button type="button" variant="outline" className="h-11 shrink-0" disabled={!usbValue.trim()} onClick={() => submitUsbScan(usbValue)}>
+                  Ler código
+                </Button>
+              </div>
+            </div>
+
             <div className="relative mt-4">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2" />
               <Input
                 ref={inputRef}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && parseQrPayload(term)) {
+                    e.preventDefault();
+                    submitUsbScan(term);
+                  }
+                }}
                 placeholder={teamOnly ? "Digite o nome da equipe" : "Nome, CPF, inscrição ou nº de peito"}
                 className="h-14 pl-11 text-base"
                 autoComplete="off"
