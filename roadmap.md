@@ -39,3 +39,5 @@
 - [x] Substituir a senha temporária por um link único para redefinição da senha da equipe.
 
 - [x] Aceitar leitura de QR Code pelo leitor USB na Central, inclusive na retirada de vários kits.
+
+- [x] Usar o botão superior para ligar/desligar a leitura USB automática, abrindo o atleta e retomando a leitura após a entrega.
