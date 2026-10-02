@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep USB QR reading as an opt-in mode in the Central, with automatic recognition and refocus after delivery; this avoids competing with camera scanning and manual search.
