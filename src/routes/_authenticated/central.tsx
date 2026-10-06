@@ -68,6 +68,8 @@ export const Route = createFileRoute("/_authenticated/central")({
       { name: "description", content: "Leia o QR Code ou pesquise o atleta e registre a entrega do kit." },
       { property: "og:title", content: "Central de Entrega — Kit Rápido" },
       { property: "og:description", content: "Entrega de kits em segundos, com bloqueio de duplicidade." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -182,7 +184,7 @@ function Central() {
     if (!usbActive || !usbValue.trim() || selected || success || bulkResult) return;
     // USB readers without an Enter suffix are processed after their last keystroke.
     usbTimerRef.current = setTimeout(() => {
-      if (parseQrPayload(usbValue)) submitUsbScan(usbValue);
+      if (parseQrPayload(usbValue, true)) submitUsbScan(usbValue);
     }, 350);
     return () => {
       if (usbTimerRef.current) clearTimeout(usbTimerRef.current);
@@ -396,11 +398,15 @@ function Central() {
     });
   }, [selected, activeDelivery, queuedOffline, event?.name, extras]);
 
-  function handleScan(raw: string) {
-    const parsed = parseQrPayload(raw);
+  function handleScan(raw: string, usb = false) {
+    const parsed = parseQrPayload(raw, usb);
     setMethod("qrcode");
     if (!parsed) { toast.error("QR Code não reconhecido."); return; }
     if (parsed.kind === "athlete") {
+      if (parsed.eventId && parsed.eventId !== eventId) {
+        toast.error("Este QR Code pertence a outro evento. Selecione o evento correto.");
+        return;
+      }
       const found = roster.find((a) => a.id === parsed.athleteId);
       if (!found) { toast.error("Atleta não encontrado neste evento."); return; }
       if (bulkMode) {
@@ -429,7 +435,7 @@ function Central() {
     if (usbTimerRef.current) clearTimeout(usbTimerRef.current);
     setUsbValue("");
     setTerm("");
-    handleScan(value);
+    handleScan(value, true);
     // In multi-kit mode, keep the reader ready for the next athlete.
     if (bulkMode && usbActive) requestAnimationFrame(() => usbInputRef.current?.focus());
   }
@@ -745,7 +751,7 @@ function Central() {
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && parseQrPayload(term)) {
+                  if (e.key === "Enter" && parseQrPayload(term, true)) {
                     e.preventDefault();
                     submitUsbScan(term);
                   }

@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep USB QR reading as an opt-in mode in the Central, with automatic recognition and refocus after delivery; this avoids competing with camera scanning and manual search.
+- Decode complete QR credentials in a browser-safe pure module; tolerate keyboard punctuation changes only for USB input and validate the event roster before opening an athlete.
