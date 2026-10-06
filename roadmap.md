@@ -41,3 +41,5 @@
 - [x] Aceitar leitura de QR Code pelo leitor USB na Central, inclusive na retirada de vários kits.
 
 - [x] Usar o botão superior para ligar/desligar a leitura USB automática, abrindo o atleta e retomando a leitura após a entrega.
+
+- [x] Corrigir e validar o reconhecimento dos QR Codes gerados, inclusive leitura USB com pontuação alterada pelo teclado.
