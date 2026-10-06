@@ -42,4 +42,4 @@
 
 - [x] Usar o botão superior para ligar/desligar a leitura USB automática, abrindo o atleta e retomando a leitura após a entrega.
 
-- [ ] Corrigir e validar o reconhecimento dos QR Codes gerados, inclusive leitura USB com pontuação alterada pelo teclado.
+- [x] Corrigir e validar o reconhecimento dos QR Codes gerados, inclusive leitura USB com pontuação alterada pelo teclado.
