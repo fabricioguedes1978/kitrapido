@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decodeQrPayload } from "./qr-payload";
+import { decodeQrPayload } from "../src/lib/qr-payload";
 
 const event = "11111111-1111-4111-8111-111111111111";
 const athlete = "22222222-2222-4222-8222-222222222222";
