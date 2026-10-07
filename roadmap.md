@@ -46,4 +46,4 @@
 
 - [x] Registrar solicitações de correção na Central sem interferir na entrega.
 - [x] Criar PENDÊNCIAS para gerente e administrador corrigirem dados e resolverem solicitações, com estatísticas.
-- [ ] Validar registro, correção e resolução preservando entregas e auditoria.
+- [x] Validar registro, correção e resolução preservando entregas e auditoria.
