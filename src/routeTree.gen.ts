@@ -30,6 +30,7 @@ import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedEventosRouteImport } from './routes/_authenticated/eventos'
 import { Route as AuthenticatedKitsRouteImport } from './routes/_authenticated/kits'
 import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated/locais'
+import { Route as AuthenticatedPendenciasRouteImport } from './routes/_authenticated/pendencias'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
 import { Route as AuthenticatedTelaAtletaRouteImport } from './routes/_authenticated/tela-atleta'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
@@ -144,6 +145,11 @@ const AuthenticatedLocaisRoute = AuthenticatedLocaisRouteImport.update({
   path: '/locais',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPendenciasRoute = AuthenticatedPendenciasRouteImport.update({
+  id: '/pendencias',
+  path: '/pendencias',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
+  '/pendencias': typeof AuthenticatedPendenciasRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof AuthenticatedEventosRoute
   '/kits': typeof AuthenticatedKitsRoute
   '/locais': typeof AuthenticatedLocaisRoute
+  '/pendencias': typeof AuthenticatedPendenciasRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/_authenticated/eventos': typeof AuthenticatedEventosRoute
   '/_authenticated/kits': typeof AuthenticatedKitsRoute
   '/_authenticated/locais': typeof AuthenticatedLocaisRoute
+  '/_authenticated/pendencias': typeof AuthenticatedPendenciasRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/tela-atleta': typeof AuthenticatedTelaAtletaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/kits'
     | '/locais'
+    | '/pendencias'
     | '/relatorios'
     | '/tela-atleta'
     | '/usuarios'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/kits'
     | '/locais'
+    | '/pendencias'
     | '/relatorios'
     | '/tela-atleta'
     | '/usuarios'
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/_authenticated/eventos'
     | '/_authenticated/kits'
     | '/_authenticated/locais'
+    | '/_authenticated/pendencias'
     | '/_authenticated/relatorios'
     | '/_authenticated/tela-atleta'
     | '/_authenticated/usuarios'
@@ -513,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLocaisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pendencias': {
+      id: '/_authenticated/pendencias'
+      path: '/pendencias'
+      fullPath: '/pendencias'
+      preLoaderRoute: typeof AuthenticatedPendenciasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/relatorios': {
       id: '/_authenticated/relatorios'
       path: '/relatorios'
@@ -572,6 +591,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEventosRoute: typeof AuthenticatedEventosRoute
   AuthenticatedKitsRoute: typeof AuthenticatedKitsRoute
   AuthenticatedLocaisRoute: typeof AuthenticatedLocaisRoute
+  AuthenticatedPendenciasRoute: typeof AuthenticatedPendenciasRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedTelaAtletaRoute: typeof AuthenticatedTelaAtletaRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
@@ -591,6 +611,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEventosRoute: AuthenticatedEventosRoute,
   AuthenticatedKitsRoute: AuthenticatedKitsRoute,
   AuthenticatedLocaisRoute: AuthenticatedLocaisRoute,
+  AuthenticatedPendenciasRoute: AuthenticatedPendenciasRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedTelaAtletaRoute: AuthenticatedTelaAtletaRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
