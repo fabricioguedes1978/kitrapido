@@ -82,7 +82,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
       if (error) throw error;
       return (data?.length ?? 0) > 0;
     },
-    refetchInterval: 15000,
+    refetchInterval: 60000,
   });
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = NAV.filter((i) => (role ? i.roles.includes(role) : false));
