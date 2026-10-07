@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
@@ -67,6 +67,23 @@ const NAV: NavItem[] = [
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { role } = useAuth();
+  const { eventId } = useCurrentEvent();
+  const { data: hasPendingRequests = false } = useQuery({
+    queryKey: ["correction-requests", eventId, "pending-indicator"],
+    enabled: !!eventId && (role === "admin" || role === "organizer"),
+    queryFn: async () => {
+      if (!eventId) return false;
+      const { data, error } = await supabase
+        .from("athlete_correction_requests")
+        .select("id")
+        .eq("event_id", eventId)
+        .eq("status", "pending")
+        .limit(1);
+      if (error) throw error;
+      return (data?.length ?? 0) > 0;
+    },
+    refetchInterval: 15000,
+  });
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = NAV.filter((i) => (role ? i.roles.includes(role) : false));
 
@@ -89,6 +106,9 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           >
             <item.icon className="size-4 shrink-0" />
             <span className="truncate">{item.label}</span>
+            {item.to === "/pendencias" && hasPendingRequests && (
+              <span role="img" aria-label="Há pendências para resolver" title="Há pendências para resolver" className="size-2.5 shrink-0 rounded-full bg-destructive" />
+            )}
           </Link>
         );
       })}
