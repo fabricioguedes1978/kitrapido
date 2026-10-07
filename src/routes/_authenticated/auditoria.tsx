@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentEvent } from "@/hooks/useEvents";
 import { formatDateTime } from "@/lib/cronochip";
+import { describeAuditRecord } from "@/lib/audit-description";
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
@@ -32,14 +33,15 @@ function Auditoria() {
     queryKey: ["audit", eventId],
     enabled: !!eventId,
     queryFn: async () => {
+      if (!eventId) return [];
       const { data, error } = await supabase
         .from("audit_logs")
-        .select("id,user_name,action,entity,created_at")
-        .eq("event_id", eventId!)
+        .select("id,user_name,action,entity,created_at,old_data,new_data")
+        .eq("event_id", eventId)
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((log) => ({ ...log, display: describeAuditRecord(log) }));
     },
   });
 
@@ -53,7 +55,7 @@ function Auditoria() {
     if (!query) return logs;
 
     return logs.filter((log) =>
-      [log.user_name, log.action].some((value) =>
+      [log.user_name, log.action, log.display.action, log.display.description].some((value) =>
         (value ?? "")
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
@@ -68,7 +70,7 @@ function Auditoria() {
       <PageHeader title="Auditoria" subtitle={event?.name ?? ""} />
       <Input
         type="search"
-        placeholder="Buscar por usuário ou ação"
+        placeholder="Buscar por usuário, ação ou descrição"
         aria-label="Buscar registros de auditoria"
         className="mb-4 h-12"
         value={term}
@@ -82,6 +84,7 @@ function Auditoria() {
                 <TableHead>Data/hora</TableHead>
                 <TableHead>Usuário</TableHead>
                 <TableHead>Ação</TableHead>
+                <TableHead>Descrição</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -89,12 +92,13 @@ function Auditoria() {
                 <TableRow key={l.id}>
                   <TableCell className="numeric whitespace-nowrap">{formatDateTime(l.created_at)}</TableCell>
                   <TableCell className="max-w-[180px] truncate">{l.user_name ?? "—"}</TableCell>
-                  <TableCell>{l.action}</TableCell>
+                  <TableCell className="whitespace-nowrap font-medium">{l.display.action}</TableCell>
+                  <TableCell className="min-w-[220px] max-w-[480px] whitespace-normal break-words">{l.display.description}</TableCell>
                 </TableRow>
               ))}
               {filteredLogs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-muted-foreground">
+                  <TableCell colSpan={4} className="text-muted-foreground">
                     {term.trim()
                       ? "Nenhum registro encontrado para esta busca."
                       : "Nenhum registro de auditoria para este evento."}
