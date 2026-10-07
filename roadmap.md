@@ -43,3 +43,7 @@
 - [x] Usar o botão superior para ligar/desligar a leitura USB automática, abrindo o atleta e retomando a leitura após a entrega.
 
 - [x] Corrigir e validar o reconhecimento dos QR Codes gerados, inclusive leitura USB com pontuação alterada pelo teclado.
+
+- [x] Registrar solicitações de correção na Central sem interferir na entrega.
+- [x] Criar PENDÊNCIAS para gerente e administrador corrigirem dados e resolverem solicitações, com estatísticas.
+- [x] Validar registro, correção e resolução preservando entregas e auditoria.

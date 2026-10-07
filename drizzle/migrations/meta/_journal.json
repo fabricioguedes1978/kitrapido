@@ -43,6 +43,13 @@
       "when": 1790197250547,
       "tag": "0005_secure_manager_athlete_import",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791406183286,
+      "tag": "0006_athlete_correction_requests",
+      "breakpoints": true
     }
   ]
 }

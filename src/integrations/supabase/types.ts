@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      athlete_correction_requests: {
+        Row: {
+          athlete_id: string
+          created_at: string
+          event_id: string
+          id: string
+          observation: string
+          requested_by: string
+          requested_by_name: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          resolved_by_name: string | null
+          status: string
+        }
+        Insert: {
+          athlete_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          observation: string
+          requested_by?: string
+          requested_by_name: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_by_name?: string | null
+          status?: string
+        }
+        Update: {
+          athlete_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          observation?: string
+          requested_by?: string
+          requested_by_name?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_by_name?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_correction_requests_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "athletes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "athlete_correction_requests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "athlete_correction_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "athlete_correction_requests_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       athletes: {
         Row: {
           bib_number: string | null
@@ -919,6 +993,10 @@ export type Database = {
           athlete_id: string
           online_checkin_at: string
         }[]
+      }
+      resolve_athlete_correction: {
+        Args: { _changes: Json; _note?: string; _request_id: string }
+        Returns: undefined
       }
       revoke_team_invite: { Args: { _invite_id: string }; Returns: boolean }
       set_attendant_cancel_permission: {

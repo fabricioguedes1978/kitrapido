@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Camera,
   CheckCircle2,
+  ClipboardList,
   ListChecks,
   MonitorSmartphone,
   Package,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { QrScanDialog } from "@/components/QrScanDialog";
+import { CorrectionRequestDialog } from "@/components/CorrectionRequestDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -152,6 +154,7 @@ function Central() {
   const [teamOnly, setTeamOnly] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const [usbActive, setUsbActive] = useState(false);
+  const [correctionOpen, setCorrectionOpen] = useState(false);
   const [selected, setSelected] = useState<Athlete | null>(null);
   const [method, setMethod] = useState<"qrcode" | "busca">("busca");
   const [confirming, setConfirming] = useState(false);
@@ -1144,6 +1147,9 @@ function Central() {
               )}
 
               <div className="border-t px-5 py-4 sm:px-6">
+                <Button variant="outline" className="mb-3 w-full" onClick={() => setCorrectionOpen(true)}>
+                  <ClipboardList className="size-4" /> Registrar pendência
+                </Button>
                 {confirming ? (
                   <div className="bg-muted space-y-3 rounded-xl p-4">
                     <p className="text-center font-semibold">
@@ -1191,6 +1197,7 @@ function Central() {
         )}
 
         <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onResult={handleScan} />
+        {selected && <CorrectionRequestDialog key={selected.id} athlete={selected} open={correctionOpen} onOpenChange={setCorrectionOpen} />}
 
         <Dialog open={bulkConfirmOpen} onOpenChange={(open) => !bulkSubmitting && setBulkConfirmOpen(open)}>
           <DialogContent>
