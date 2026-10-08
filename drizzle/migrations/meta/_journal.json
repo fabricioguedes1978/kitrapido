@@ -64,6 +64,13 @@
       "when": 1791464738449,
       "tag": "0008_enforce_correction_submission_deadline",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791469294485,
+      "tag": "0009_validate_manual_athlete_completeness",
+      "breakpoints": true
     }
   ]
 }

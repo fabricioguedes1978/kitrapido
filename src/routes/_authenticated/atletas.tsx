@@ -7,6 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { AlertTriangle, Download, Loader2, Pencil, Plus, QrCode, Trash2, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
+import { AthletePendingValue } from "@/components/AthletePendingValue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -463,10 +464,8 @@ function Atletas() {
       const problems: string[] = [];
       if (!r["name"]) problems.push("nome em branco");
       if (!r["gender"]) problems.push("sexo em branco");
-      if (!r["modality"]) problems.push("modalidade em branco");
       const birth = r["birth_date"] ? parseBrDate(r["birth_date"]) : null;
-      if (!r["birth_date"]) problems.push("data de nascimento em branco");
-      else if (!birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
+      if (r["birth_date"] && !birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
       const cpf = r["cpf"] ? onlyDigits(r["cpf"]) : null;
       const bib = r["bib_number"] ?? "";
       if (!bib) problems.push("número em branco");
@@ -654,6 +653,7 @@ function Atletas() {
     if (!form.birth_date) missing.push("data de nascimento");
     if (!form.gender) missing.push("sexo");
     if (!form.modality.trim()) missing.push("modalidade");
+    if (!form.category.trim()) missing.push("categoria");
     
     if (!form.bib_number.trim()) missing.push("número");
     if (missing.length > 0) {
@@ -1021,14 +1021,14 @@ function Atletas() {
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
-                  <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
+                  <TableCell className="hidden md:table-cell"><AthletePendingValue value={a.birth_date ? formatDate(a.birth_date) : null} /></TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell">{a.kit_type ?? "—"}</TableCell>
                   <TableCell>{a.shirt_size ?? "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell">{a.equipe ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
-                  <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell"><AthletePendingValue value={a.modality} /></TableCell>
                   <TableCell>
                     <Badge variant={a.payment_status === "pendente" ? "destructive" : "outline"}>
                       {a.payment_status === "pendente" ? "Pendente" : "Pago"}
@@ -1263,7 +1263,7 @@ function Atletas() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label>Categoria</Label>
+                <Label>Categoria *</Label>
                 <select
                   disabled={bibDuplicate}
                   value={categoryOther ? "__other__" : form.category}
