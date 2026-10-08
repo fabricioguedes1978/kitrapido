@@ -50,6 +50,13 @@
       "when": 1791406183286,
       "tag": "0006_athlete_correction_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791464181343,
+      "tag": "0007_cascade_event_athlete_correction_requests",
+      "breakpoints": true
     }
   ]
 }
