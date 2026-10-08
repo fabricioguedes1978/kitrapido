@@ -9,7 +9,7 @@ export function useCorrectionAccess(eventId: string | null) {
   const deadline = event?.athletes_lock_at ? Date.parse(event.athletes_lock_at) : null;
   useEffect(() => {
     setNow(Date.now());
-    if (deadline === null || !Number.isFinite(deadline)) return;
+    if (deadline === null || !Number.isFinite(deadline) || deadline <= Date.now()) return;
     const timer = window.setTimeout(() => setNow(Date.now()), Math.min(Math.max(deadline - Date.now() + 1, 0), 2147483647));
     return () => window.clearTimeout(timer);
   }, [deadline, now]);
