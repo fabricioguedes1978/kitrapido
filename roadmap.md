@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Diagnosticar recusa na ativação do gerente: senha fraca confirmada nos registros; aviso corrigido e testado com resposta simulada, sem alterar contas existentes.
+
 - [x] Permitir nascimento, modalidade e categoria ausentes na planilha, sinalizar em vermelho e exigir no cadastro/edição; avisos verificados na Central sem alterar dados reais.
 
 - [x] Bloquear envio de pendências pelo prazo de alteração de atletas; regra aplicada no banco e botão validado com prazo encerrado simulado.
