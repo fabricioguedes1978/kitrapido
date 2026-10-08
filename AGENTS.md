@@ -14,4 +14,5 @@
 - Store athlete correction requests separately from deliveries; resolve allowlisted personal-data corrections atomically through an event-manager-authorized database function, preserving kit, stock and delivery records.
 - Cascade correction requests when their event or athlete is deliberately deleted; this keeps existing deletion flows working without changing audit-log retention or delete permissions.
 - Enforce correction submission deadlines in both RLS and a shared deadline-aware UI hook; retain the administrator override and all original ownership checks.
+- Keep imported missing athlete fields nullable and render a shared noninteractive pending indicator; validate completeness on manual creation and personal-data editing without blocking delivery status updates.
 - Derive audit labels and descriptions in a browser-safe presentation helper from existing logs; preserve original history and only name allowlisted changed fields to avoid exposing secrets.

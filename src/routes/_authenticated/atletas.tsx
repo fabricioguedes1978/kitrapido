@@ -7,6 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { AlertTriangle, Download, Loader2, Pencil, Plus, QrCode, Trash2, Upload } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
+import { AthletePendingValue } from "@/components/AthletePendingValue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1020,14 +1021,14 @@ function Atletas() {
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">{a.gender ?? "—"}</TableCell>
-                  <TableCell className="hidden md:table-cell">{formatDate(a.birth_date)}</TableCell>
+                  <TableCell className="hidden md:table-cell"><AthletePendingValue value={a.birth_date ? formatDate(a.birth_date) : null} /></TableCell>
                   <TableCell className="hidden md:table-cell">{a.city ?? "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell">{a.kit_type ?? "—"}</TableCell>
                   <TableCell>{a.shirt_size ?? "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell">{a.equipe ?? "—"}</TableCell>
                   <TableCell className="numeric">{a.bib_number ?? "—"}</TableCell>
                   <TableCell className="hidden sm:table-cell">{maskCPF(a.cpf)}</TableCell>
-                  <TableCell className="hidden md:table-cell">{a.modality ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell"><AthletePendingValue value={a.modality} /></TableCell>
                   <TableCell>
                     <Badge variant={a.payment_status === "pendente" ? "destructive" : "outline"}>
                       {a.payment_status === "pendente" ? "Pendente" : "Pago"}
