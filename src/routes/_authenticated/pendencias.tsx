@@ -70,6 +70,7 @@ function Pendencias() {
       if (value !== String(editing.athlete[key as keyof Athlete] ?? "")) changes[key] = value;
     }
     if (!form["name"]?.trim()) { toast.error("Informe o nome do atleta."); return; }
+    if (["birth_date", "modality", "category"].some((key) => !form[key]?.trim())) { toast.error("Preencha data de nascimento, modalidade e categoria."); return; }
     setSaving(true);
     try {
       const { error } = await supabase.rpc("resolve_athlete_correction", { _request_id: editing.request.id, _changes: changes, _note: note.trim() });
@@ -93,7 +94,7 @@ function Pendencias() {
       </div>}
     </>}
     <Dialog open={!!editing} onOpenChange={(open) => { if (!open && !saving) setEditing(null); }}><DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto"><DialogHeader><DialogTitle>Corrigir / resolver pendência</DialogTitle><DialogDescription className="whitespace-pre-wrap break-words">{editing?.request.observation}</DialogDescription></DialogHeader>
-      <form onSubmit={(e) => { e.preventDefault(); void resolve(); }} className="space-y-5"><div className="grid gap-3 sm:grid-cols-2">{editFields.map(([key,label]) => <div key={key} className="space-y-1.5"><Label htmlFor={`correction-${key}`}>{label}</Label><Input id={`correction-${key}`} type={key === "birth_date" ? "date" : "text"} required={key === "name"} maxLength={500} value={form[key] ?? ""} onChange={(e) => setForm((current) => ({ ...current, [key]: e.target.value }))} /></div>)}</div>
+      <form onSubmit={(e) => { e.preventDefault(); void resolve(); }} className="space-y-5"><div className="grid gap-3 sm:grid-cols-2">{editFields.map(([key,label]) => <div key={key} className="space-y-1.5"><Label htmlFor={`correction-${key}`}>{label}</Label><Input id={`correction-${key}`} type={key === "birth_date" ? "date" : "text"} required={["name", "birth_date", "modality", "category"].includes(key)} maxLength={500} value={form[key] ?? ""} onChange={(e) => setForm((current) => ({ ...current, [key]: e.target.value }))} /></div>)}</div>
         <div className="space-y-1.5"><Label htmlFor="resolution-note">Observação da resolução</Label><Textarea id="resolution-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={2000} /></div>
         <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => setEditing(null)}>Cancelar</Button><Button type="submit" disabled={saving}>{saving ? "Salvando…" : "Salvar e marcar como resolvida"}</Button></DialogFooter>
       </form></DialogContent></Dialog>

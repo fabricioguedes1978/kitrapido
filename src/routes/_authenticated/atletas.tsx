@@ -463,10 +463,8 @@ function Atletas() {
       const problems: string[] = [];
       if (!r["name"]) problems.push("nome em branco");
       if (!r["gender"]) problems.push("sexo em branco");
-      if (!r["modality"]) problems.push("modalidade em branco");
       const birth = r["birth_date"] ? parseBrDate(r["birth_date"]) : null;
-      if (!r["birth_date"]) problems.push("data de nascimento em branco");
-      else if (!birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
+      if (r["birth_date"] && !birth) problems.push(`data de nascimento inválida (${r["birth_date"]})`);
       const cpf = r["cpf"] ? onlyDigits(r["cpf"]) : null;
       const bib = r["bib_number"] ?? "";
       if (!bib) problems.push("número em branco");
@@ -654,6 +652,7 @@ function Atletas() {
     if (!form.birth_date) missing.push("data de nascimento");
     if (!form.gender) missing.push("sexo");
     if (!form.modality.trim()) missing.push("modalidade");
+    if (!form.category.trim()) missing.push("categoria");
     
     if (!form.bib_number.trim()) missing.push("número");
     if (missing.length > 0) {
@@ -1263,7 +1262,7 @@ function Atletas() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label>Categoria</Label>
+                <Label>Categoria *</Label>
                 <select
                   disabled={bibDuplicate}
                   value={categoryOther ? "__other__" : form.category}

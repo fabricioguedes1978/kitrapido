@@ -22,6 +22,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { QrScanDialog } from "@/components/QrScanDialog";
 import { CorrectionRequestDialog } from "@/components/CorrectionRequestDialog";
+import { AthletePendingValue } from "@/components/AthletePendingValue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -1062,12 +1063,12 @@ function Central() {
                   </div>
 
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
-                    <Info label="Data de Nascimento" value={formatDate(selected.birth_date)} />
+                    <Info label="Data de Nascimento" value={selected.birth_date ? formatDate(selected.birth_date) : null} pending />
                     <Info label="Sexo" value={selected.gender} />
                     <Info label="Tipo de Kit" value={selected.kit_type} />
                     <Info label="Tamanho da Camiseta" value={selected.shirt_size} />
-                    <Info label="Modalidade" value={selected.modality} />
-                    <Info label="Categoria" value={selected.category} />
+                    <Info label="Modalidade" value={selected.modality} pending />
+                    <Info label="Categoria" value={selected.category} pending />
                     <Info label="Cidade" value={selected.city} />
                     <Info label="Inscrição" value={selected.registration_number} />
                     {extras.map((f) => (
@@ -1365,11 +1366,11 @@ function StatCard({
   );
 }
 
-function Info({ label, value, big }: { label: string; value?: string | null; big?: boolean }) {
+function Info({ label, value, big, pending }: { label: string; value?: string | null; big?: boolean; pending?: boolean }) {
   return (
     <div className="min-w-0">
       <dt className="text-muted-foreground text-xs tracking-wide uppercase">{label}</dt>
-      <dd className={big ? "text-xl font-extrabold" : "truncate font-semibold"}>{value || "—"}</dd>
+      <dd className={big ? "text-xl font-extrabold" : "truncate font-semibold"}>{pending ? <AthletePendingValue value={value} /> : value || "—"}</dd>
     </div>
   );
 }
