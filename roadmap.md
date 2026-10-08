@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Permitir nascimento, modalidade e categoria ausentes na planilha, sinalizar em vermelho e exigir no cadastro/edição.
+
 - [x] Bloquear envio de pendências pelo prazo de alteração de atletas; regra aplicada no banco e botão validado com prazo encerrado simulado.
 
 - [x] Capturar telas reais do KIT RÁPIDO.
