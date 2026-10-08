@@ -13,4 +13,5 @@
 - Decode complete QR credentials in a browser-safe pure module; tolerate keyboard punctuation changes only for USB input and validate the event roster before opening an athlete.
 - Store athlete correction requests separately from deliveries; resolve allowlisted personal-data corrections atomically through an event-manager-authorized database function, preserving kit, stock and delivery records.
 - Cascade correction requests when their event or athlete is deliberately deleted; this keeps existing deletion flows working without changing audit-log retention or delete permissions.
+- Enforce correction submission deadlines in both RLS and a shared deadline-aware UI hook; retain the administrator override and all original ownership checks.
 - Derive audit labels and descriptions in a browser-safe presentation helper from existing logs; preserve original history and only name allowlisted changed fields to avoid exposing secrets.

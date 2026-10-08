@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useCorrectionAccess } from "@/hooks/useCorrectionAccess";
 import { logAudit } from "@/lib/cronochip";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -15,10 +16,12 @@ export function CorrectionRequestDialog({ athlete, open, onOpenChange }: {
 }) {
   const { user, profile } = useAuth();
   const qc = useQueryClient();
+  const canSubmit = useCorrectionAccess(athlete.event_id);
   const [observation, setObservation] = useState("");
   const [saving, setSaving] = useState(false);
   async function submit() {
     if (!user || !profile || saving || observation.trim().length < 3) return;
+    if (!canSubmit) { toast.error("O prazo para registrar pendências neste evento encerrou."); return; }
     if (!navigator.onLine) { toast.error("Conecte-se à internet para enviar a pendência."); return; }
     setSaving(true);
     try {
@@ -35,9 +38,10 @@ export function CorrectionRequestDialog({ athlete, open, onOpenChange }: {
     <DialogContent>
       <DialogHeader><DialogTitle>Registrar pendência</DialogTitle><DialogDescription>{athlete.name}</DialogDescription></DialogHeader>
       <div className="space-y-2"><Label htmlFor="correction-observation">Observação / correção solicitada</Label>
-        <Textarea id="correction-observation" value={observation} onChange={(e) => setObservation(e.target.value)} maxLength={2000} rows={5} placeholder="Ex.: nascimento correto: 15/03/1990; equipe: Corredores Unidos." />
+        <Textarea id="correction-observation" disabled={!canSubmit || saving} value={observation} onChange={(e) => setObservation(e.target.value)} maxLength={2000} rows={5} placeholder="Ex.: nascimento correto: 15/03/1990; equipe: Corredores Unidos." />
+        {!canSubmit && <p className="text-sm text-destructive">Prazo para registrar pendências encerrado.</p>}
       </div>
-      <DialogFooter><Button variant="outline" disabled={saving} onClick={() => onOpenChange(false)}>Cancelar</Button><Button disabled={saving || observation.trim().length < 3} onClick={() => void submit()}>{saving ? "Enviando…" : "Enviar pendência"}</Button></DialogFooter>
+      <DialogFooter><Button variant="outline" disabled={saving} onClick={() => onOpenChange(false)}>Cancelar</Button><Button disabled={!canSubmit || saving || observation.trim().length < 3} onClick={() => void submit()}>{saving ? "Enviando…" : "Enviar pendência"}</Button></DialogFooter>
     </DialogContent>
   </Dialog>;
 }
