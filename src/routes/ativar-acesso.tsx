@@ -68,8 +68,11 @@ function ActivateAccessPage() {
 
     if (error) {
       const duplicate = /already|registered|exists/i.test(error.message);
-      toast.error(duplicate ? "Este CPF já possui acesso" : "Não foi possível ativar", {
-        description: duplicate
+      const weakPassword = error.code === "weak_password" || /weak|easy to guess|pwned|breached|compromised/i.test(error.message);
+      toast.error(weakPassword ? "Escolha uma senha mais segura" : duplicate ? "Este CPF já possui acesso" : "Não foi possível ativar", {
+        description: weakPassword
+          ? "A senha foi considerada fraca ou conhecida em vazamentos. Escolha outra senha e tente novamente com o mesmo CPF e código."
+          : duplicate
           ? "Entre com sua senha atual. Para outro evento, peça ao administrador para vincular sua conta existente."
           : "Confira o CPF e o código, ou solicite um novo convite.",
       });
