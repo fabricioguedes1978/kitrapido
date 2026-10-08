@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { fetchAllRows } from "@/lib/fetch-all";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentEvent } from "@/hooks/useEvents";
+import { useCorrectionAccess } from "@/hooks/useCorrectionAccess";
 import {
   athleteQrUrl,
   formatDate,
@@ -147,6 +148,7 @@ function PaymentBadge({ athlete, big = false }: { athlete: Athlete; big?: boolea
 
 function Central() {
   const { event, eventId } = useCurrentEvent();
+  const canRegisterCorrection = useCorrectionAccess(eventId);
   const { user, profile, isAdmin, isOrganizer, isAttendant } = useAuth();
   const qc = useQueryClient();
 
@@ -1147,8 +1149,8 @@ function Central() {
               )}
 
               <div className="border-t px-5 py-4 sm:px-6">
-                <Button variant="outline" className="mb-3 w-full" onClick={() => setCorrectionOpen(true)}>
-                  <ClipboardList className="size-4" /> Registrar pendência
+                <Button variant="outline" className="mb-3 w-full" disabled={!canRegisterCorrection} onClick={() => setCorrectionOpen(true)}>
+                  <ClipboardList className="size-4" /> {canRegisterCorrection ? "Registrar pendência" : "Pendências: prazo encerrado"}
                 </Button>
                 {confirming ? (
                   <div className="bg-muted space-y-3 rounded-xl p-4">

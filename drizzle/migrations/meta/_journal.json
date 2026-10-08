@@ -57,6 +57,13 @@
       "when": 1791464181343,
       "tag": "0007_cascade_event_athlete_correction_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791464738449,
+      "tag": "0008_enforce_correction_submission_deadline",
+      "breakpoints": true
     }
   ]
 }
