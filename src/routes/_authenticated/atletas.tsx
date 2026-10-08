@@ -380,9 +380,9 @@ function Atletas() {
       phone: a.phone ?? "",
       registration_number: a.registration_number ?? "",
       bib_number: a.bib_number ?? "",
-      modality: modalityKnown ? (a.modality ?? "") : a.modality ? "__other__" : "",
-      category: categoryKnown ? (a.category ?? "") : a.category ? "__other__" : "",
-      shirt_size: shirtKnown ? (a.shirt_size ?? "") : a.shirt_size ? "__other__" : "",
+      modality: a.modality ?? "",
+      category: a.category ?? "",
+      shirt_size: a.shirt_size ?? "",
       kit_type: a.kit_type ?? "",
       payment_status: a.payment_status ?? "pago",
       custom_1: a.custom_1 ?? "",
@@ -1243,6 +1243,7 @@ function Atletas() {
                   }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
+                  <option value="">Selecione a modalidade</option>
                   {importedModalities.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -1281,6 +1282,7 @@ function Atletas() {
                   }}
                   className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
+                  <option value="">Selecione a categoria</option>
                   {importedCategories.map((s) => (
                     <option key={s} value={s}>
                       {s}
