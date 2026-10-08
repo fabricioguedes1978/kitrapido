@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Bloquear envio de pendências pelo prazo de alteração de atletas e validar a proteção.
+- [x] Bloquear envio de pendências pelo prazo de alteração de atletas; regra aplicada no banco e botão validado com prazo encerrado simulado.
 
 - [x] Capturar telas reais do KIT RÁPIDO.
 - [x] Criar narrações para Atleta, Staff e Gerente.
