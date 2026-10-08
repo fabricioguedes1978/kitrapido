@@ -333,8 +333,8 @@ function Atletas() {
     setForm({
       ...EMPTY_FORM,
       gender: "MASCULINO",
-      modality: importedModalities[0] ?? "",
-      category: importedCategories[0] ?? "",
+      modality: "",
+      category: "",
       shirt_size: importedSizes[0] ?? "",
     });
     setEditingId(null);
@@ -358,8 +358,10 @@ function Atletas() {
       });
       return;
     }
-    const modalityKnown = importedModalities.includes(a.modality ?? "");
-    const categoryKnown = importedCategories.includes(a.category ?? "");
+    const modality = (a.modality ?? "").trim();
+    const category = (a.category ?? "").trim();
+    const modalityKnown = importedModalities.includes(modality);
+    const categoryKnown = importedCategories.includes(category);
     const shirtKnown = importedSizes.includes(a.shirt_size ?? "");
     const rawGender = (a.gender ?? "").trim().toUpperCase();
     const normalizedGender = rawGender
@@ -380,8 +382,8 @@ function Atletas() {
       phone: a.phone ?? "",
       registration_number: a.registration_number ?? "",
       bib_number: a.bib_number ?? "",
-      modality: a.modality ?? "",
-      category: a.category ?? "",
+      modality,
+      category,
       shirt_size: a.shirt_size ?? "",
       kit_type: a.kit_type ?? "",
       payment_status: a.payment_status ?? "pago",
@@ -391,11 +393,11 @@ function Atletas() {
       custom_4: a.custom_4 ?? "",
       custom_5: a.custom_5 ?? "",
     });
-    setModalityOther(!modalityKnown && !!a.modality);
-    setCategoryOther(!categoryKnown && !!a.category);
+    setModalityOther(!modalityKnown && !!modality);
+    setCategoryOther(!categoryKnown && !!category);
     setShirtOther(!shirtKnown && !!a.shirt_size);
-    setCustomModality(modalityKnown ? "" : (a.modality ?? ""));
-    setCustomCategory(categoryKnown ? "" : (a.category ?? ""));
+    setCustomModality(modalityKnown ? "" : modality);
+    setCustomCategory(categoryKnown ? "" : category);
     setCustomShirt(shirtKnown ? "" : (a.shirt_size ?? ""));
     setEditingId(a.id);
     setDupWarning(null);
