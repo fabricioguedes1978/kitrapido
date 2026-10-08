@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Bloquear envio de pendências pelo prazo de alteração de atletas e validar a proteção.
+
 - [x] Capturar telas reais do KIT RÁPIDO.
 - [x] Criar narrações para Atleta, Staff e Gerente.
 - [x] Corrigir a camisa da Ana: remover marcas fictícias e aplicar somente símbolo e nome KIT RÁPIDO.
