@@ -237,13 +237,15 @@ function Central() {
     queryKey: ["deliveries", eventId],
     enabled: !!eventId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deliveries")
-        .select("id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,location_id,status")
-        .eq("event_id", eventId!)
-        .order("delivered_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as Delivery[];
+      if (!eventId) return [];
+      return fetchAllRows<Delivery>(() =>
+        supabase
+          .from("deliveries")
+          .select("id,athlete_id,delivered_at,delivered_by_name,delivery_type,third_party_name,location_id,status")
+          .eq("event_id", eventId)
+          .order("delivered_at", { ascending: false })
+          .order("id", { ascending: false }),
+      );
     },
   });
 

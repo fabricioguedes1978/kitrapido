@@ -16,3 +16,4 @@
 - Enforce correction submission deadlines in both RLS and a shared deadline-aware UI hook; retain the administrator override and all original ownership checks.
 - Keep imported missing athlete fields nullable and render a shared noninteractive pending indicator; validate completeness on manual creation and personal-data editing without blocking delivery status updates.
 - Derive audit labels and descriptions in a browser-safe presentation helper from existing logs; preserve original history and only name allowlisted changed fields to avoid exposing secrets.
+- Fetch the Central's delivery records with the shared pagination helper and a deterministic timestamp/id order; counts and delivery details must not be truncated by the per-request row limit.
