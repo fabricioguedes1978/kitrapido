@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Corrigir e validar a contagem completa de entregas na Central, sem alterar gravação, estoque ou registros existentes.
+
 - [x] Diagnosticar recusa na ativação do gerente: senha fraca confirmada nos registros; aviso corrigido e testado com resposta simulada, sem alterar contas existentes.
 
 - [x] Permitir nascimento, modalidade e categoria ausentes na planilha, sinalizar em vermelho e exigir no cadastro/edição; avisos verificados na Central sem alterar dados reais.
