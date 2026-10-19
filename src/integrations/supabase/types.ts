@@ -964,6 +964,8 @@ export type Database = {
           custom_labels: string[]
           custom_values: string[]
           delivered_at: string
+          delivered_by_name: string
+          delivery_type: string
           event_address: string
           event_city: string
           event_date: string
@@ -985,6 +987,7 @@ export type Database = {
           qr_payload: string
           shirt_size: string
           start_location: string
+          third_party_name: string
         }[]
       }
       public_online_checkin_status_all: {

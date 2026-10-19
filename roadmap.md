@@ -55,3 +55,5 @@
 - [x] Registrar solicitações de correção na Central sem interferir na entrega.
 - [x] Criar PENDÊNCIAS para gerente e administrador corrigirem dados e resolverem solicitações, com estatísticas.
 - [x] Validar registro, correção e resolução preservando entregas e auditoria.
+
+- [x] Banner de kit retirado no check-in do atleta: mostrar nome de quem retirou (atleta ou terceiro) com destaque
