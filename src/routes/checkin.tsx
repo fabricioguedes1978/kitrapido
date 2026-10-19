@@ -64,6 +64,9 @@ type KitRow = {
   pickup_info: string | null;
   pickup_maps_url: string | null;
   delivered_at: string | null;
+  delivery_type: string | null;
+  third_party_name: string | null;
+  delivered_by_name: string | null;
   qr_payload: string;
   custom_labels: string[] | null;
   custom_values: string[] | null;
@@ -263,8 +266,16 @@ function KitCard({ row, index, total, cpf }: { row: KitRow; index: number; total
 
         <div className="space-y-5 px-5">
           {delivered ? (
-            <div className="border-success/30 bg-success/12 text-success flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold">
-              <CheckCircle2 className="size-5" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
+            <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border-2 px-3 py-2 text-sm font-bold">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-5 shrink-0" /> KIT RETIRADO ✓ {formatDateTime(row.delivered_at)}
+              </div>
+              <p className="mt-1 text-base font-extrabold tracking-wide uppercase">
+                Retirado por:{" "}
+                {row.delivery_type === "third_party" && row.third_party_name?.trim()
+                  ? row.third_party_name
+                  : row.name}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
