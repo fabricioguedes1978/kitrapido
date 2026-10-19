@@ -71,6 +71,13 @@
       "when": 1791469294485,
       "tag": "0009_validate_manual_athlete_completeness",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792448497514,
+      "tag": "0010_kit_lookup_all_pickup_name",
+      "breakpoints": true
     }
   ]
 }
