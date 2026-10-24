@@ -410,6 +410,23 @@ function Central() {
     const parsed = parseQrPayload(raw, usb);
     setMethod("qrcode");
     if (!parsed) { toast.error("QR Code não reconhecido."); return; }
+    if (parsed.kind === "cpf") {
+      const matches = roster.filter((a) => onlyDigits(a.cpf) === parsed.cpf);
+      if (matches.length === 0) { toast.error("Nenhum atleta encontrado com este CPF neste evento."); return; }
+      if (matches.length > 1) {
+        setTerm(parsed.cpf);
+        toast.info(`${matches.length} atletas com este CPF. Selecione na lista qual kit será retirado.`);
+        return;
+      }
+      const match = matches[0]!;
+      if (bulkMode) {
+        addBulkAthlete(match, "qrcode");
+        return;
+      }
+      setAsThirdParty(false);
+      setSelected(match);
+      return;
+    }
     if (parsed.kind === "athlete") {
       if (parsed.eventId && parsed.eventId !== eventId) {
         toast.error("Este QR Code pertence a outro evento. Selecione o evento correto.");

@@ -25,6 +25,10 @@ export function decodeQrPayload(raw: string, usb = false) {
   const authorization = value.match(new RegExp(`^CRONOCHIP-AUTH:(${UUID})$`, "i"));
   if (authorization?.[1]) return { kind: "third_party" as const, code: authorization[1].toLowerCase() };
 
+  // Registration receipts (Cronochip) carry only the athlete's 11 CPF digits.
+  if (/^\d{11}$/.test(value)) return { kind: "cpf" as const, cpf: value };
+  if (/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(value)) return { kind: "cpf" as const, cpf: value.replace(/\D/g, "") };
+
   if (!usb) return null;
   // Read identifiers, never follow the scanned URL. The Central still checks its own event roster.
   const usbAthlete = value.match(new RegExp(`^CRONOCHIP[^a-z0-9]{1,3}(${UUID})[^a-z0-9]{1,3}(${UUID})$`, "i"));
