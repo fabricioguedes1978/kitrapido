@@ -418,12 +418,13 @@ function Central() {
         toast.info(`${matches.length} atletas com este CPF. Selecione na lista qual kit será retirado.`);
         return;
       }
+      const match = matches[0]!;
       if (bulkMode) {
-        addBulkAthlete(matches[0], "qrcode");
+        addBulkAthlete(match, "qrcode");
         return;
       }
       setAsThirdParty(false);
-      setSelected(matches[0]);
+      setSelected(match);
       return;
     }
     if (parsed.kind === "athlete") {
