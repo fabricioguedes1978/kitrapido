@@ -29,3 +29,12 @@ describe("generated QR credentials", () => {
     expect(decodeQrPayload("arbitrary text", true)).toBeNull();
   });
 });
+describe("registration receipt CPF QR", () => {
+  test("reads 11 CPF digits on camera and USB", () => {
+    expect(decodeQrPayload("12345678900")).toEqual({ kind: "cpf", cpf: "12345678900" });
+    expect(decodeQrPayload("123.456.789-00", true)).toEqual({ kind: "cpf", cpf: "12345678900" });
+  });
+  test("rejects other digit lengths", () => {
+    expect(decodeQrPayload("1234567890")).toBeNull();
+  });
+});
