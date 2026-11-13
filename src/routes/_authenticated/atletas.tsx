@@ -973,7 +973,7 @@ function Atletas() {
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas na ordem: numero, nome, cpf, telefone, email, sexo,
               nascimento, cidade, kit, camisa, modalidade, categoria, equipe, status (Pago ou Pendente),
-              numero de inscricao, kit retirado (SIM ou NÃO, opcional)
+              kit retirado (SIM ou NÃO, opcional), numero de inscricao
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -988,13 +988,13 @@ function Atletas() {
                 e.stopPropagation();
                 const headers = [
                   "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
-                  "kit", "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
-                  "extra1", "extra2", "extra3", "extra4", "extra5", "kit retirado",
+                  "kit", "camisa", "modalidade", "categoria", "equipe", "status", "kit retirado",
+                  "numero de inscricao", "extra1", "extra2", "extra3", "extra4", "extra5",
                 ];
                 const exemplo = [
                   "1001", "Maria Silva", "123.456.789-09", "(31) 9999-9999", "maria@email.com",
                   "FEMININO", "15/05/1990", "São Paulo", "Kit Padrão", "M", "Corrida", "Feminino Geral",
-                  "Equipe Exemplo", "Pago", "INS001", "", "", "", "", "", "NÃO",
+                  "Equipe Exemplo", "Pago", "NÃO", "INS001", "", "", "", "", "",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
