@@ -147,7 +147,21 @@ const COLUMN_MAP: Record<string, string> = {
   campo3: "custom_3",
   campo4: "custom_4",
   campo5: "custom_5",
+  "kit retirado": "kit_picked",
+  retirado: "kit_picked",
+  "kit entregue": "kit_picked",
+  entregue: "kit_picked",
+  baixa: "kit_picked",
+  "status kit": "kit_picked",
 };
+
+function parsePicked(value: string | null | undefined): boolean | null {
+  const v = (value ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (!v) return false;
+  if (["sim", "s", "entregue", "retirado", "1", "true", "x", "yes"].includes(v)) return true;
+  if (["nao", "n", "pendente", "0", "false", "no"].includes(v)) return false;
+  return null;
+}
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
@@ -458,6 +472,7 @@ function Atletas() {
       custom_4: string | null;
       custom_5: string | null;
     }[] = [];
+    const pickedBibs = new Set<string>();
 
     mapped.forEach((r, index) => {
       const line = index + 2;
@@ -473,6 +488,8 @@ function Atletas() {
       if (!bib) problems.push("número em branco");
       else if (existingBib.has(bib)) problems.push(`número ${bib} já cadastrado neste evento`);
       else if (sheetBib.has(bib)) problems.push(`número ${bib} repetido na planilha (linha ${sheetBib.get(bib)})`);
+      const picked = parsePicked(r["kit_picked"]);
+      if (picked === null) problems.push(`kit retirado inválido (${r["kit_picked"]}); use SIM ou NÃO`);
       const reg = r["registration_number"] ?? "";
       if (reg && existingReg.has(reg)) problems.push(`inscrição ${reg} já cadastrada neste evento`);
       else if (reg && sheetReg.has(reg))
@@ -483,6 +500,7 @@ function Atletas() {
         return;
       }
       if (bib) sheetBib.set(bib, line);
+      if (picked && bib) pickedBibs.add(bib);
       if (reg) sheetReg.set(reg, line);
       records.push({
         event_id: eventId,
@@ -523,15 +541,47 @@ function Atletas() {
     }
 
     let inserted = 0;
+    const toDeliver: { id: string; kit_type: string | null; shirt_size: string | null }[] = [];
     for (let i = 0; i < records.length; i += 200) {
       const chunk = records.slice(i, i + 200);
-      const { error, count } = await supabase.from("athletes").insert(chunk, { count: "exact" });
+      const { error, data } = await supabase
+        .from("athletes")
+        .insert(chunk)
+        .select("id,bib_number,kit_type,shirt_size");
       if (error) {
         setImporting(false);
         toast.error("Erro na importação", { description: error.message });
         return;
       }
-      inserted += count ?? chunk.length;
+      inserted += data?.length ?? chunk.length;
+      (data ?? []).forEach((a) => {
+        if (a.bib_number && pickedBibs.has(a.bib_number)) toDeliver.push(a);
+      });
+    }
+    let pickedOk = 0;
+    if (toDeliver.length > 0) {
+      const { data: userData } = await supabase.auth.getUser();
+      for (let i = 0; i < toDeliver.length; i += 200) {
+        const chunk = toDeliver.slice(i, i + 200).map((a) => ({
+          event_id: eventId,
+          athlete_id: a.id,
+          kit_name: a.kit_type,
+          shirt_size: a.shirt_size,
+          delivered_by: userData.user?.id ?? null,
+          delivered_by_name: "Importação via Planilha",
+          delivery_type: "athlete" as const,
+          identification_method: "planilha",
+        }));
+        const { error, data } = await supabase.from("deliveries").insert(chunk).select("id");
+        if (error) {
+          toast.error("Atletas importados, mas houve erro ao dar baixa nos kits retirados", {
+            description: error.message,
+          });
+          break;
+        }
+        pickedOk += data?.length ?? chunk.length;
+      }
+      if (pickedOk > 0) toast.success(`${pickedOk} kit(s) marcados como retirados pela planilha.`);
     }
     void logAudit({
       eventId,
@@ -923,7 +973,7 @@ function Atletas() {
             <p className="text-muted-foreground mt-1 text-xs">
               Aceita CSV, XLSX e XLS. Colunas na ordem: numero, nome, cpf, telefone, email, sexo,
               nascimento, cidade, kit, camisa, modalidade, categoria, equipe, status (Pago ou Pendente),
-              numero de inscricao
+              numero de inscricao, kit retirado (SIM ou NÃO, opcional)
               e os 5 campos personalizados (use extra1 a extra5 ou o nome que você definiu no evento).
             </p>
             {lastFile && !importing && (
@@ -939,12 +989,12 @@ function Atletas() {
                 const headers = [
                   "numero", "nome", "cpf", "telefone", "email", "sexo", "nascimento", "cidade",
                   "kit", "camisa", "modalidade", "categoria", "equipe", "status", "numero de inscricao",
-                  "extra1", "extra2", "extra3", "extra4", "extra5",
+                  "extra1", "extra2", "extra3", "extra4", "extra5", "kit retirado",
                 ];
                 const exemplo = [
                   "1001", "Maria Silva", "123.456.789-09", "(31) 9999-9999", "maria@email.com",
                   "FEMININO", "15/05/1990", "São Paulo", "Kit Padrão", "M", "Corrida", "Feminino Geral",
-                  "Equipe Exemplo", "Pago", "INS001", "", "", "", "", "",
+                  "Equipe Exemplo", "Pago", "INS001", "", "", "", "", "", "NÃO",
                 ];
                 const ws = XLSX.utils.aoa_to_sheet([headers, exemplo]);
                 ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length + 2, 12) }));
